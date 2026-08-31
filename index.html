@@ -27,35 +27,80 @@
       z-index: -1;
     }
 
-    /* SIDEBAR */
-    .sidebar {
-      width: 280px;
+    /* SIDEBAR WRAPPER */
+    .sidebar-wrap {
+      position: fixed;
+      top: 0;
       height: 100vh;
-      background: rgba(10, 10, 20, 0.75);
-      backdrop-filter: blur(12px);
-      border-right: 1px solid #00ffcc44;
       display: flex;
-      flex-direction: column;
-      padding: 24px 12px;
-      gap: 8px;
-      overflow-y: auto;
+      align-items: center;
+      z-index: 100;
     }
 
-    .sidebar.right {
-      border-right: none;
-      border-left: 1px solid #00ffcc44;
-      margin-left: auto;
+    .sidebar-wrap.left { left: 0; }
+    .sidebar-wrap.right { right: 0; }
+
+    /* MŨI TÊN */
+    .arrow {
+      width: 28px;
+      height: 60px;
+      background: rgba(0, 255, 204, 0.15);
+      border: 1px solid #00ffcc55;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #00ffcc;
+      font-size: 16px;
+      transition: background 0.2s;
+      backdrop-filter: blur(6px);
+      user-select: none;
+      flex-shrink: 0;
     }
+
+    .sidebar-wrap.left .arrow { border-radius: 0 8px 8px 0; }
+    .sidebar-wrap.right .arrow { border-radius: 8px 0 0 8px; }
+
+    .arrow:hover { background: rgba(0, 255, 204, 0.3); }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 0;
+      height: 100vh;
+      background: rgba(10, 10, 20, 0.85);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+
+    .sidebar-wrap.left .sidebar { border-right: 1px solid #00ffcc33; order: -1; }
+    .sidebar-wrap.right .sidebar { border-left: 1px solid #00ffcc33; }
+
+    .sidebar-wrap:hover .sidebar { width: 280px; padding: 24px 12px; }
+
+    /* Mũi tên đổi chiều khi mở */
+    .sidebar-wrap.left:hover .arrow::before { content: '◀'; }
+    .sidebar-wrap.left .arrow::before { content: '▶'; }
+    .sidebar-wrap.right:hover .arrow::before { content: '▶'; }
+    .sidebar-wrap.right .arrow::before { content: '◀'; }
 
     .sidebar h2 {
       color: #00ffcc;
-      font-size: 13px;
-      letter-spacing: 2px;
+      font-size: 12px;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       padding-bottom: 8px;
       border-bottom: 1px solid #00ffcc33;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s 0.2s;
     }
+
+    .sidebar-wrap:hover .sidebar h2 { opacity: 1; }
 
     .car-item {
       border-radius: 8px;
@@ -63,28 +108,44 @@
       border: 1px solid #00ffcc22;
       cursor: pointer;
       transition: border 0.2s, transform 0.2s;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: opacity 0.25s, transform 0.25s, border 0.2s;
+      white-space: nowrap;
     }
+
+    .sidebar-wrap.right .car-item { transform: translateX(10px); }
+
+    .sidebar-wrap:hover .car-item {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .sidebar-wrap:hover .car-item:nth-child(2) { transition-delay: 0.08s; }
+    .sidebar-wrap:hover .car-item:nth-child(3) { transition-delay: 0.14s; }
+    .sidebar-wrap:hover .car-item:nth-child(4) { transition-delay: 0.20s; }
+    .sidebar-wrap:hover .car-item:nth-child(5) { transition-delay: 0.26s; }
 
     .car-item:hover {
       border: 1px solid #00ffcc;
-      transform: scale(1.02);
+      transform: scale(1.02) !important;
     }
 
     .car-item img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  image-rendering: crisp-edges;
-}
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
 
     .car-item span {
       display: block;
       color: #00ffcc;
       font-size: 11px;
       padding: 6px 8px;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.6);
     }
 
     /* CENTER */
@@ -99,13 +160,13 @@
 
     .title {
       color: #00ffcc;
-      font-size: 28px;
-      letter-spacing: 4px;
+      font-size: 32px;
+      letter-spacing: 6px;
       text-shadow: 0 0 20px #00ffcc88;
     }
 
     .subtitle {
-      color: #ffffff88;
+      color: #ffffff66;
       font-size: 13px;
       letter-spacing: 2px;
     }
@@ -115,21 +176,19 @@
   <div class="bg" id="bg"></div>
 
   <!-- SIDEBAR TRÁI -->
-  <div class="sidebar">
-    <h2>🚗 Xe Tao</h2>
-
-    <!-- THÊM XE VÔ ĐÂY — copy cái block này -->
-    <div class="car-item">
-      <img src="https://www.topgear.com/sites/default/files/cars-car/image/2024/10/1-Lamborghini-Urus-SE-review-2024.jpg?w=1280&h=720" alt="Lamborghini Urus">
-      <span>Lamborghini Urus</span>
+  <div class="sidebar-wrap left">
+    <div class="sidebar">
+      <h2>🚗 Xe Tao</h2>
+      <div class="car-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/2019_Lamborghini_Urus_front_8.15.19.jpg/1280px-2019_Lamborghini_Urus_front_8.15.19.jpg" alt="Lamborghini Urus">
+        <span>Lamborghini Urus</span>
+      </div>
+      <div class="car-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/2020_Ferrari_SF90_Stradale%2C_front_8.15.19.jpg/1280px-2020_Ferrari_SF90_Stradale%2C_front_8.15.19.jpg" alt="Ferrari SF90">
+        <span>Ferrari SF90</span>
+      </div>
     </div>
-
-    <div class="car-item">
-      <img src="https://www.topgear.com/sites/default/files/cars-car/image/2020/07/dsc09285.jpg" alt="Ferrari SF90">
-      <span>Ferrari SF90</span>
-    </div>
-    <!-- END XE TRÁI -->
-
+    <div class="arrow"></div>
   </div>
 
   <!-- CENTER -->
@@ -139,21 +198,19 @@
   </div>
 
   <!-- SIDEBAR PHẢI -->
-  <div class="sidebar right">
-    <h2>🏎️ Dream Car</h2>
-
-    <!-- THÊM XE VÔ ĐÂY -->
-    <div class="car-item">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Bugatti_Chiron_1.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original" alt="Bugatti Chiron">
-      <span>Bugatti Chiron</span>
+  <div class="sidebar-wrap right">
+    <div class="arrow"></div>
+    <div class="sidebar">
+      <h2>🏎️ Dream Car</h2>
+      <div class="car-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/2017_Bugatti_Chiron.jpg/1280px-2017_Bugatti_Chiron.jpg" alt="Bugatti Chiron">
+        <span>Bugatti Chiron</span>
+      </div>
+      <div class="car-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/thirty/McLaren_P1_-_Flickr_-_Supermac1961_%282%29.jpg/1280px-McLaren_P1_-_Flickr_-_Supermac1961_%282%29.jpg" alt="McLaren P1">
+        <span>McLaren P1</span>
+      </div>
     </div>
-
-    <div class="car-item">
-      <img src="https://imageio.forbes.com/specials-images/imageserve/627be3167b47f51af48ee821/McLaren-765LT-Spider--1/960x0.jpg?format=jpg&width=960" alt="mclaren">
-      <span>mclaren</span>
-    </div>
-    <!-- END XE PHẢI -->
-
   </div>
 
   <script>
