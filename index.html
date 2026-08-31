@@ -44,7 +44,7 @@
       border-color: var(--main-color);
     }
 
-    /* POPUP SETTING MÀU */
+    /* POPUP SETTING MÀU & ẢNH */
     .setting-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.8);
       z-index: 1001; display: none; align-items: center; justify-content: center;
@@ -53,12 +53,13 @@
     .setting-overlay.open { display: flex; }
 
     .setting-box {
-      width: 90vw; max-width: 400px;
+      width: 90vw; max-width: 420px;
       background: rgba(10,10,25,0.95);
       border: 1px solid rgba(var(--main-color-rgb), 0.4);
       border-radius: 16px; padding: 24px;
       animation: slideUp 0.3s ease;
       display: flex; flex-direction: column; gap: 16px;
+      max-height: 90vh; overflow-y: auto;
     }
     .setting-header {
       display: flex; justify-content: space-between; align-items: center;
@@ -72,7 +73,7 @@
     .setting-close:hover { color: var(--main-color); }
 
     .color-options {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 6px;
     }
     .color-btn {
       height: 40px; border-radius: 8px; border: 2px solid transparent;
@@ -82,12 +83,51 @@
     .color-btn.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
 
     .custom-color-row {
-      display: flex; align-items: center; gap: 10px; margin-top: 10px;
+      display: flex; align-items: center; gap: 10px; margin-top: 6px;
     }
     .custom-color-row label { color: #fff; font-size: 12px; }
     .custom-color-row input[type="color"] {
       flex: 1; height: 35px; border: none; background: none; cursor: pointer; border-radius: 4px;
     }
+
+    /* KHU VỰC ĐỔI ẢNH NỀN TRONG SETTING */
+    .setting-section-title {
+      color: var(--main-color); font-size: 12px; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; margin-top: 10px; border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
+      padding-top: 14px;
+    }
+    .bg-input-group {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .bg-input-group label { color: rgba(255,255,255,0.7); font-size: 11px; }
+    .bg-input-group input {
+      background: rgba(var(--main-color-rgb), 0.05);
+      border: 1px solid rgba(var(--main-color-rgb), 0.3);
+      border-radius: 6px; color: #fff; font-family: 'Inter', sans-serif;
+      font-size: 12px; padding: 8px 10px; outline: none;
+    }
+    .bg-input-group input:focus { border-color: var(--main-color); }
+    .bg-preview-box {
+      width: 100%; height: 100px; object-fit: cover; border-radius: 6px;
+      border: 1px solid rgba(var(--main-color-rgb), 0.3); display: none;
+    }
+    .bg-actions {
+      display: flex; gap: 10px; margin-top: 4px;
+    }
+    .btn-bg-cancel {
+      flex: 1; padding: 8px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+      color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 500;
+      cursor: pointer; text-align: center; transition: background 0.2s;
+    }
+    .btn-bg-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .btn-bg-apply {
+      flex: 1; padding: 8px; background: rgba(var(--main-color-rgb), 0.15);
+      border: 1px solid var(--main-color); border-radius: 6px;
+      color: var(--main-color); font-size: 12px; font-weight: 600;
+      cursor: pointer; text-align: center; transition: background 0.2s;
+    }
+    .btn-bg-apply:hover { background: rgba(var(--main-color-rgb), 0.3); }
 
     /* GIAO DIỆN CHÍNH */
     .sidebar-wrap {
@@ -329,15 +369,16 @@
   <div class="bg" id="bg"></div>
 
   <!-- NÚT SETTING GÓC MÀN HÌNH -->
-  <div class="setting-btn" onclick="openSetting()" title="Đổi màu giao diện">⚙️</div>
+  <div class="setting-btn" onclick="openSetting()" title="Cài đặt giao diện">⚙️</div>
 
-  <!-- MODAL CÀI ĐẶT MÀU -->
+  <!-- MODAL CÀI ĐẶT MÀU & ẢNH NỀN -->
   <div class="setting-overlay" id="setting-overlay" onclick="closeSettingModal(event)">
     <div class="setting-box">
       <div class="setting-header">
-        <h2>🎨 Tùy chỉnh màu giao diện</h2>
+        <h2>⚙️ Tùy Chỉnh Giao Diện</h2>
         <div class="setting-close" onclick="closeSetting()">✕</div>
       </div>
+      
       <div style="color: #fff; font-size: 12px;">Chọn màu chủ đạo:</div>
       <div class="color-options">
         <div class="color-btn" style="background: #00ffcc;" onclick="setThemeColor('#00ffcc')"></div>
@@ -352,6 +393,18 @@
       <div class="custom-color-row">
         <label>Hoặc chọn màu tùy ý:</label>
         <input type="color" id="custom-color-picker" value="#00ffcc" oninput="setThemeColor(this.value)">
+      </div>
+
+      <!-- PHẦN TÙY CHỈNH ẢNH NỀN NGOÀI -->
+      <div class="setting-section-title">🖼️ Tùy Chỉnh Ảnh Nền Ngoài</div>
+      <div class="bg-input-group">
+        <label>Dán link ảnh (URL):</label>
+        <input type="text" id="setting-bg-url" placeholder="https://..." oninput="previewSettingBg(this.value)">
+        <img id="setting-bg-preview" class="bg-preview-box" alt="Preview ảnh nền">
+      </div>
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="cancelBgChanges()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyBgChanges()">Áp dụng</div>
       </div>
     </div>
   </div>
@@ -513,11 +566,40 @@
 
   <script>
     const bg = document.getElementById('bg');
+    
+    // GIỮ NGUYÊN HIỆU ỨNG ẢNH THEO CHUỘT
     document.addEventListener('mousemove', (e) => {
       const x = (e.clientX / window.innerWidth - 0.5) * 20;
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
+
+    // XỬ LÝ ẢNH NỀN TRONG SETTING
+    function previewSettingBg(url) {
+      const prev = document.getElementById('setting-bg-preview');
+      if (url && url.startsWith('http')) {
+        prev.src = url;
+        prev.style.display = 'block';
+      } else {
+        prev.style.display = 'none';
+      }
+    }
+
+    function applyBgChanges() {
+      const url = document.getElementById('setting-bg-url').value.trim();
+      if (url) {
+        bg.style.backgroundImage = `url('${url}')`;
+        closeSetting();
+      } else {
+        alert('Vui lòng nhập link ảnh hợp lệ!');
+      }
+    }
+
+    function cancelBgChanges() {
+      document.getElementById('setting-bg-url').value = '';
+      document.getElementById('setting-bg-preview').style.display = 'none';
+      closeSetting();
+    }
 
     // ĐỔI TÊN MENU (TRÁI / PHẢI)
     function renameMenu(side) {
@@ -529,7 +611,7 @@
       }
     }
 
-    // XỬ LÝ SETTING MÀU SẮC
+    // XỬ LÝ SETTING MÀU SẮC & ẢNH
     function openSetting() {
       document.getElementById('setting-overlay').classList.add('open');
     }
