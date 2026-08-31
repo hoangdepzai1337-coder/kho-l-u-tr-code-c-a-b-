@@ -348,7 +348,7 @@
     .title:hover { opacity: 0.8; }
     
     .credit-section {
-      display: flex; align-items: center; gap: 6px;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
     }
 
     .credit-text {
@@ -358,6 +358,21 @@
       letter-spacing: 1px;
       text-shadow: 0 0 10px rgba(var(--main-color-rgb), 0.3);
       user-select: none;
+    }
+
+    /* ĐOẠN CHỮ NHỎ CHỨA LINK Ở DƯỚI */
+    .credit-link {
+      color: rgba(255, 255, 255, 0.4);
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      text-decoration: none;
+      transition: color 0.2s, text-shadow 0.2s;
+      user-select: none;
+    }
+    .credit-link:hover {
+      color: var(--main-color);
+      text-shadow: 0 0 8px rgba(var(--main-color-rgb), 0.4);
+      text-decoration: underline;
     }
 
     /* POPUP THÔNG SỐ */
@@ -544,6 +559,17 @@
         <div class="btn-bg-apply" onclick="applyTitleChanges()">Áp dụng</div>
       </div>
 
+      <!-- PHẦN THÊM LINK CHIA SẺ -->
+      <div class="setting-section-title">🔗 Tùy Chỉnh Link Chia Sẻ Dưới Chữ</div>
+      <div class="bg-input-group">
+        <label>Nhập URL đường dẫn (VD: https://github.com/...):</label>
+        <input type="text" id="setting-link-input" placeholder="https://..." value="https://github.com">
+      </div>
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="cancelLinkChanges()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyLinkChanges()">Áp dụng</div>
+      </div>
+
       <div class="setting-section-title">🖼️ Tùy Chỉnh Ảnh Nền Ngoài</div>
       <div class="bg-input-group">
         <label>Dán link ảnh (URL) hoặc chọn file từ máy:</label>
@@ -704,6 +730,7 @@
     <div class="title" id="title-display" onclick="openSetting()" title="Nhấn để đổi chữ lớn">KHO CODE</div>
     <div class="credit-section">
       <div class="credit-text" id="credit-text-display">// by hoangdepzai1337</div>
+      <a href="https://github.com" target="_blank" class="credit-link" id="credit-link-display">https://github.com</a>
     </div>
   </div>
 
@@ -727,8 +754,9 @@
     const titleDisplay = document.getElementById('title-display');
     const titleInput = document.getElementById('setting-title-input');
     const pageTitleMeta = document.getElementById('page-title-meta');
+    const linkInput = document.getElementById('setting-link-input');
+    const linkDisplay = document.getElementById('credit-link-display');
     
-    // Hàm xử lý khi ảnh bị lỗi load trên điện thoại
     function handleImageError(img) {
       if (!img.dataset.fallback) {
         img.dataset.fallback = "true";
@@ -736,7 +764,6 @@
       }
     }
 
-    // Xử lý chọn file ảnh từ máy tính cho cả 3 trường hợp (avatar, bg, car)
     function handleImageUpload(input, type) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -795,6 +822,23 @@
 
     function cancelTitleChanges() {
       titleInput.value = titleDisplay.textContent;
+      closeSetting();
+    }
+
+    /* XỬ LÝ LINK CHIA SẺ */
+    function applyLinkChanges() {
+      const val = linkInput.value.trim();
+      if (val !== '') {
+        linkDisplay.href = val;
+        linkDisplay.textContent = val;
+        closeSetting();
+      } else {
+        alert('Đường dẫn link không được để trống!');
+      }
+    }
+
+    function cancelLinkChanges() {
+      linkInput.value = linkDisplay.href;
       closeSetting();
     }
 
