@@ -7,19 +7,22 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #121212;
             margin: 0;
             overflow: hidden;
+            font-family: sans-serif;
         }
 
         /* Khung chứa tạo chiều sâu 3D */
         .card-container {
             perspective: 1000px;
-            width: 300px;
-            height: 400px;
+            width: 280px;
+            height: 380px;
+            margin-bottom: 20px;
         }
 
         /* Thẻ ảnh chính */
@@ -32,6 +35,7 @@
             transition: transform 0.1s ease-out;
             transform-style: preserve-3d;
             will-change: transform;
+            background: #222;
         }
 
         .card img {
@@ -40,38 +44,71 @@
             object-fit: cover;
             pointer-events: none;
         }
+
+        /* Nút chọn ảnh từ máy */
+        .upload-btn {
+            background-color: #00ffcc;
+            color: #121212;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0,255,204,0.3);
+        }
+
+        #fileInput {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="card-container" id="cardContainer">
         <div class="card" id="card">
-            <!-- Thay link ảnh của bạn vào đây -->
-            <img src="https://picsum.photos/300/400" alt="Sample Image">
+            <!-- Ảnh mặc định ban đầu -->
+            <img id="previewImg" src="https://picsum.photos/300/400" alt="Sample Image">
         </div>
     </div>
+
+    <!-- Nút chọn ảnh từ thiết bị -->
+    <label for="fileInput" class="upload-btn">Chọn ảnh từ máy</label>
+    <input type="file" id="fileInput" accept="image/*">
 
     <script>
         const container = document.getElementById('cardContainer');
         const card = document.getElementById('card');
+        const fileInput = document.getElementById('fileInput');
+        const previewImg = document.getElementById('previewImg');
+
+        // --- XỬ LÝ CHỌN ẢNH TỪ MÁY ---
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewImg.src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
 
         // --- 1. HIỆU ỨNG TRÊN PC (DI CHUỘT) ---
         container.addEventListener('mousemove', (e) => {
             const rect = container.getBoundingClientRect();
-            const x = e.clientX - rect.left; // Tọa độ X của chuột trong card
-            const y = e.clientY - rect.top;  // Tọa độ Y của chuột trong card
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
-            // Tính toán góc nghiêng dựa trên tâm của card
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             
-            const rotateX = -((y - centerY) / centerY) * 20; // Giới hạn góc nghiêng 20 độ
+            const rotateX = -((y - centerY) / centerY) * 20;
             const rotateY = ((x - centerX) / centerX) * 20;
 
             card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
         });
 
-        // Khi di chuột ra ngoài, trả ảnh về vị trí cũ
         container.addEventListener('mouseleave', () => {
             card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
             card.style.transition = 'transform 0.5s ease';
@@ -81,13 +118,12 @@
             card.style.transition = 'transform 0.1s ease-out';
         });
 
-        // --- 2. HIỆU ỨNG TRÊN ĐIỆN THOẠI (LẮC / NGHIÊNG ĐTH) ---
+        // --- 2. HIỆU ỨNG TRÊN ĐIỆN THOẠI (NGHIÊNG ĐTH) ---
         function handleOrientation(e) {
-            const beta = e.beta;   // Góc nghiêng trước/sau (-180 đến 180)
-            const gamma = e.gamma; // Góc nghiêng trái/phải (-90 đến 90)
+            const beta = e.beta;   // Nghiêng trước/sau
+            const gamma = e.gamma; // Nghiêng trái/phải
 
             if (beta !== null && gamma !== null) {
-                // Giới hạn góc để hiệu ứng mượt mà, không bị lật ngược
                 const rotateX = Math.max(-20, Math.min(20, beta));
                 const rotateY = Math.max(-20, Math.min(20, gamma));
 
@@ -95,11 +131,8 @@
             }
         }
 
-        // Kiểm tra xem trình duyệt có hỗ trợ cảm biến chuyển động không
         if (window.DeviceOrientationEvent) {
-            // Trên các trình duyệt iOS hiện đại (iOS 13+), cần xin quyền truy cập
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                // Bạn có thể tạo một nút bấm (button) để người dùng click và kích hoạt quyền này
                 document.body.addEventListener('click', () => {
                     DeviceOrientationEvent.requestPermission()
                         .then(response => {
@@ -108,9 +141,8 @@
                             }
                         })
                         .catch(console.error);
-                }, { once: true }); // Chỉ chạy 1 lần khi click đầu tiên
+                }, { once: true });
             } else {
-                // Android và các thiết bị hỗ trợ sẵn
                 window.addEventListener('deviceorientation', handleOrientation);
             }
         }
