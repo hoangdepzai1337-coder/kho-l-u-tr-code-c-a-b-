@@ -439,6 +439,26 @@
       .form-package-grid { grid-template-columns: 1fr; }
       .stats { gap: 30px; }
     }
+    /* Hiệu ứng phóng to nhẹ khi di chuột vào các chữ/tiêu đề chính */
+.nav-links a,
+.nav-logo,
+.section-title h2,
+.product-name,
+.feature-title,
+.form-title {
+  transition: transform 0.25s ease, color 0.25s ease;
+  display: inline-block; /* Bắt buộc phải có để transform hoạt động mượt với chữ */
+}
+
+/* Khi rê chuột vào thì chữ to lên khoảng 5% - 8% (scale 1.05 hoặc 1.08) */
+.nav-links a:hover,
+.nav-logo:hover,
+.section-title h2:hover,
+.product-name:hover,
+.feature-title:hover,
+.form-title:hover {
+  transform: scale(1.06);
+}
   </style>
 </head>
 <body>
