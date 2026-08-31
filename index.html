@@ -8,10 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   
   <style>
-    /* KHAI BÁO BIẾN MÀU SẮC */
+    /* KHAI BÁO BIẾN MÀU SẮC & ĐỘ MỜ MENU */
     :root {
       --main-color: #00ffcc;
       --main-color-rgb: 0, 255, 204;
+      --menu-opacity: 0.85; /* Độ mờ mặc định của menu */
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -151,7 +152,7 @@
 
     .top-sidebar {
       width: 320px; height: 0;
-      background: rgba(10,10,20,0.9); backdrop-filter: blur(14px);
+      background: rgba(10, 10, 20, var(--menu-opacity)); backdrop-filter: blur(14px);
       overflow: hidden; transition: height 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex; flex-direction: column;
       border-bottom: 1px solid rgba(var(--main-color-rgb),0.2);
@@ -253,7 +254,7 @@
 
     .sidebar {
       width: 0; height: 100vh;
-      background: rgba(10,10,20,0.85); backdrop-filter: blur(14px);
+      background: rgba(10, 10, 20, var(--menu-opacity)); backdrop-filter: blur(14px);
       overflow: hidden; transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex; flex-direction: column;
     }
@@ -360,7 +361,6 @@
       user-select: none;
     }
 
-    /* ĐOẠN CHỮ NHỎ CHỨA LINK Ở DƯỚI */
     .credit-link {
       color: rgba(255, 255, 255, 0.4);
       font-family: 'Fira Code', monospace;
@@ -525,7 +525,7 @@
     <div class="top-arrow"></div>
   </div>
 
-  <!-- MODAL CÀI ĐẶT MÀU & ẢNH NỀN -->
+  <!-- MODAL CÀI ĐẶT MÀU, ĐỘ MỜ & ẢNH NỀN -->
   <div class="setting-overlay" id="setting-overlay" onclick="closeSettingModal(event)">
     <div class="setting-box">
       <div class="setting-header">
@@ -549,6 +549,13 @@
         <input type="color" id="custom-color-picker" value="#00ffcc" oninput="setThemeColor(this.value)">
       </div>
 
+      <!-- ĐIỀU CHỈNH ĐỘ MỜ MENU (TRANSPARENCY SLIDER) -->
+      <div class="setting-section-title">🎚️ Độ Mờ Đậm Menu</div>
+      <div class="bg-input-group">
+        <label>Điều chỉnh độ trong suốt (0.1 = trong suốt nhiều, 1.0 = đặc hoàn toàn): <span id="opacity-val-label">0.85</span></label>
+        <input type="range" id="menu-opacity-range" min="0.1" max="1.0" step="0.05" value="0.85" oninput="changeMenuOpacity(this.value)">
+      </div>
+
       <div class="setting-section-title">🔤 Tùy Chỉnh Chữ Lớn (Kho Code)</div>
       <div class="bg-input-group">
         <label>Nội dung chữ lớn:</label>
@@ -559,7 +566,6 @@
         <div class="btn-bg-apply" onclick="applyTitleChanges()">Áp dụng</div>
       </div>
 
-      <!-- PHẦN THÊM LINK CHIA SẺ -->
       <div class="setting-section-title">🔗 Tùy Chỉnh Link Chia Sẻ Dưới Chữ</div>
       <div class="bg-input-group">
         <label>Nhập URL đường dẫn (VD: https://github.com/...):</label>
@@ -783,11 +789,30 @@
       }
     }
 
+    // ĐIỀU CHỈNH ĐỘ MỜ MENU DỰA TRÊN SLIDER
+    function changeMenuOpacity(val) {
+      document.documentElement.style.setProperty('--menu-opacity', val);
+      document.getElementById('opacity-val-label').textContent = val;
+    }
+
+    // PARALLAX PC
     document.addEventListener('mousemove', (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20;
-      const y = (e.clientY / window.innerHeight - 0.5) * 20;
-      bg.style.transform = `translate(${x}px, ${y}px)`;
+      if (window.innerWidth > 768) {
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        bg.style.transform = `translate(${x}px, ${y}px)`;
+      }
     });
+
+    // PARALLAX MOBILE
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma === null || window.innerWidth > 768) return;
+        const x = Math.max(-15, Math.min(15, (e.gamma / 45) * 15));
+        const y = Math.max(-15, Math.min(15, ((e.beta - 45) / 45) * 15));
+        bg.style.transform = `translate(${x}px, ${y}px)`;
+      }, true);
+    }
 
     function previewAvatarUrl(val) {}
 
