@@ -341,6 +341,10 @@
     .title { color: var(--main-color); font-size: 32px; font-weight: 600; letter-spacing: 4px; text-shadow: 0 0 20px rgba(var(--main-color-rgb),0.5); cursor: pointer; transition: color 0.2s; }
     .title:hover { opacity: 0.8; }
     
+    .credit-section {
+      display: flex; align-items: center; gap: 6px;
+    }
+
     .credit-text {
       color: rgba(var(--main-color-rgb), 0.7);
       font-family: 'Fira Code', monospace;
@@ -349,6 +353,13 @@
       text-shadow: 0 0 10px rgba(var(--main-color-rgb), 0.3);
       user-select: none;
     }
+
+    .credit-edit-btn {
+      background: none; border: none; color: rgba(var(--main-color), 0.6);
+      cursor: pointer; font-size: 13px; transition: color 0.2s, transform 0.2s;
+      padding: 2px; display: flex; align-items: center; justify-content: center;
+    }
+    .credit-edit-btn:hover { color: var(--main-color); transform: scale(1.15); }
 
     /* POPUP THÔNG SỐ */
     .popup-overlay {
@@ -473,7 +484,7 @@
   <!-- NÚT SETTING GÓC MÀN HÌNH -->
   <div class="setting-btn" onclick="openSetting()" title="Cài đặt giao diện">⚙️</div>
 
-  <!-- MENU TRÊN (TOP SIDEBAR) - ĐÃ CÓ CÂY BÚT CẠNH TÊN ĐỂ ĐỔI TÊN -->
+  <!-- MENU TRÊN (TOP SIDEBAR) -->
   <div class="top-sidebar-wrap">
     <div class="top-sidebar">
       <div class="top-sidebar-inner">
@@ -681,7 +692,10 @@
   <!-- CENTER -->
   <div class="center">
     <div class="title" id="title-display" onclick="openSetting()" title="Nhấn để đổi chữ lớn">KHO CODE</div>
-    <div class="credit-text">// by hoangdepzai1337</div>
+    <div class="credit-section">
+      <div class="credit-text" id="credit-text-display">// by hoangdepzai1337</div>
+      <button class="credit-edit-btn" onclick="renameCredit()" title="Đổi tên">✏️</button>
+    </div>
   </div>
 
   <!-- SIDEBAR PHẢI -->
@@ -717,6 +731,15 @@
       const newName = prompt('Nhập tên mới:', currentName);
       if (newName !== null && newName.trim() !== '') {
         nameEl.textContent = newName.trim();
+      }
+    }
+
+    function renameCredit() {
+      const creditEl = document.getElementById('credit-text-display');
+      const currentText = creditEl.textContent;
+      const newText = prompt('Nhập dòng chữ credit mới:', currentText);
+      if (newText !== null && newText.trim() !== '') {
+        creditEl.textContent = newText.trim();
       }
     }
 
