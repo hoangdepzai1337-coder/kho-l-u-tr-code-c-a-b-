@@ -248,8 +248,6 @@
     }
     .title { color: var(--main-color); font-size: 32px; font-weight: 600; letter-spacing: 4px; text-shadow: 0 0 20px rgba(var(--main-color-rgb),0.5); cursor: pointer; transition: color 0.2s; }
     .title:hover { opacity: 0.8; }
-    .subtitle { color: #ffffff66; font-size: 13px; font-family: 'Fira Code', monospace; letter-spacing: 2px; cursor: pointer; transition: color 0.2s; }
-    .subtitle:hover { color: var(--main-color); }
 
     /* POPUP THÔNG SỐ */
     .popup-overlay {
@@ -409,17 +407,6 @@
         <div class="btn-bg-apply" onclick="applyTitleChanges()">Áp dụng</div>
       </div>
 
-      <!-- PHẦN TÙY CHỈNH CHỮ KÝ (SUBTITLE) -->
-      <div class="setting-section-title">✍️ Tùy Chỉnh Chữ Nhỏ Dưới (Credit)</div>
-      <div class="bg-input-group">
-        <label>Nội dung chữ nhỏ:</label>
-        <input type="text" id="setting-subtitle-input" value="// by hoangdepzai1337" oninput="previewSubtitle(this.value)">
-      </div>
-      <div class="bg-actions">
-        <div class="btn-bg-cancel" onclick="cancelSubtitleChanges()">Hủy</div>
-        <div class="btn-bg-apply" onclick="applySubtitleChanges()">Áp dụng</div>
-      </div>
-
       <!-- PHẦN TÙY CHỈNH ẢNH NỀN NGOÀI -->
       <div class="setting-section-title">🖼️ Tùy Chỉnh Ảnh Nền Ngoài</div>
       <div class="bg-input-group">
@@ -571,7 +558,6 @@
   <!-- CENTER -->
   <div class="center">
     <div class="title" id="title-display" onclick="openSetting()" title="Nhấn để đổi chữ lớn">KHO CODE</div>
-    <div class="subtitle" id="subtitle-display" onclick="openSetting()" title="Nhấn để đổi chữ nhỏ">// by hoangdepzai1337</div>
   </div>
 
   <!-- SIDEBAR PHẢI -->
@@ -593,8 +579,6 @@
     const bg = document.getElementById('bg');
     const titleDisplay = document.getElementById('title-display');
     const titleInput = document.getElementById('setting-title-input');
-    const subtitleDisplay = document.getElementById('subtitle-display');
-    const subtitleInput = document.getElementById('setting-subtitle-input');
     const pageTitleMeta = document.getElementById('page-title-meta');
     
     // GIỮ NGUYÊN HIỆU ỨNG ẢNH THEO CHUỘT
@@ -622,26 +606,6 @@
 
     function cancelTitleChanges() {
       titleInput.value = titleDisplay.textContent;
-      closeSetting();
-    }
-
-    // XỬ LÝ XEM TRƯỚC VÀ ĐỔI CHỮ NHỎ (SUBTITLE / CREDIT)
-    function previewSubtitle(val) {
-      subtitleDisplay.textContent = val;
-    }
-
-    function applySubtitleChanges() {
-      const val = subtitleInput.value.trim();
-      if (val !== '') {
-        subtitleDisplay.textContent = val;
-        closeSetting();
-      } else {
-        alert('Nội dung chữ nhỏ không được để trống!');
-      }
-    }
-
-    function cancelSubtitleChanges() {
-      subtitleInput.value = subtitleDisplay.textContent;
       closeSetting();
     }
 
