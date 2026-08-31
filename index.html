@@ -584,6 +584,23 @@
         <div class="btn-bg-cancel" onclick="cancelBgChanges()">Hủy</div>
         <div class="btn-bg-apply" onclick="applyBgChanges()">Áp dụng</div>
       </div>
+
+      <!-- PHẦN CÀI ĐẶT NHẠC Ở DƯỚI CÙNG -->
+      <div class="setting-section-title">🎵 Cài Đặt Nhạc Nền</div>
+      <div class="bg-input-group">
+        <label>Dán Link (YouTube, Spotify, Link MP3...) hoặc Tải file nhạc từ máy:</label>
+        <div class="file-upload-row">
+          <input type="text" id="setting-music-url" placeholder="Nhập link nhạc hoặc chọn file...">
+          <label class="btn-file-select" for="music-file-input">📁 Chọn nhạc</label>
+          <input type="file" id="music-file-input" accept="audio/*" style="display:none;" onchange="handleMusicUpload(this)">
+        </div>
+        <!-- Vùng hiển thị trình phát nhạc / nhúng iframe tùy theo loại link -->
+        <div id="music-player-container" style="margin-top: 6px;"></div>
+      </div>
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="cancelMusicChanges()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyMusicChanges()">Áp dụng</div>
+      </div>
     </div>
   </div>
 
@@ -749,6 +766,9 @@
     </div>
   </div>
 
+  <!-- KHU VỰC PHÁT NHẠC NGẦM -->
+  <div id="global-music-player" style="display:none;"></div>
+
   <script>
     const bg = document.getElementById('bg');
     const titleDisplay = document.getElementById('title-display');
@@ -782,7 +802,60 @@
         reader.readAsDataURL(input.files[0]);
       }
     }
-        // PARALLAX PC
+
+    /* XỬ LÝ TẢI NHẠC TỪ MÁY */
+    function handleMusicUpload(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('setting-music-url').value = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    /* ÁP DỤNG & XỬ LÝ PHÁT NHẠC */
+    function applyMusicChanges() {
+      const val = document.getElementById('setting-music-url').value.trim();
+      const playerContainer = document.getElementById('global-music-player');
+      playerContainer.innerHTML = '';
+
+      if (!val) {
+        alert('Vui lòng nhập link nhạc hoặc chọn file!');
+        return;
+      }
+
+      // Xử lý link YouTube (hỗ trợ dạng watch?v= hoặc youtu.be/)
+      if (val.includes('youtube.com') || val.includes('youtu.be')) {
+        let videoId = '';
+        if (val.includes('youtu.be/')) {
+          videoId = val.split('youtu.be/')[1]?.split('?')[0];
+        } else if (val.includes('watch?v=')) {
+          videoId = val.split('watch?v=')[1]?.split('&')[0];
+        }
+        if (videoId) {
+          playerContainer.innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}" allow="autoplay"></iframe>`;
+        }
+      } 
+      // Xử lý link Spotify (dạng track/)
+      else if (val.includes('spotify.com')) {
+        let embedUrl = val.replace('/track/', '/embed/track/');
+        playerContainer.innerHTML = `<iframe src="${embedUrl}?utm_source=generator&theme=0" width="100%" height="80" style="border-radius:12px;border:none;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
+      } 
+      // Xử lý file trực tiếp / link MP3 / Base64 tải lên từ máy
+      else {
+        playerContainer.innerHTML = `<audio src="${val}" autoplay loop controls style="width:100%; margin-top:10px;"></audio>`;
+      }
+
+      closeSetting();
+    }
+
+    function cancelMusicChanges() {
+      document.getElementById('setting-music-url').value = '';
+      closeSetting();
+    }
+
+    // PARALLAX PC
     document.addEventListener('mousemove', (e) => {
       if (window.innerWidth > 768) {
         const x = (e.clientX / window.innerWidth - 0.5) * 20;
