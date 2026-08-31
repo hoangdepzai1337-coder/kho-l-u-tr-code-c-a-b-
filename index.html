@@ -15,7 +15,7 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { width: 100vw; height: 100vh; overflow: hidden; display: flex; font-family: 'Inter', sans-serif; }
+    body { width: 100vw; height: 100vh; overflow: hidden; display: flex; font-family: 'Inter', sans-serif; background-color: #0a0a14; }
 
     .bg {
       position: fixed; top: -20px; left: -20px;
@@ -172,6 +172,7 @@
       width: 70px; height: 70px; border-radius: 50%;
       object-fit: cover; border: 2px solid var(--main-color);
       box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.4);
+      background-color: #1a1a2e;
     }
 
     .creator-name-row {
@@ -291,7 +292,7 @@
 
     .car-item img {
       width: 100%; height: 150px; object-fit: cover; display: block;
-      cursor: pointer;
+      cursor: pointer; background-color: #1a1a2e;
     }
     .car-item img:hover { opacity: 0.9; }
 
@@ -370,7 +371,7 @@
     }
     @keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
 
-    .popup-header { position: relative; height: 300px; overflow: hidden; border-radius: 16px 16px 0 0; flex-shrink: 0; }
+    .popup-header { position: relative; height: 300px; overflow: hidden; border-radius: 16px 16px 0 0; flex-shrink: 0; background-color: #1a1a2e; }
     .popup-header img { width: 100%; height: 100%; object-fit: cover; }
     .popup-header-overlay {
       position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 24px;
@@ -453,7 +454,7 @@
     .img-preview {
       width: 100%; height: 140px; object-fit: cover;
       border-radius: 8px; border: 1px solid rgba(var(--main-color-rgb),0.3);
-      display: none; margin-top: 8px;
+      display: none; margin-top: 8px; background-color: #1a1a2e;
     }
 
     .form-actions { display: flex; gap: 10px; margin-top: 24px; }
@@ -481,11 +482,10 @@
   <div class="top-sidebar-wrap">
     <div class="top-sidebar">
       <div class="top-sidebar-inner">
-        <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar">
+        <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar" onerror="handleImageError(this)">
         
         <div class="creator-name-row">
           <div class="creator-name" id="creator-name-display">hoangdepzai</div>
-          <button class="creator-edit-btn" onclick="renameCreator()" title="Đổi tên">✏️</button>
         </div>
 
         <div class="avatar-edit-group">
@@ -539,7 +539,7 @@
       <div class="bg-input-group">
         <label>Dán link ảnh (URL):</label>
         <input type="text" id="setting-bg-url" placeholder="https://..." oninput="previewSettingBg(this.value)">
-        <img id="setting-bg-preview" class="bg-preview-box" alt="Preview ảnh nền">
+        <img id="setting-bg-preview" class="bg-preview-box" alt="Preview ảnh nền" onerror="handleImageError(this)">
       </div>
       <div class="bg-actions">
         <div class="btn-bg-cancel" onclick="cancelBgChanges()">Hủy</div>
@@ -552,7 +552,7 @@
   <div class="popup-overlay" id="popup-overlay" onclick="closePopup(event)">
     <div class="popup">
       <div class="popup-header">
-        <img id="popup-img" src="" alt="">
+        <img id="popup-img" src="" alt="" onerror="handleImageError(this)">
         <div class="popup-header-overlay">
           <h1 id="popup-name"></h1>
           <p id="popup-sub"></p>
@@ -582,7 +582,7 @@
           <div class="form-field full">
             <label>Link ảnh (URL)</label>
             <input type="text" id="f-img" placeholder="https://..." oninput="previewImg(this.value)">
-            <img id="img-preview" class="img-preview" alt="preview">
+            <img id="img-preview" class="img-preview" alt="preview" onerror="handleImageError(this)">
           </div>
           <div class="form-field full">
             <label>Tên xe</label>
@@ -711,20 +711,19 @@
     const titleInput = document.getElementById('setting-title-input');
     const pageTitleMeta = document.getElementById('page-title-meta');
     
+    // Hàm xử lý khi ảnh bị lỗi load trên điện thoại
+    function handleImageError(img) {
+      if (!img.dataset.fallback) {
+        img.dataset.fallback = "true";
+        img.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800"; // Ảnh thay thế mặc định chống lỗi
+      }
+    }
+
     document.addEventListener('mousemove', (e) => {
       const x = (e.clientX / window.innerWidth - 0.5) * 20;
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
-
-    function renameCreator() {
-      const nameEl = document.getElementById('creator-name-display');
-      const currentName = nameEl.textContent;
-      const newName = prompt('Nhập tên mới:', currentName);
-      if (newName !== null && newName.trim() !== '') {
-        nameEl.textContent = newName.trim();
-      }
-    }
 
     function applyAvatarChange() {
       const url = document.getElementById('avatar-url-input').value.trim();
@@ -793,7 +792,6 @@
       if (newName !== null && newName.trim() !== '') {
         const trimmed = newName.trim();
         titleEl.textContent = trimmed;
-        // Cập nhật tên tương ứng trong form thêm xe và giữ đúng nhãn (Trái) / (Phải)
         document.getElementById('target-' + side + '-text').textContent = trimmed + (side === 'left' ? ' (Trái)' : ' (Phải)');
       }
     }
@@ -880,7 +878,7 @@
       item.className = 'car-item';
       item.id = 'car-item-' + id;
       item.innerHTML = `
-        <img src="${car.img}" alt="${car.name}" onclick="openCar('${id}')">
+        <img src="${car.img}" alt="${car.name}" onclick="openCar('${id}')" onerror="handleImageError(this)">
         <div class="car-item-footer">
           <span onclick="openCar('${id}')">${car.name}</span>
           <div class="edit-btn" onclick="openForm('${side}','${id}')" title="Chỉnh sửa">✏️</div>
