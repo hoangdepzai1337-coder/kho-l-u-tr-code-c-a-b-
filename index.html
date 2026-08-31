@@ -782,12 +782,24 @@
         reader.readAsDataURL(input.files[0]);
       }
     }
-
+        // PARALLAX PC
     document.addEventListener('mousemove', (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20;
-      const y = (e.clientY / window.innerHeight - 0.5) * 20;
-      bg.style.transform = `translate(${x}px, ${y}px)`;
+      if (window.innerWidth > 768) {
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        bg.style.transform = `translate(${x}px, ${y}px)`;
+      }
     });
+
+    // PARALLAX MOBILE
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma === null || window.innerWidth > 768) return;
+        const x = Math.max(-15, Math.min(15, (e.gamma / 45) * 15));
+        const y = Math.max(-15, Math.min(15, ((e.beta - 45) / 45) * 15));
+        bg.style.transform = `translate(${x}px, ${y}px)`;
+      }, true);
+    }
 
     function previewAvatarUrl(val) {}
 
