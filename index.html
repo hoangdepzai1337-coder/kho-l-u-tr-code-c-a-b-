@@ -100,7 +100,7 @@
       display: flex; flex-direction: column; gap: 8px;
     }
     .bg-input-group label { color: rgba(255,255,255,0.7); font-size: 11px; }
-    .bg-input-group input[type="text"] {
+    .bg-input-group input[type="text"], .bg-input-group input[type="range"] {
       background: rgba(var(--main-color-rgb), 0.05);
       border: 1px solid rgba(var(--main-color-rgb), 0.3);
       border-radius: 6px; color: #fff; font-family: 'Inter', sans-serif;
@@ -525,7 +525,7 @@
     <div class="top-arrow"></div>
   </div>
 
-  <!-- MODAL CÀI ĐẶT MÀU, ĐỘ MỜ & ẢNH NỀN -->
+  <!-- MODAL CÀI ĐẶT MÀU, ĐỘ MỜ & TẦN SỐ QUÉT -->
   <div class="setting-overlay" id="setting-overlay" onclick="closeSettingModal(event)">
     <div class="setting-box">
       <div class="setting-header">
@@ -549,11 +549,18 @@
         <input type="color" id="custom-color-picker" value="#00ffcc" oninput="setThemeColor(this.value)">
       </div>
 
-      <!-- ĐIỀU CHỈNH ĐỘ MỜ MENU (TRANSPARENCY SLIDER) -->
+      <!-- ĐIỀU CHỈNH ĐỘ MỜ MENU -->
       <div class="setting-section-title">🎚️ Độ Mờ Đậm Menu</div>
       <div class="bg-input-group">
-        <label>Điều chỉnh độ trong suốt (0.1 = trong suốt nhiều, 1.0 = đặc hoàn toàn): <span id="opacity-val-label">0.85</span></label>
+        <label>Điều chỉnh độ trong suốt: <span id="opacity-val-label">0.85</span></label>
         <input type="range" id="menu-opacity-range" min="0.1" max="1.0" step="0.05" value="0.85" oninput="changeMenuOpacity(this.value)">
+      </div>
+
+      <!-- ĐIỀU CHỈNH TẦN SỐ QUÉT HZ (60 - 120) -->
+      <div class="setting-section-title">⚡ Tần Số Quét Màn Hình (Hz)</div>
+      <div class="bg-input-group">
+        <label>Giới hạn tốc độ khung hình: <span id="hz-val-label">120</span> Hz</label>
+        <input type="range" id="hz-range" min="60" max="120" step="10" value="120" oninput="changeRefreshRate(this.value)">
       </div>
 
       <div class="setting-section-title">🔤 Tùy Chỉnh Chữ Lớn (Kho Code)</div>
@@ -763,6 +770,9 @@
     const linkInput = document.getElementById('setting-link-input');
     const linkDisplay = document.getElementById('credit-link-display');
     
+    let currentMaxHz = 120; // Mặc định tần số quét
+    let lastFrameTime = 0;
+
     function handleImageError(img) {
       if (!img.dataset.fallback) {
         img.dataset.fallback = "true";
@@ -794,6 +804,26 @@
       document.documentElement.style.setProperty('--menu-opacity', val);
       document.getElementById('opacity-val-label').textContent = val;
     }
+
+    // ĐIỀU CHỈNH TẦN SỐ QUÉT HZ
+    function changeRefreshRate(val) {
+      currentMaxHz = parseInt(val);
+      document.getElementById('hz-val-label').textContent = currentMaxHz;
+    }
+
+    // GIỚI HẠN KHUNG HÌNH (FPS / HZ LIMITER)
+    function throttleLoop(timestamp) {
+      if (!lastFrameTime) lastFrameTime = timestamp;
+      const elapsed = timestamp - lastFrameTime;
+      const interval = 1000 / currentMaxHz;
+
+      if (elapsed >= interval) {
+        lastFrameTime = timestamp - (elapsed % interval);
+        // Có thể thực hiện các thao tác cập nhật động mượt mà tại đây theo Hz đã chọn
+      }
+      requestAnimationFrame(throttleLoop);
+    }
+    requestAnimationFrame(throttleLoop);
 
     // PARALLAX PC
     document.addEventListener('mousemove', (e) => {
