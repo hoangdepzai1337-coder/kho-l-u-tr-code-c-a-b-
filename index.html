@@ -90,7 +90,6 @@
       flex: 1; height: 35px; border: none; background: none; cursor: pointer; border-radius: 4px;
     }
 
-    /* KHU VỰC TÙY CHỈNH TRONG SETTING */
     .setting-section-title {
       color: var(--main-color); font-size: 12px; font-weight: 600; letter-spacing: 1px;
       text-transform: uppercase; margin-top: 10px; border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
@@ -129,42 +128,46 @@
     }
     .btn-bg-apply:hover { background: rgba(var(--main-color-rgb), 0.3); }
 
-    /* MENU TRÊN (TOP SIDEBAR) */
+    /* MENU TRÊN (TOP SIDEBAR) - ĐÃ CỐ ĐỊNH THANH KÉO / MŨI TÊN RÕ RÀNG */
     .top-sidebar-wrap {
       position: fixed; top: 0; left: 0; width: 100vw;
-      display: flex; justify-content: center; z-index: 100;
-      pointer-events: none; /* Để không che màn hình khi ẩn */
+      display: flex; flex-direction: column; align-items: center; z-index: 100;
+      pointer-events: none;
     }
-    /* Cho phép tương tác với nội dung khi hover hoặc mở */
     .top-sidebar-wrap * { pointer-events: auto; }
 
-    .top-arrow {
-      width: 60px; height: 28px;
-      background: rgba(var(--main-color-rgb),0.15); border: 1px solid rgba(var(--main-color-rgb),0.33);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--main-color); font-size: 16px;
-      backdrop-filter: blur(6px); user-select: none; flex-shrink: 0;
-      border-radius: 0 0 8px 8px;
-    }
-    .top-arrow::before { content: '▼'; }
-    .top-sidebar-wrap:hover .top-arrow::before { content: '▲'; }
-
     .top-sidebar {
-      position: absolute; top: 0;
       width: 320px; height: 0;
-      background: rgba(10,10,20,0.85); backdrop-filter: blur(14px);
+      background: rgba(10,10,20,0.9); backdrop-filter: blur(14px);
       overflow: hidden; transition: height 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex; flex-direction: column;
       border-bottom: 1px solid rgba(var(--main-color-rgb),0.2);
       border-radius: 0 0 16px 16px;
     }
-    .top-sidebar-wrap:hover .top-sidebar { height: 240px; }
+    .top-sidebar-wrap:hover .top-sidebar { height: 250px; }
 
     .top-sidebar-inner {
       width: 100%; height: 100%;
       display: flex; flex-direction: column; align-items: center;
       padding: 20px 20px 16px; overflow-y: auto; text-align: center; gap: 12px;
     }
+
+    /* Mũi tên kéo nằm ngay dưới menu trên, luôn hiện nổi bật */
+    .top-arrow {
+      width: 60px; height: 26px;
+      background: rgba(var(--main-color-rgb),0.25); 
+      border: 1px solid rgba(var(--main-color-rgb),0.5); 
+      border-top: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--main-color); font-size: 12px;
+      backdrop-filter: blur(6px); user-select: none;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 10px rgba(var(--main-color-rgb), 0.3);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .top-arrow:hover { background: rgba(var(--main-color-rgb), 0.4); transform: scale(1.05); }
+    .top-arrow::before { content: '▼'; }
+    .top-sidebar-wrap:hover .top-arrow::before { content: '▲'; }
 
     .creator-avatar {
       width: 70px; height: 70px; border-radius: 50%;
@@ -248,7 +251,6 @@
       padding: 24px 12px 12px; overflow-y: auto;
     }
 
-    /* TIÊU ĐỀ SIDEBAR & NÚT SỬA TÊN */
     .sidebar-header-row {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 14px; padding-bottom: 8px;
@@ -329,7 +331,6 @@
     .title { color: var(--main-color); font-size: 32px; font-weight: 600; letter-spacing: 4px; text-shadow: 0 0 20px rgba(var(--main-color-rgb),0.5); cursor: pointer; transition: color 0.2s; }
     .title:hover { opacity: 0.8; }
     
-    /* CHỮ NHỎ CREDIT CỐ ĐỊNH */
     .credit-text {
       color: rgba(var(--main-color-rgb), 0.7);
       font-family: 'Fira Code', monospace;
@@ -462,15 +463,13 @@
   <!-- NÚT SETTING GÓC MÀN HÌNH -->
   <div class="setting-btn" onclick="openSetting()" title="Cài đặt giao diện">⚙️</div>
 
-  <!-- MENU TRÊN (TOP SIDEBAR) -->
+  <!-- MENU TRÊN (TOP SIDEBAR) - CÓ MŨI TÊN RÕ RÀNG Ở DƯỚI -->
   <div class="top-sidebar-wrap">
     <div class="top-sidebar">
       <div class="top-sidebar-inner">
-        <!-- AVATAR MẶC ĐỊNH HOẶC TÙY CHỈNH -->
         <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar">
         <div class="creator-name">hoangdepzai</div>
 
-        <!-- KHUNG THÊM LINK AVATAR -->
         <div class="avatar-edit-group">
           <label>Đổi Ảnh Avatar (URL):</label>
           <input type="text" id="avatar-url-input" placeholder="https://...">
@@ -508,7 +507,6 @@
         <input type="color" id="custom-color-picker" value="#00ffcc" oninput="setThemeColor(this.value)">
       </div>
 
-      <!-- PHẦN TÙY CHỈNH CHỮ LỚN (TIÊU ĐỀ CHÍNH) -->
       <div class="setting-section-title">🔤 Tùy Chỉnh Chữ Lớn (Kho Code)</div>
       <div class="bg-input-group">
         <label>Nội dung chữ lớn:</label>
@@ -519,7 +517,6 @@
         <div class="btn-bg-apply" onclick="applyTitleChanges()">Áp dụng</div>
       </div>
 
-      <!-- PHẦN TÙY CHỈNH ẢNH NỀN NGOÀI -->
       <div class="setting-section-title">🖼️ Tùy Chỉnh Ảnh Nền Ngoài</div>
       <div class="bg-input-group">
         <label>Dán link ảnh (URL):</label>
@@ -694,14 +691,12 @@
     const titleInput = document.getElementById('setting-title-input');
     const pageTitleMeta = document.getElementById('page-title-meta');
     
-    // GIỮ NGUYÊN HIỆU ỨNG ẢNH THEO CHUỘT
     document.addEventListener('mousemove', (e) => {
       const x = (e.clientX / window.innerWidth - 0.5) * 20;
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
 
-    // XỬ LÝ ĐỔI AVATAR TRÊN MENU TRÊN
     function applyAvatarChange() {
       const url = document.getElementById('avatar-url-input').value.trim();
       const avatarImg = document.getElementById('creator-avatar-img');
@@ -716,7 +711,6 @@
       document.getElementById('avatar-url-input').value = '';
     }
 
-    // XỬ LÝ XEM TRƯỚC VÀ ĐỔI CHỮ LỚN (TITLE)
     function previewTitle(val) {
       titleDisplay.textContent = val;
     }
@@ -737,7 +731,6 @@
       closeSetting();
     }
 
-    // XỬ LÝ ẢNH NỀN TRONG SETTING
     function previewSettingBg(url) {
       const prev = document.getElementById('setting-bg-preview');
       if (url && url.startsWith('http')) {
@@ -764,7 +757,6 @@
       closeSetting();
     }
 
-    // ĐỔI TÊN MENU (TRÁI / PHẢI)
     function renameMenu(side) {
       const titleEl = document.getElementById('title-' + side);
       const currentName = titleEl.textContent;
@@ -774,7 +766,6 @@
       }
     }
 
-    // XỬ LÝ SETTING MÀU SẮC & ẢNH
     function openSetting() {
       document.getElementById('setting-overlay').classList.add('open');
     }
