@@ -128,7 +128,7 @@
     }
     .btn-bg-apply:hover { background: rgba(var(--main-color-rgb), 0.3); }
 
-    /* MENU TRÊN (TOP SIDEBAR) - ĐÃ CỐ ĐỊNH THANH KÉO / MŨI TÊN RÕ RÀNG */
+    /* MENU TRÊN (TOP SIDEBAR) */
     .top-sidebar-wrap {
       position: fixed; top: 0; left: 0; width: 100vw;
       display: flex; flex-direction: column; align-items: center; z-index: 100;
@@ -144,7 +144,7 @@
       border-bottom: 1px solid rgba(var(--main-color-rgb),0.2);
       border-radius: 0 0 16px 16px;
     }
-    .top-sidebar-wrap:hover .top-sidebar { height: 250px; }
+    .top-sidebar-wrap:hover .top-sidebar { height: 260px; }
 
     .top-sidebar-inner {
       width: 100%; height: 100%;
@@ -152,7 +152,6 @@
       padding: 20px 20px 16px; overflow-y: auto; text-align: center; gap: 12px;
     }
 
-    /* Mũi tên kéo nằm ngay dưới menu trên, luôn hiện nổi bật */
     .top-arrow {
       width: 60px; height: 26px;
       background: rgba(var(--main-color-rgb),0.25); 
@@ -175,10 +174,21 @@
       box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.4);
     }
 
+    .creator-name-row {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
     .creator-name {
       color: var(--main-color); font-size: 14px; font-weight: 600;
       letter-spacing: 1px; font-family: 'Fira Code', monospace;
     }
+
+    .creator-edit-btn {
+      background: none; border: none; color: rgba(var(--main-color), 0.6);
+      cursor: pointer; font-size: 13px; transition: color 0.2s, transform 0.2s;
+      padding: 2px; display: flex; align-items: center; justify-content: center;
+    }
+    .creator-edit-btn:hover { color: var(--main-color); transform: scale(1.15); }
 
     .avatar-edit-group {
       display: flex; flex-direction: column; gap: 6px; width: 100%;
@@ -463,12 +473,16 @@
   <!-- NÚT SETTING GÓC MÀN HÌNH -->
   <div class="setting-btn" onclick="openSetting()" title="Cài đặt giao diện">⚙️</div>
 
-  <!-- MENU TRÊN (TOP SIDEBAR) - CÓ MŨI TÊN RÕ RÀNG Ở DƯỚI -->
+  <!-- MENU TRÊN (TOP SIDEBAR) - ĐÃ CÓ CÂY BÚT CẠNH TÊN ĐỂ ĐỔI TÊN -->
   <div class="top-sidebar-wrap">
     <div class="top-sidebar">
       <div class="top-sidebar-inner">
         <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar">
-        <div class="creator-name">hoangdepzai</div>
+        
+        <div class="creator-name-row">
+          <div class="creator-name" id="creator-name-display">hoangdepzai</div>
+          <button class="creator-edit-btn" onclick="renameCreator()" title="Đổi tên">✏️</button>
+        </div>
 
         <div class="avatar-edit-group">
           <label>Đổi Ảnh Avatar (URL):</label>
@@ -696,6 +710,15 @@
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
+
+    function renameCreator() {
+      const nameEl = document.getElementById('creator-name-display');
+      const currentName = nameEl.textContent;
+      const newName = prompt('Nhập tên mới:', currentName);
+      if (newName !== null && newName.trim() !== '') {
+        nameEl.textContent = newName.trim();
+      }
+    }
 
     function applyAvatarChange() {
       const url = document.getElementById('avatar-url-input').value.trim();
