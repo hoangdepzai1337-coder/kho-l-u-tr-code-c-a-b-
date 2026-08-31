@@ -106,6 +106,19 @@
       font-size: 12px; padding: 8px 10px; outline: none;
     }
     .bg-input-group input:focus { border-color: var(--main-color); }
+    
+    .file-upload-row {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .btn-file-select {
+      background: rgba(var(--main-color-rgb), 0.1);
+      border: 1px solid rgba(var(--main-color-rgb), 0.3);
+      border-radius: 6px; color: var(--main-color); font-size: 11px;
+      padding: 8px 12px; cursor: pointer; text-align: center; white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-file-select:hover { background: rgba(var(--main-color-rgb), 0.25); }
+
     .bg-preview-box {
       width: 100%; height: 100px; object-fit: cover; border-radius: 6px;
       border: 1px solid rgba(var(--main-color-rgb), 0.3); display: none;
@@ -144,7 +157,7 @@
       border-bottom: 1px solid rgba(var(--main-color-rgb),0.2);
       border-radius: 0 0 16px 16px;
     }
-    .top-sidebar-wrap:hover .top-sidebar { height: 260px; }
+    .top-sidebar-wrap:hover .top-sidebar { height: 290px; }
 
     .top-sidebar-inner {
       width: 100%; height: 100%;
@@ -184,13 +197,6 @@
       letter-spacing: 1px; font-family: 'Fira Code', monospace;
     }
 
-    .creator-edit-btn {
-      background: none; border: none; color: rgba(var(--main-color), 0.6);
-      cursor: pointer; font-size: 13px; transition: color 0.2s, transform 0.2s;
-      padding: 2px; display: flex; align-items: center; justify-content: center;
-    }
-    .creator-edit-btn:hover { color: var(--main-color); transform: scale(1.15); }
-
     .avatar-edit-group {
       display: flex; flex-direction: column; gap: 6px; width: 100%;
       background: rgba(var(--main-color-rgb), 0.04);
@@ -200,13 +206,13 @@
     .avatar-edit-group label {
       color: rgba(255,255,255,0.7); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; text-align: left;
     }
-    .avatar-edit-group input {
+    .avatar-edit-group input[type="text"] {
       background: rgba(var(--main-color-rgb), 0.05);
       border: 1px solid rgba(var(--main-color-rgb), 0.3);
       border-radius: 4px; color: #fff; font-family: 'Inter', sans-serif;
       font-size: 11px; padding: 6px 8px; outline: none; width: 100%;
     }
-    .avatar-edit-group input:focus { border-color: var(--main-color); }
+    .avatar-edit-group input[type="text"]:focus { border-color: var(--main-color); }
 
     .avatar-actions {
       display: flex; gap: 6px; width: 100%; margin-top: 2px;
@@ -222,7 +228,6 @@
       background: rgba(var(--main-color-rgb), 0.15); border: 1px solid var(--main-color); color: var(--main-color); font-weight: 600;
     }
     .avatar-btn-apply:hover { background: rgba(var(--main-color-rgb), 0.3); }
-
 
     /* GIAO DIỆN CHÍNH (SIDEBAR TRÁI / PHẢI) */
     .sidebar-wrap {
@@ -489,8 +494,12 @@
         </div>
 
         <div class="avatar-edit-group">
-          <label>Đổi Ảnh Avatar (URL):</label>
-          <input type="text" id="avatar-url-input" placeholder="https://...">
+          <label>Đổi Ảnh Avatar (URL hoặc Tải lên):</label>
+          <div class="file-upload-row">
+            <input type="text" id="avatar-url-input" placeholder="https://..." oninput="previewAvatarUrl(this.value)">
+            <label class="btn-file-select" for="avatar-file-input">📁 Chọn ảnh</label>
+            <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this, 'avatar')">
+          </div>
           <div class="avatar-actions">
             <div class="avatar-btn-cancel" onclick="cancelAvatarChange()">Hủy</div>
             <div class="avatar-btn-apply" onclick="applyAvatarChange()">Áp dụng</div>
@@ -537,8 +546,12 @@
 
       <div class="setting-section-title">🖼️ Tùy Chỉnh Ảnh Nền Ngoài</div>
       <div class="bg-input-group">
-        <label>Dán link ảnh (URL):</label>
-        <input type="text" id="setting-bg-url" placeholder="https://..." oninput="previewSettingBg(this.value)">
+        <label>Dán link ảnh (URL) hoặc chọn file:</label>
+        <div class="file-upload-row">
+          <input type="text" id="setting-bg-url" placeholder="https://..." oninput="previewSettingBg(this.value)">
+          <label class="btn-file-select" for="bg-file-input">📁 Chọn ảnh</label>
+          <input type="file" id="bg-file-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this, 'bg')">
+        </div>
         <img id="setting-bg-preview" class="bg-preview-box" alt="Preview ảnh nền" onerror="handleImageError(this)">
       </div>
       <div class="bg-actions">
@@ -580,8 +593,12 @@
         <h3>📸 Ảnh & Tên</h3>
         <div class="form-grid">
           <div class="form-field full">
-            <label>Link ảnh (URL)</label>
-            <input type="text" id="f-img" placeholder="https://..." oninput="previewImg(this.value)">
+            <label>Link ảnh (URL) hoặc Tải từ máy</label>
+            <div class="file-upload-row">
+              <input type="text" id="f-img" placeholder="https://..." oninput="previewImg(this.value)">
+              <label class="btn-file-select" for="car-file-input">📁 Chọn ảnh</label>
+              <input type="file" id="car-file-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this, 'car')">
+            </div>
             <img id="img-preview" class="img-preview" alt="preview" onerror="handleImageError(this)">
           </div>
           <div class="form-field full">
@@ -715,7 +732,27 @@
     function handleImageError(img) {
       if (!img.dataset.fallback) {
         img.dataset.fallback = "true";
-        img.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800"; // Ảnh thay thế mặc định chống lỗi
+        img.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800";
+      }
+    }
+
+    // Xử lý chọn file ảnh từ máy tính cho cả 3 trường hợp (avatar, bg, car)
+    function handleImageUpload(input, type) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const resultUrl = e.target.result;
+          if (type === 'avatar') {
+            document.getElementById('avatar-url-input').value = resultUrl;
+          } else if (type === 'bg') {
+            document.getElementById('setting-bg-url').value = resultUrl;
+            previewSettingBg(resultUrl);
+          } else if (type === 'car') {
+            document.getElementById('f-img').value = resultUrl;
+            previewImg(resultUrl);
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
       }
     }
 
@@ -725,13 +762,17 @@
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
 
+    function previewAvatarUrl(val) {
+      // Có thể dùng để preview nhanh nếu cần
+    }
+
     function applyAvatarChange() {
       const url = document.getElementById('avatar-url-input').value.trim();
       const avatarImg = document.getElementById('creator-avatar-img');
-      if (url && url.startsWith('http')) {
+      if (url) {
         avatarImg.src = url;
       } else {
-        alert('Vui lòng nhập link ảnh hợp lệ!');
+        alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!');
       }
     }
 
@@ -761,7 +802,7 @@
 
     function previewSettingBg(url) {
       const prev = document.getElementById('setting-bg-preview');
-      if (url && url.startsWith('http')) {
+      if (url) {
         prev.src = url;
         prev.style.display = 'block';
       } else {
@@ -775,7 +816,7 @@
         bg.style.backgroundImage = `url('${url}')`;
         closeSetting();
       } else {
-        alert('Vui lòng nhập link ảnh hợp lệ!');
+        alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!');
       }
     }
 
@@ -1035,7 +1076,7 @@
 
     function previewImg(url) {
       const prev = document.getElementById('img-preview');
-      if (url && url.startsWith('http')) {
+      if (url) {
         prev.src = url; prev.style.display = 'block';
       } else { prev.style.display = 'none'; }
     }
@@ -1045,7 +1086,7 @@
     function submitCar() {
       const name = g('f-name');
       const img = g('f-img');
-      if (!name || !img) { alert('Cần có tên xe và link ảnh!'); return; }
+      if (!name || !img) { alert('Cần có tên xe và ảnh!'); return; }
 
       const data = {
         name, img,
