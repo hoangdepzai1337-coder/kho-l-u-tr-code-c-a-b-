@@ -90,7 +90,7 @@
       flex: 1; height: 35px; border: none; background: none; cursor: pointer; border-radius: 4px;
     }
 
-    /* KHU VỰC ĐỔI ẢNH NỀN TRONG SETTING */
+    /* KHU VỰC TÙY CHỈNH TRONG SETTING */
     .setting-section-title {
       color: var(--main-color); font-size: 12px; font-weight: 600; letter-spacing: 1px;
       text-transform: uppercase; margin-top: 10px; border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
@@ -246,7 +246,8 @@
       justify-content: center; align-items: center; gap: 10px;
     }
     .title { color: var(--main-color); font-size: 32px; font-weight: 600; letter-spacing: 4px; text-shadow: 0 0 20px rgba(var(--main-color-rgb),0.5); }
-    .subtitle { color: #ffffff66; font-size: 13px; font-family: 'Fira Code', monospace; letter-spacing: 2px; }
+    .subtitle { color: #ffffff66; font-size: 13px; font-family: 'Fira Code', monospace; letter-spacing: 2px; cursor: pointer; transition: color 0.2s; }
+    .subtitle:hover { color: var(--main-color); }
 
     /* POPUP THÔNG SỐ */
     .popup-overlay {
@@ -393,6 +394,17 @@
       <div class="custom-color-row">
         <label>Hoặc chọn màu tùy ý:</label>
         <input type="color" id="custom-color-picker" value="#00ffcc" oninput="setThemeColor(this.value)">
+      </div>
+
+      <!-- PHẦN TÙY CHỈNH CHỮ KÝ (SUBTITLE) -->
+      <div class="setting-section-title">✍️ Tùy Chỉnh Chữ Nhỏ Dưới (Credit)</div>
+      <div class="bg-input-group">
+        <label>Nội dung chữ nhỏ:</label>
+        <input type="text" id="setting-subtitle-input" value="// by hoangdepzai1337" oninput="previewSubtitle(this.value)">
+      </div>
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="cancelSubtitleChanges()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applySubtitleChanges()">Áp dụng</div>
       </div>
 
       <!-- PHẦN TÙY CHỈNH ẢNH NỀN NGOÀI -->
@@ -546,7 +558,7 @@
   <!-- CENTER -->
   <div class="center">
     <div class="title">KHO CODE</div>
-    <div class="subtitle">// by hoangdepzai1337</div>
+    <div class="subtitle" id="subtitle-display" onclick="openSetting()" title="Nhấn để đổi chữ nhỏ">// by hoangdepzai1337</div>
   </div>
 
   <!-- SIDEBAR PHẢI -->
@@ -566,6 +578,8 @@
 
   <script>
     const bg = document.getElementById('bg');
+    const subtitleDisplay = document.getElementById('subtitle-display');
+    const subtitleInput = document.getElementById('setting-subtitle-input');
     
     // GIỮ NGUYÊN HIỆU ỨNG ẢNH THEO CHUỘT
     document.addEventListener('mousemove', (e) => {
@@ -573,6 +587,26 @@
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
+
+    // XỬ LÝ XEM TRƯỚC VÀ ĐỔI CHỮ NHỎ (SUBTITLE / CREDIT)
+    function previewSubtitle(val) {
+      subtitleDisplay.textContent = val;
+    }
+
+    function applySubtitleChanges() {
+      const val = subtitleInput.value.trim();
+      if (val !== '') {
+        subtitleDisplay.textContent = val;
+        closeSetting();
+      } else {
+        alert('Nội dung chữ nhỏ không được để trống!');
+      }
+    }
+
+    function cancelSubtitleChanges() {
+      subtitleInput.value = subtitleDisplay.textContent;
+      closeSetting();
+    }
 
     // XỬ LÝ ẢNH NỀN TRONG SETTING
     function previewSettingBg(url) {
