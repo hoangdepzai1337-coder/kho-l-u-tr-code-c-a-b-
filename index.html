@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   
   <style>
-    /* KHAI BÁO BIẾN MÀU SẮC ĐỂ DỄ DÀNG THAY ĐỔI */
+    /* KHAI BÁO BIẾN MÀU SẮC */
     :root {
       --main-color: #00ffcc;
       --main-color-rgb: 0, 255, 204;
@@ -25,7 +25,7 @@
       transition: transform 0.1s ease-out; z-index: -1;
     }
 
-    /* NÚT SETTING GÓC TRÊN BÊN PHẢI */
+    /* NÚT SETTING GÓC MÀN HÌNH */
     .setting-btn {
       position: fixed; top: 20px; right: 20px; z-index: 200;
       width: 40px; height: 40px;
@@ -127,12 +127,23 @@
       padding: 24px 12px 12px; overflow-y: auto;
     }
 
-    .sidebar h2 {
-      color: var(--main-color); font-size: 12px; font-weight: 600; letter-spacing: 2px;
-      text-transform: uppercase; margin-bottom: 14px;
-      padding-bottom: 8px; border-bottom: 1px solid rgba(var(--main-color-rgb),0.2);
+    /* TIÊU ĐỀ SIDEBAR & NÚT SỬA TÊN */
+    .sidebar-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1px solid rgba(var(--main-color-rgb),0.2);
       white-space: nowrap; flex-shrink: 0;
     }
+    .sidebar-header-row h2 {
+      color: var(--main-color); font-size: 12px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; margin: 0;
+    }
+    .rename-btn {
+      background: none; border: none; color: rgba(var(--main-color), 0.6);
+      cursor: pointer; font-size: 13px; transition: color 0.2s, transform 0.2s;
+      padding: 2px;
+    }
+    .rename-btn:hover { color: var(--main-color); transform: scale(1.1); }
 
     .cars-list { flex: 1; overflow-y: auto; }
 
@@ -243,7 +254,7 @@
     .spec-item .label { color: #ffffff55; font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
     .spec-item .value { color: #fff; font-size: 13px; font-family: 'Fira Code', monospace; }
 
-    /* FORM THÊM / CHỈNH SỬA */
+    /* FORM THÊM / CHỈNH SỬA XE */
     .form-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.92);
       z-index: 1000; display: none; align-items: center; justify-content: center;
@@ -360,7 +371,7 @@
     </div>
   </div>
 
-  <!-- FORM THÊM / CHỈNH SỬA -->
+  <!-- FORM THÊM / CHỈNH SỬA XE -->
   <div class="form-overlay" id="form-overlay">
     <div class="form-box">
       <div class="form-title-row">
@@ -468,7 +479,10 @@
   <div class="sidebar-wrap left">
     <div class="sidebar">
       <div class="sidebar-inner">
-        <h2>🚗 Xe Tao</h2>
+        <div class="sidebar-header-row">
+          <h2 id="title-left">XE TAO</h2>
+          <button class="rename-btn" onclick="renameMenu('left')" title="Đổi tên menu">✏️</button>
+        </div>
         <div class="cars-list" id="list-left"></div>
         <div class="add-btn" onclick="openForm('left', null)">＋</div>
       </div>
@@ -487,7 +501,10 @@
     <div class="arrow"></div>
     <div class="sidebar">
       <div class="sidebar-inner">
-        <h2>🏎️ Dream Car</h2>
+        <div class="sidebar-header-row">
+          <h2 id="title-right">DREAM CAR</h2>
+          <button class="rename-btn" onclick="renameMenu('right')" title="Đổi tên menu">✏️</button>
+        </div>
         <div class="cars-list" id="list-right"></div>
         <div class="add-btn" onclick="openForm('right', null)">＋</div>
       </div>
@@ -501,6 +518,16 @@
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
+
+    // ĐỔI TÊN MENU (TRÁI / PHẢI)
+    function renameMenu(side) {
+      const titleEl = document.getElementById('title-' + side);
+      const currentName = titleEl.textContent;
+      const newName = prompt('Nhập tên mới cho menu:', currentName);
+      if (newName !== null && newName.trim() !== '') {
+        titleEl.textContent = newName.trim();
+      }
+    }
 
     // XỬ LÝ SETTING MÀU SẮC
     function openSetting() {
