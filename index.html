@@ -99,16 +99,16 @@
       display: flex; flex-direction: column; gap: 8px;
     }
     .bg-input-group label { color: rgba(255,255,255,0.7); font-size: 11px; }
-    .bg-input-group input {
+    .bg-input-group input[type="text"] {
       background: rgba(var(--main-color-rgb), 0.05);
       border: 1px solid rgba(var(--main-color-rgb), 0.3);
       border-radius: 6px; color: #fff; font-family: 'Inter', sans-serif;
-      font-size: 12px; padding: 8px 10px; outline: none;
+      font-size: 12px; padding: 8px 10px; outline: none; width: 100%;
     }
-    .bg-input-group input:focus { border-color: var(--main-color); }
+    .bg-input-group input[type="text"]:focus { border-color: var(--main-color); }
     
     .file-upload-row {
-      display: flex; gap: 8px; align-items: center;
+      display: flex; gap: 8px; align-items: center; width: 100%;
     }
     .btn-file-select {
       background: rgba(var(--main-color-rgb), 0.1);
@@ -121,7 +121,7 @@
 
     .bg-preview-box {
       width: 100%; height: 100px; object-fit: cover; border-radius: 6px;
-      border: 1px solid rgba(var(--main-color-rgb), 0.3); display: none;
+      border: 1px solid rgba(var(--main-color-rgb), 0.3); display: none; margin-top: 4px;
     }
     .bg-actions {
       display: flex; gap: 10px; margin-top: 4px;
@@ -546,7 +546,7 @@
 
       <div class="setting-section-title">🖼️ Tùy Chỉnh Ảnh Nền Ngoài</div>
       <div class="bg-input-group">
-        <label>Dán link ảnh (URL) hoặc chọn file:</label>
+        <label>Dán link ảnh (URL) hoặc chọn file từ máy:</label>
         <div class="file-upload-row">
           <input type="text" id="setting-bg-url" placeholder="https://..." oninput="previewSettingBg(this.value)">
           <label class="btn-file-select" for="bg-file-input">📁 Chọn ảnh</label>
@@ -762,9 +762,7 @@
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
 
-    function previewAvatarUrl(val) {
-      // Có thể dùng để preview nhanh nếu cần
-    }
+    function previewAvatarUrl(val) {}
 
     function applyAvatarChange() {
       const url = document.getElementById('avatar-url-input').value.trim();
