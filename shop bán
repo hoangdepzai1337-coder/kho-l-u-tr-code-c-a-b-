@@ -325,4 +325,437 @@
       border-radius: 8px; padding: 12px 14px;
       color: var(--text); font-family: 'Inter', sans-serif;
       font-size: 13px; outline: none;
-      transition: border
+      transition: border 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .form-group select option { background: var(--bg3); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .form-package-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .package-option {
+      background: var(--bg3);
+      border: 1px solid rgba(var(--accent-rgb), 0.15);
+      border-radius: 8px; padding: 14px;
+      cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .package-option input[type="radio"] {
+      position: absolute; opacity: 0; width: 0; height: 0;
+    }
+    .package-option.selected,
+    .package-option:has(input:checked) {
+      border-color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.08);
+    }
+    .package-name {
+      font-size: 13px; font-weight: 600; margin-bottom: 4px;
+    }
+    .package-price {
+      font-family: 'Fira Code', monospace;
+      font-size: 16px; color: var(--accent); font-weight: 600;
+    }
+    .package-desc {
+      font-size: 11px; color: var(--text-muted); margin-top: 4px;
+    }
+
+    .form-divider {
+      border: none; border-top: 1px solid rgba(255,255,255,0.07);
+      margin: 24px 0;
+    }
+
+    .btn-order {
+      width: 100%; padding: 16px;
+      background: rgba(var(--accent-rgb), 0.15);
+      border: 1px solid var(--accent); border-radius: 10px;
+      color: var(--accent); font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      font-family: 'Fira Code', monospace; letter-spacing: 1px;
+      margin-top: 8px;
+    }
+    .btn-order:hover {
+      background: rgba(var(--accent-rgb), 0.3);
+      box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.2);
+    }
+
+    .form-note {
+      text-align: center; font-size: 11px;
+      color: var(--text-muted); margin-top: 14px;
+      line-height: 1.6;
+    }
+
+    /* SUCCESS */
+    .success-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      z-index: 999; display: none; align-items: center; justify-content: center;
+    }
+    .success-overlay.open { display: flex; }
+    .success-box {
+      background: var(--bg2); border: 1px solid rgba(var(--accent-rgb), 0.4);
+      border-radius: 20px; padding: 48px; text-align: center; max-width: 400px;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+    .success-icon { font-size: 52px; margin-bottom: 16px; }
+    .success-title { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    .success-msg { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 24px; }
+    .btn-close-success {
+      background: rgba(var(--accent-rgb), 0.15);
+      border: 1px solid var(--accent); border-radius: 8px;
+      color: var(--accent); font-size: 13px; font-weight: 600;
+      padding: 10px 28px; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-close-success:hover { background: rgba(var(--accent-rgb), 0.3); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 30px 40px; text-align: center;
+      color: var(--text-muted); font-size: 12px;
+    }
+    footer span { color: var(--accent); }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb), 0.3); border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      section { padding: 60px 20px; }
+      .order-section { padding: 28px 20px; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-package-grid { grid-template-columns: 1fr; }
+      .stats { gap: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">⚡ TweakShop</div>
+    <ul class="nav-links">
+      <li><a href="#products">Dịch vụ</a></li>
+      <li><a href="#features">Tại sao chọn tao</a></li>
+      <li><a href="#order">Đặt hàng</a></li>
+    </ul>
+    <div class="nav-cart" onclick="document.getElementById('order').scrollIntoView({behavior:'smooth'})">
+      🛒 Đặt ngay
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Windows Optimization Service
+    </div>
+    <h1>Tối ưu Windows<br><span>Nhanh hơn. Mượt hơn.</span></h1>
+    <p>Dịch vụ tweaks hệ điều hành chuyên nghiệp — tăng FPS, giảm latency, dọn rác hệ thống, tối ưu registry và startup cho PC gaming.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="#order">⚡ Đặt dịch vụ ngay</a>
+      <a class="btn-secondary" href="#products">Xem gói dịch vụ</a>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">500+</div>
+        <div class="stat-label">Khách hàng</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">98%</div>
+        <div class="stat-label">Hài lòng</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">30fps+</div>
+        <div class="stat-label">Tăng FPS TB</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Hỗ trợ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section id="products">
+    <div class="section-title">
+      <h2>Gói <span>Dịch Vụ</span></h2>
+      <p>Chọn gói phù hợp với nhu cầu của mày</p>
+    </div>
+    <div class="products-grid">
+
+      <div class="product-card" onclick="selectPackage('basic')">
+        <div class="product-img">
+          🔧
+          <div class="product-badge">BASIC</div>
+        </div>
+        <div class="product-body">
+          <div class="product-name">Basic Tweak</div>
+          <div class="product-desc">Dọn dẹp cơ bản, tắt startup không cần thiết, tối ưu power plan và visual effects.</div>
+          <div class="product-tags">
+            <span class="tag">Startup</span>
+            <span class="tag">Power Plan</span>
+            <span class="tag">Visual</span>
+            <span class="tag">Debloat</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">50K <span class="old-price">80K</span></div>
+            <button class="btn-add-cart">Chọn gói</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="selectPackage('gaming')">
+        <div class="product-img">
+          🎮
+          <div class="product-badge hot">HOT</div>
+        </div>
+        <div class="product-body">
+          <div class="product-name">Gaming Tweak</div>
+          <div class="product-desc">Full tweak cho gaming: tăng FPS, giảm input lag, tối ưu GPU/CPU priority, network latency.</div>
+          <div class="product-tags">
+            <span class="tag">FPS Boost</span>
+            <span class="tag">GPU Tweak</span>
+            <span class="tag">Network</span>
+            <span class="tag">Registry</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">100K <span class="old-price">150K</span></div>
+            <button class="btn-add-cart">Chọn gói</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="selectPackage('pro')">
+        <div class="product-img">
+          ⚡
+          <div class="product-badge">PRO</div>
+        </div>
+        <div class="product-body">
+          <div class="product-name">Pro Tweak</div>
+          <div class="product-desc">Toàn diện nhất: bao gồm Gaming Tweak + BIOS settings, Windows ISO custom, driver optimization.</div>
+          <div class="product-tags">
+            <span class="tag">BIOS</span>
+            <span class="tag">ISO Custom</span>
+            <span class="tag">Driver</span>
+            <span class="tag">IRQ Priority</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">200K <span class="old-price">300K</span></div>
+            <button class="btn-add-cart">Chọn gói</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="selectPackage('custom')">
+        <div class="product-img">🛠️</div>
+        <div class="product-body">
+          <div class="product-name">Custom Tweak</div>
+          <div class="product-desc">Tư vấn và tối ưu theo yêu cầu riêng của mày. Báo giá sau khi trao đổi.</div>
+          <div class="product-tags">
+            <span class="tag">Tuỳ chỉnh</span>
+            <span class="tag">Tư vấn 1-1</span>
+          </div>
+          <div class="product-footer">
+            <div class="product-price">Liên hệ</div>
+            <button class="btn-add-cart">Chọn gói</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-title">
+      <h2>Tại Sao Chọn <span>Tao?</span></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Tăng FPS thật sự</div>
+        <div class="feature-desc">Không phải placebo — tối ưu GPU scheduling, CPU affinity, game mode.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">An toàn 100%</div>
+        <div class="feature-desc">Backup registry trước khi tweak. Hoàn tiền nếu không hài lòng.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <div class="feature-title">Hỗ trợ qua AnyDesk</div>
+        <div class="feature-desc">Kết nối remote trực tiếp, tao làm tất cả — mày chỉ cần ngồi xem.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">Bảo hành 7 ngày</div>
+        <div class="feature-desc">Lỗi phát sinh sau tweak — tao fix miễn phí trong vòng 7 ngày.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ORDER FORM -->
+  <section id="order">
+    <div class="order-section">
+      <div class="form-title">Đặt <span>Dịch Vụ</span></div>
+      <div class="form-subtitle">Điền form — tao liên hệ lại trong vòng 15 phút 🔥</div>
+
+      <div class="form-group">
+        <label>Tên của mày</label>
+        <input type="text" id="f-name" placeholder="VD: Hoàng Depzai">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Liên hệ (Zalo / Discord)</label>
+          <input type="text" id="f-contact" placeholder="VD: 0901234567">
+        </div>
+        <div class="form-group">
+          <label>Hệ điều hành</label>
+          <select id="f-os">
+            <option value="">-- Chọn OS --</option>
+            <option>Windows 11 (23H2)</option>
+            <option>Windows 11 (22H2)</option>
+            <option>Windows 10 (22H2)</option>
+            <option>Windows 10 (21H2)</option>
+            <option>Khác</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Chọn gói dịch vụ</label>
+        <div class="form-package-grid">
+          <div class="package-option" id="pkg-basic" onclick="selectPackage('basic')">
+            <input type="radio" name="package" value="basic">
+            <div class="package-name">Basic Tweak</div>
+            <div class="package-price">50K</div>
+            <div class="package-desc">Cơ bản, nhanh gọn</div>
+          </div>
+          <div class="package-option" id="pkg-gaming" onclick="selectPackage('gaming')">
+            <input type="radio" name="package" value="gaming">
+            <div class="package-name">Gaming Tweak 🔥</div>
+            <div class="package-price">100K</div>
+            <div class="package-desc">Full FPS & latency</div>
+          </div>
+          <div class="package-option" id="pkg-pro" onclick="selectPackage('pro')">
+            <input type="radio" name="package" value="pro">
+            <div class="package-name">Pro Tweak ⚡</div>
+            <div class="package-price">200K</div>
+            <div class="package-desc">Toàn diện nhất</div>
+          </div>
+          <div class="package-option" id="pkg-custom" onclick="selectPackage('custom')">
+            <input type="radio" name="package" value="custom">
+            <div class="package-name">Custom Tweak</div>
+            <div class="package-price">Liên hệ</div>
+            <div class="package-desc">Theo yêu cầu</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Cấu hình PC (CPU / GPU / RAM)</label>
+        <input type="text" id="f-specs" placeholder="VD: i5-12400F / RTX 3060 / 16GB DDR4">
+      </div>
+
+      <div class="form-group">
+        <label>Vấn đề đang gặp / Yêu cầu thêm</label>
+        <textarea id="f-note" placeholder="VD: FPS hay bị drop, lag khi stream, máy chạy chậm..."></textarea>
+      </div>
+
+      <hr class="form-divider">
+
+      <button class="btn-order" onclick="submitOrder()">
+        ⚡ GỬI ĐƠN HÀNG
+      </button>
+
+      <div class="form-note">
+        Sau khi gửi đơn, tao sẽ liên hệ qua Zalo/Discord để xác nhận và hẹn giờ.<br>
+        Thanh toán sau khi hoàn thành — không thu trước 🔒
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Made with 💚 by <span>TweakShop</span> — Windows Optimization Service</p>
+  </footer>
+
+  <!-- SUCCESS POPUP -->
+  <div class="success-overlay" id="success-overlay" onclick="closeSuccess(event)">
+    <div class="success-box">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Đặt hàng thành công!</div>
+      <div class="success-msg" id="success-msg">Tao đã nhận được đơn của mày. Sẽ liên hệ lại trong vòng 15 phút qua Zalo/Discord nhé brody! 🔥</div>
+      <button class="btn-close-success" onclick="document.getElementById('success-overlay').classList.remove('open')">OK ngon 👌</button>
+    </div>
+  </div>
+
+  <script>
+    let selectedPkg = '';
+
+    function selectPackage(pkg) {
+      selectedPkg = pkg;
+      ['basic','gaming','pro','custom'].forEach(p => {
+        document.getElementById('pkg-' + p).classList.remove('selected');
+      });
+      document.getElementById('pkg-' + pkg).classList.add('selected');
+      document.getElementById('order').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function submitOrder() {
+      const name = document.getElementById('f-name').value.trim();
+      const contact = document.getElementById('f-contact').value.trim();
+      const os = document.getElementById('f-os').value;
+      const specs = document.getElementById('f-specs').value.trim();
+
+      if (!name) { alert('Mày chưa điền tên!'); return; }
+      if (!contact) { alert('Mày chưa điền liên hệ!'); return; }
+      if (!os) { alert('Chọn hệ điều hành đi brody!'); return; }
+      if (!selectedPkg) { alert('Chọn gói dịch vụ đi!'); return; }
+      if (!specs) { alert('Điền cấu hình PC vô nha!'); return; }
+
+      document.getElementById('success-msg').textContent =
+        `Đơn của ${name} đã được ghi nhận! Gói: ${selectedPkg.toUpperCase()} — Tao sẽ nhắn qua ${contact} trong 15 phút 🔥`;
+
+      document.getElementById('success-overlay').classList.add('open');
+
+      // Reset form
+      ['f-name','f-contact','f-specs','f-note'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('f-os').value = '';
+      ['basic','gaming','pro','custom'].forEach(p => {
+        document.getElementById('pkg-' + p).classList.remove('selected');
+      });
+      selectedPkg = '';
+    }
+
+    function closeSuccess(e) {
+      if (e.target === document.getElementById('success-overlay'))
+        document.getElementById('success-overlay').classList.remove('open');
+    }
+
+    // Smooth scroll nav links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
