@@ -783,10 +783,20 @@
       }
     }
 
-    document.addEventListener('mousemove', (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20;
-      const y = (e.clientY / window.innerHeight - 0.5) * 20;
-      bg.style.transform = `translate(${x}px, ${y}px)`;
+
+// PARALLAX PC
+document.addEventListener('mousemove', (e) => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 20;
+  const y = (e.clientY / window.innerHeight - 0.5) * 20;
+  bg.style.transform = `translate(${x}px, ${y}px)`;
+});
+// PARALLAX MOBILE (nghiêng điện thoại)
+window.addEventListener('deviceorientation', (e) => {
+  if (e.gamma === null) return;
+  const x = (e.gamma / 45) * 15;  // nghiêng trái/phải
+  const y = (e.beta / 90) * 15;   // nghiêng trước/sau
+  bg.style.transform = `translate(${x}px, ${y}px)`;
+}, true);
     });
 
     function previewAvatarUrl(val) {}
