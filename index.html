@@ -579,8 +579,8 @@
       </div>
 
       <div class="sidebar-target" id="sidebar-target-row">
-        <div class="target-btn active" id="target-left" onclick="setTarget('left')"><span id="target-left-text">Xe Tao (Trái)</span></div>
-        <div class="target-btn" id="target-right" onclick="setTarget('right')"><span id="target-right-text">Dream Car (Phải)</span></div>
+        <div class="target-btn active" id="target-left" onclick="setTarget('left')"><span id="target-left-text">XE TAO (Trái)</span></div>
+        <div class="target-btn" id="target-right" onclick="setTarget('right')"><span id="target-right-text">DREAM CAR (Phải)</span></div>
       </div>
 
       <div class="form-section">
@@ -810,7 +810,7 @@
       if (newName !== null && newName.trim() !== '') {
         const trimmed = newName.trim();
         titleEl.textContent = trimmed;
-        // Cập nhật tên tương ứng trong form thêm xe
+        // Cập nhật tên tương ứng trong form thêm xe và giữ đúng nhãn (Trái) / (Phải)
         document.getElementById('target-' + side + '-text').textContent = trimmed + (side === 'left' ? ' (Trái)' : ' (Phải)');
       }
     }
@@ -1017,6 +1017,10 @@
       const targetRow = document.getElementById('sidebar-target-row');
       const submitBtn = document.getElementById('form-submit-btn');
       const formTitle = document.getElementById('form-title');
+
+      // Tự động cập nhật lại tên trên 2 nút lựa chọn ở form mỗi khi mở form
+      document.getElementById('target-left-text').textContent = document.getElementById('title-left').textContent + ' (Trái)';
+      document.getElementById('target-right-text').textContent = document.getElementById('title-right').textContent + ' (Phải)';
 
       if (id) {
         formTitle.textContent = '✏️ Chỉnh Sửa Xe';
