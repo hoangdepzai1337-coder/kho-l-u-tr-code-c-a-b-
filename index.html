@@ -354,13 +354,6 @@
       user-select: none;
     }
 
-    .credit-edit-btn {
-      background: none; border: none; color: rgba(var(--main-color), 0.6);
-      cursor: pointer; font-size: 13px; transition: color 0.2s, transform 0.2s;
-      padding: 2px; display: flex; align-items: center; justify-content: center;
-    }
-    .credit-edit-btn:hover { color: var(--main-color); transform: scale(1.15); }
-
     /* POPUP THÔNG SỐ */
     .popup-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.85);
@@ -694,7 +687,6 @@
     <div class="title" id="title-display" onclick="openSetting()" title="Nhấn để đổi chữ lớn">KHO CODE</div>
     <div class="credit-section">
       <div class="credit-text" id="credit-text-display">// by hoangdepzai1337</div>
-      <button class="credit-edit-btn" onclick="renameCredit()" title="Đổi tên">✏️</button>
     </div>
   </div>
 
@@ -731,15 +723,6 @@
       const newName = prompt('Nhập tên mới:', currentName);
       if (newName !== null && newName.trim() !== '') {
         nameEl.textContent = newName.trim();
-      }
-    }
-
-    function renameCredit() {
-      const creditEl = document.getElementById('credit-text-display');
-      const currentText = creditEl.textContent;
-      const newText = prompt('Nhập dòng chữ credit mới:', currentText);
-      if (newText !== null && newText.trim() !== '') {
-        creditEl.textContent = newText.trim();
       }
     }
 
@@ -1018,7 +1001,6 @@
       const submitBtn = document.getElementById('form-submit-btn');
       const formTitle = document.getElementById('form-title');
 
-      // Tự động cập nhật lại tên trên 2 nút lựa chọn ở form mỗi khi mở form
       document.getElementById('target-left-text').textContent = document.getElementById('title-left').textContent + ' (Trái)';
       document.getElementById('target-right-text').textContent = document.getElementById('title-right').textContent + ' (Phải)';
 
