@@ -579,8 +579,8 @@
       </div>
 
       <div class="sidebar-target" id="sidebar-target-row">
-        <div class="target-btn active" id="target-left" onclick="setTarget('left')">🚗 Xe Tao (Trái)</div>
-        <div class="target-btn" id="target-right" onclick="setTarget('right')">🏎️ Dream Car (Phải)</div>
+        <div class="target-btn active" id="target-left" onclick="setTarget('left')"><span id="target-left-text">Xe Tao (Trái)</span></div>
+        <div class="target-btn" id="target-right" onclick="setTarget('right')"><span id="target-right-text">Dream Car (Phải)</span></div>
       </div>
 
       <div class="form-section">
@@ -808,7 +808,10 @@
       const currentName = titleEl.textContent;
       const newName = prompt('Nhập tên mới cho menu:', currentName);
       if (newName !== null && newName.trim() !== '') {
-        titleEl.textContent = newName.trim();
+        const trimmed = newName.trim();
+        titleEl.textContent = trimmed;
+        // Cập nhật tên tương ứng trong form thêm xe
+        document.getElementById('target-' + side + '-text').textContent = trimmed + (side === 'left' ? ' (Trái)' : ' (Phải)');
       }
     }
 
