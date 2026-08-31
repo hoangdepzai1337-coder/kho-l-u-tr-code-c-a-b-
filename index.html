@@ -129,7 +129,88 @@
     }
     .btn-bg-apply:hover { background: rgba(var(--main-color-rgb), 0.3); }
 
-    /* GIAO DIỆN CHÍNH */
+    /* MENU TRÊN (TOP SIDEBAR) */
+    .top-sidebar-wrap {
+      position: fixed; top: 0; left: 0; width: 100vw;
+      display: flex; justify-content: center; z-index: 100;
+      pointer-events: none; /* Để không che màn hình khi ẩn */
+    }
+    /* Cho phép tương tác với nội dung khi hover hoặc mở */
+    .top-sidebar-wrap * { pointer-events: auto; }
+
+    .top-arrow {
+      width: 60px; height: 28px;
+      background: rgba(var(--main-color-rgb),0.15); border: 1px solid rgba(var(--main-color-rgb),0.33);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--main-color); font-size: 16px;
+      backdrop-filter: blur(6px); user-select: none; flex-shrink: 0;
+      border-radius: 0 0 8px 8px;
+    }
+    .top-arrow::before { content: '▼'; }
+    .top-sidebar-wrap:hover .top-arrow::before { content: '▲'; }
+
+    .top-sidebar {
+      position: absolute; top: 0;
+      width: 320px; height: 0;
+      background: rgba(10,10,20,0.85); backdrop-filter: blur(14px);
+      overflow: hidden; transition: height 0.3s cubic-bezier(0.4,0,0.2,1);
+      display: flex; flex-direction: column;
+      border-bottom: 1px solid rgba(var(--main-color-rgb),0.2);
+      border-radius: 0 0 16px 16px;
+    }
+    .top-sidebar-wrap:hover .top-sidebar { height: 240px; }
+
+    .top-sidebar-inner {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px 20px 16px; overflow-y: auto; text-align: center; gap: 12px;
+    }
+
+    .creator-avatar {
+      width: 70px; height: 70px; border-radius: 50%;
+      object-fit: cover; border: 2px solid var(--main-color);
+      box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.4);
+    }
+
+    .creator-name {
+      color: var(--main-color); font-size: 14px; font-weight: 600;
+      letter-spacing: 1px; font-family: 'Fira Code', monospace;
+    }
+
+    .avatar-edit-group {
+      display: flex; flex-direction: column; gap: 6px; width: 100%;
+      background: rgba(var(--main-color-rgb), 0.04);
+      border: 1px solid rgba(var(--main-color-rgb), 0.15);
+      padding: 10px; border-radius: 8px;
+    }
+    .avatar-edit-group label {
+      color: rgba(255,255,255,0.7); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; text-align: left;
+    }
+    .avatar-edit-group input {
+      background: rgba(var(--main-color-rgb), 0.05);
+      border: 1px solid rgba(var(--main-color-rgb), 0.3);
+      border-radius: 4px; color: #fff; font-family: 'Inter', sans-serif;
+      font-size: 11px; padding: 6px 8px; outline: none; width: 100%;
+    }
+    .avatar-edit-group input:focus { border-color: var(--main-color); }
+
+    .avatar-actions {
+      display: flex; gap: 6px; width: 100%; margin-top: 2px;
+    }
+    .avatar-btn-cancel, .avatar-btn-apply {
+      flex: 1; padding: 6px; border-radius: 4px; font-size: 11px; font-weight: 500; cursor: pointer; text-align: center;
+    }
+    .avatar-btn-cancel {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);
+    }
+    .avatar-btn-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .avatar-btn-apply {
+      background: rgba(var(--main-color-rgb), 0.15); border: 1px solid var(--main-color); color: var(--main-color); font-weight: 600;
+    }
+    .avatar-btn-apply:hover { background: rgba(var(--main-color-rgb), 0.3); }
+
+
+    /* GIAO DIỆN CHÍNH (SIDEBAR TRÁI / PHẢI) */
     .sidebar-wrap {
       position: fixed; top: 0; height: 100vh;
       display: flex; align-items: center; z-index: 100;
@@ -381,6 +462,28 @@
   <!-- NÚT SETTING GÓC MÀN HÌNH -->
   <div class="setting-btn" onclick="openSetting()" title="Cài đặt giao diện">⚙️</div>
 
+  <!-- MENU TRÊN (TOP SIDEBAR) -->
+  <div class="top-sidebar-wrap">
+    <div class="top-sidebar">
+      <div class="top-sidebar-inner">
+        <!-- AVATAR MẶC ĐỊNH HOẶC TÙY CHỈNH -->
+        <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar">
+        <div class="creator-name">hoangdepzai</div>
+
+        <!-- KHUNG THÊM LINK AVATAR -->
+        <div class="avatar-edit-group">
+          <label>Đổi Ảnh Avatar (URL):</label>
+          <input type="text" id="avatar-url-input" placeholder="https://...">
+          <div class="avatar-actions">
+            <div class="avatar-btn-cancel" onclick="cancelAvatarChange()">Hủy</div>
+            <div class="avatar-btn-apply" onclick="applyAvatarChange()">Áp dụng</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="top-arrow"></div>
+  </div>
+
   <!-- MODAL CÀI ĐẶT MÀU & ẢNH NỀN -->
   <div class="setting-overlay" id="setting-overlay" onclick="closeSettingModal(event)">
     <div class="setting-box">
@@ -597,6 +700,21 @@
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
+
+    // XỬ LÝ ĐỔI AVATAR TRÊN MENU TRÊN
+    function applyAvatarChange() {
+      const url = document.getElementById('avatar-url-input').value.trim();
+      const avatarImg = document.getElementById('creator-avatar-img');
+      if (url && url.startsWith('http')) {
+        avatarImg.src = url;
+      } else {
+        alert('Vui lòng nhập link ảnh hợp lệ!');
+      }
+    }
+
+    function cancelAvatarChange() {
+      document.getElementById('avatar-url-input').value = '';
+    }
 
     // XỬ LÝ XEM TRƯỚC VÀ ĐỔI CHỮ LỚN (TITLE)
     function previewTitle(val) {
