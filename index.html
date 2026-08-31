@@ -360,6 +360,7 @@
       user-select: none;
     }
 
+    /* ĐOẠN CHỮ NHỎ CHỨA LINK Ở DƯỚI */
     .credit-link {
       color: rgba(255, 255, 255, 0.4);
       font-family: 'Fira Code', monospace;
@@ -374,261 +375,7 @@
       text-decoration: underline;
     }
 
-    /* ==================================================== */
-    /* WIDGET TRÌNH PHÁT NHẠC (KIỂU ĐĨA THAN / MẪU BẠN GỬI) */
-    /* ==================================================== */
-    .music-widget-wrapper {
-      position: fixed;
-      bottom: 25px;
-      left: 25px;
-      z-index: 150;
-      display: none; /* Hiện lên khi có nhạc */
-      align-items: center;
-      filter: drop-shadow(0 10px 25px rgba(0,0,0,0.6));
-      animation: fadeInUp 0.4s ease;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Thẻ chứa ảnh bìa và điều khiển */
-    .music-card {
-      position: relative;
-      width: 250px;
-      height: 250px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #121222;
-      border: 1px solid rgba(var(--main-color-rgb), 0.3);
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-    .music-card-bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 1;
-      opacity: 0.65;
-    }
-    .music-card-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(5,5,15,0.85) 70%, rgba(5,5,15,0.95) 100%);
-      z-index: 2;
-    }
-
-    /* Phần thông tin & nút bấm trên thẻ */
-    .music-card-top {
-      position: absolute;
-      top: 12px;
-      left: 14px;
-      right: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 3;
-    }
-    .music-live-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 3px 8px;
-      border-radius: 20px;
-      border: 1px solid rgba(var(--main-color-rgb), 0.3);
-      backdrop-filter: blur(4px);
-    }
-    .live-dot {
-      width: 6px;
-      height: 6px;
-      background-color: var(--main-color);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--main-color);
-      animation: pulseDot 1.5s infinite;
-    }
-    @keyframes pulseDot {
-      0% { transform: scale(0.9); opacity: 0.7; }
-      50% { transform: scale(1.3); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.7; }
-    }
-    .live-text {
-      color: var(--main-color);
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .music-card-content {
-      position: relative;
-      z-index: 3;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin-bottom: 8px;
-    }
-    .music-title {
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .music-artist {
-      color: rgba(255,255,255,0.65);
-      font-size: 11px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Thanh thời gian & thời lượng */
-    .music-progress-container {
-      position: relative;
-      z-index: 3;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-bottom: 10px;
-    }
-    .music-time-row {
-      display: flex;
-      justify-content: space-between;
-      color: rgba(255,255,255,0.5);
-      font-size: 9px;
-      font-family: 'Fira Code', monospace;
-    }
-    .music-seek-bar {
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 2px;
-      outline: none;
-      cursor: pointer;
-      appearance: none;
-      -webkit-appearance: none;
-    }
-    .music-seek-bar::-webkit-slider-thumb {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--main-color);
-      cursor: pointer;
-      box-shadow: 0 0 6px var(--main-color);
-    }
-
-    /* Các nút điều khiển nhạc */
-    .music-controls {
-      position: relative;
-      z-index: 3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 8px;
-    }
-    .ctrl-btn {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.8);
-      font-size: 13px;
-      cursor: pointer;
-      transition: color 0.2s, transform 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .ctrl-btn:hover {
-      color: var(--main-color);
-      transform: scale(1.15);
-    }
-    .ctrl-btn.main-play {
-      width: 32px;
-      height: 32px;
-      background: rgba(var(--main-color-rgb), 0.2);
-      border: 1px solid var(--main-color);
-      border-radius: 50%;
-      color: var(--main-color);
-      font-size: 12px;
-    }
-    .ctrl-btn.main-play:hover {
-      background: rgba(var(--main-color-rgb), 0.4);
-    }
-
-    /* Hiệu ứng Đĩa Than (Vinyl) ló dạng ở bên phải */
-    .vinyl-record {
-      position: absolute;
-      right: -55px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 210px;
-      height: 210px;
-      background: radial-gradient(circle, #111 0%, #000 70%);
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.1);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.3s ease;
-    }
-    /* Các rãnh đĩa than */
-    .vinyl-grooves {
-      position: absolute;
-      inset: 15px;
-      border-radius: 50%;
-      border: 1px dashed rgba(255,255,255,0.08);
-      box-shadow: inset 0 0 0 15px rgba(255,255,255,0.03), inset 0 0 0 30px rgba(255,255,255,0.02), inset 0 0 0 45px rgba(255,255,255,0.03);
-    }
-    /* Tem nhãn giữa đĩa than */
-    .vinyl-label {
-      width: 75px;
-      height: 75px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 2px solid var(--main-color);
-      position: relative;
-    }
-    .vinyl-label img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .vinyl-center-hole {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 12px;
-      height: 12px;
-      background: #0a0a14;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.3);
-    }
-
-    /* Hiệu ứng xoay đĩa khi nhạc đang phát */
-    .vinyl-record.spinning {
-      animation: spinVinyl 6s linear infinite;
-    }
-    @keyframes spinVinyl {
-      0% { transform: translateY(-50%) rotate(0deg); }
-      100% { transform: translateY(-50%) rotate(360deg); }
-    }
-    /* ==================================================== */
-
-    /* POPUP THÔNG SỐ XE */
+    /* POPUP THÔNG SỐ */
     .popup-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.85);
       z-index: 999; display: none; align-items: center; justify-content: center;
@@ -812,6 +559,7 @@
         <div class="btn-bg-apply" onclick="applyTitleChanges()">Áp dụng</div>
       </div>
 
+      <!-- PHẦN THÊM LINK CHIA SẺ -->
       <div class="setting-section-title">🔗 Tùy Chỉnh Link Chia Sẻ Dưới Chữ</div>
       <div class="bg-input-group">
         <label>Nhập URL đường dẫn (VD: https://github.com/...):</label>
@@ -835,31 +583,6 @@
       <div class="bg-actions">
         <div class="btn-bg-cancel" onclick="cancelBgChanges()">Hủy</div>
         <div class="btn-bg-apply" onclick="applyBgChanges()">Áp dụng</div>
-      </div>
-
-      <!-- PHẦN CÀI ĐẶT NHẠC -->
-      <div class="setting-section-title">🎵 Cài Đặt Nhạc Nền & Widget</div>
-      <div class="bg-input-group">
-        <label>Tên bài hát:</label>
-        <input type="text" id="setting-song-name" placeholder="VD: Sau Ngắn Ấy Năm" value="Sau Ngắn Ấy Năm">
-        <label style="margin-top:4px;">Tên ca sĩ / nghệ sĩ:</label>
-        <input type="text" id="setting-song-artist" placeholder="VD: Tăng Phúc" value="Tăng Phúc">
-        <label style="margin-top:4px;">Link Ảnh Bìa (URL hoặc Tải lên):</label>
-        <div class="file-upload-row">
-          <input type="text" id="setting-song-art" placeholder="https://..." value="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600">
-          <label class="btn-file-select" for="art-file-input">📁 Chọn ảnh</label>
-          <input type="file" id="art-file-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this, 'art')">
-        </div>
-        <label style="margin-top:4px;">Link Nhạc (.mp3) hoặc Tải file nhạc:</label>
-        <div class="file-upload-row">
-          <input type="text" id="setting-music-url" placeholder="Nhập link file .mp3 trực tiếp...">
-          <label class="btn-file-select" for="music-file-input">📁 Chọn nhạc</label>
-          <input type="file" id="music-file-input" accept="audio/*" style="display:none;" onchange="handleMusicUpload(this)">
-        </div>
-      </div>
-      <div class="bg-actions">
-        <div class="btn-bg-cancel" onclick="cancelMusicChanges()">Hủy</div>
-        <div class="btn-bg-apply" onclick="applyMusicChanges()">Áp dụng</div>
       </div>
     </div>
   </div>
@@ -1026,59 +749,6 @@
     </div>
   </div>
 
-  <!-- ==================================================== -->
-  <!-- GIAO DIỆN WIDGET TRÌNH PHÁT NHẠC NỔI GÓC TRÁI DƯỚI -->
-  <!-- ==================================================== -->
-  <div class="music-widget-wrapper" id="music-widget-wrapper">
-    <!-- Thẻ phát nhạc -->
-    <div class="music-card">
-      <img id="m-card-bg" class="music-card-bg" src="" alt="Art" onerror="handleImageError(this)">
-      <div class="music-card-overlay"></div>
-
-      <!-- Icon live & trạng thái -->
-      <div class="music-card-top">
-        <div class="music-live-badge">
-          <div class="live-dot"></div>
-          <div class="live-text" id="live-status-text">PLAYING</div>
-        </div>
-      </div>
-
-      <!-- Tên bài hát & nghệ sĩ -->
-      <div class="music-card-content">
-        <div class="music-title" id="m-card-title">Tên bài hát</div>
-        <div class="music-artist" id="m-card-artist">Nghệ sĩ</div>
-      </div>
-
-      <!-- Thanh thời gian & mốc thời gian -->
-      <div class="music-progress-container">
-        <div class="music-time-row">
-          <span id="m-current-time">00:00</span>
-          <span id="m-duration">00:00</span>
-        </div>
-        <input type="range" id="m-seek-bar" class="music-seek-bar" value="0" min="0" max="100" step="0.1" oninput="seekAudio(this.value)">
-      </div>
-
-      <!-- Các nút tua lùi, play/pause, tua tới -->
-      <div class="music-controls">
-        <button class="ctrl-btn" onclick="skipAudio(-5)" title="Tua lùi 5 giây">⏮</button>
-        <button class="ctrl-btn main-play" id="m-play-pause-btn" onclick="togglePlayPause()" title="Phát / Tạm dừng">⏸</button>
-        <button class="ctrl-btn" onclick="skipAudio(5)" title="Tua tới 5 giây">⏭</button>
-      </div>
-    </div>
-
-    <!-- Đĩa than (Vinyl) xoay bên phải thẻ -->
-    <div class="vinyl-record" id="vinyl-record-el">
-      <div class="vinyl-grooves"></div>
-      <div class="vinyl-label">
-        <img id="m-vinyl-img" src="" alt="Vinyl" onerror="handleImageError(this)">
-        <div class="vinyl-center-hole"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- THẺ AUDIO NGẦM -->
-  <audio id="global-audio-element" style="display:none;"></audio>
-
   <script>
     const bg = document.getElementById('bg');
     const titleDisplay = document.getElementById('title-display');
@@ -1107,137 +777,17 @@
           } else if (type === 'car') {
             document.getElementById('f-img').value = resultUrl;
             previewImg(resultUrl);
-          } else if (type === 'art') {
-            document.getElementById('setting-song-art').value = resultUrl;
           }
         };
         reader.readAsDataURL(input.files[0]);
       }
     }
 
-    function handleMusicUpload(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('setting-music-url').value = e.target.result;
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
-    }
-
-    /* ĐIỀU KHIỂN AUDIO VÀ WIDGET NHẠC */
-    const audioEl = document.getElementById('global-audio-element');
-    const musicWidget = document.getElementById('music-widget-wrapper');
-    const vinylEl = document.getElementById('vinyl-record-el');
-
-    function formatTime(secs) {
-      if (isNaN(secs)) return "00:00";
-      const m = Math.floor(secs / 60);
-      const s = Math.floor(secs % 60);
-      return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-
-    function applyMusicChanges() {
-      const musicUrl = document.getElementById('setting-music-url').value.trim();
-      const songName = document.getElementById('setting-song-name').value.trim() || 'Bài hát';
-      const songArtist = document.getElementById('setting-song-artist').value.trim() || 'Nghệ sĩ';
-      const songArt = document.getElementById('setting-song-art').value.trim();
-
-      if (!musicUrl) {
-        alert('Vui lòng nhập link nhạc hoặc chọn file nhạc (.mp3)!');
-        return;
-      }
-
-      // Gán thông tin lên widget
-      document.getElementById('m-card-title').textContent = songName;
-      document.getElementById('m-card-artist').textContent = songArtist;
-      if (songArt) {
-        document.getElementById('m-card-bg').src = songArt;
-        document.getElementById('m-vinyl-img').src = songArt;
-      }
-
-      // Nạp nguồn nhạc vào thẻ audio
-      audioEl.src = musicUrl;
-      audioEl.load();
-      audioEl.play().then(() => {
-        musicWidget.style.display = 'flex';
-        vinylEl.classList.add('spinning');
-        document.getElementById('m-play-pause-btn').textContent = '⏸';
-        document.getElementById('live-status-text').textContent = 'PLAYING';
-      }).catch(err => {
-        console.log("Auto-play bị chặn hoặc lỗi link:", err);
-        musicWidget.style.display = 'flex';
-        document.getElementById('m-play-pause-btn').textContent = '▶';
-        document.getElementById('live-status-text').textContent = 'PAUSED';
-      });
-
-      closeSetting();
-    }
-
-    function cancelMusicChanges() {
-      closeSetting();
-    }
-
-    function togglePlayPause() {
-      const playPauseBtn = document.getElementById('m-play-pause-btn');
-      const liveStatus = document.getElementById('live-status-text');
-      if (audioEl.paused) {
-        audioEl.play();
-        playPauseBtn.textContent = '⏸';
-        vinylEl.classList.add('spinning');
-        liveStatus.textContent = 'PLAYING';
-      } else {
-        audioEl.pause();
-        playPauseBtn.textContent = '▶';
-        vinylEl.classList.remove('spinning');
-        liveStatus.textContent = 'PAUSED';
-      }
-    }
-
-    function skipAudio(seconds) {
-      audioEl.currentTime = Math.min(Math.max(0, audioEl.currentTime + seconds), audioEl.duration);
-    }
-
-    function seekAudio(val) {
-      if (!isNaN(audioEl.duration)) {
-        audioEl.currentTime = (val / 100) * audioEl.duration;
-      }
-    }
-
-    // Cập nhật thanh thời gian khi nhạc chạy
-    audioEl.addEventListener('timeupdate', () => {
-      if (!isNaN(audioEl.duration)) {
-        const percent = (audioEl.currentTime / audioEl.duration) * 100;
-        document.getElementById('m-seek-bar').value = percent;
-        document.getElementById('m-current-time').textContent = formatTime(audioEl.currentTime);
-        document.getElementById('m-duration').textContent = formatTime(audioEl.duration);
-      }
-    });
-
-    audioEl.addEventListener('ended', () => {
-      document.getElementById('m-play-pause-btn').textContent = '▶';
-      vinylEl.classList.remove('spinning');
-      document.getElementById('live-status-text').textContent = 'ENDED';
-    });
-
-    // PARALLAX PC
     document.addEventListener('mousemove', (e) => {
-      if (window.innerWidth > 768) {
-        const x = (e.clientX / window.innerWidth - 0.5) * 20;
-        const y = (e.clientY / window.innerHeight - 0.5) * 20;
-        bg.style.transform = `translate(${x}px, ${y}px)`;
-      }
+      const x = (e.clientX / window.innerWidth - 0.5) * 20;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+      bg.style.transform = `translate(${x}px, ${y}px)`;
     });
-
-    // PARALLAX MOBILE
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', (e) => {
-        if (e.gamma === null || window.innerWidth > 768) return;
-        const x = Math.max(-15, Math.min(15, (e.gamma / 45) * 15));
-        const y = Math.max(-15, Math.min(15, ((e.beta - 45) / 45) * 15));
-        bg.style.transform = `translate(${x}px, ${y}px)`;
-      }, true);
-    }
 
     function previewAvatarUrl(val) {}
 
@@ -1275,6 +825,7 @@
       closeSetting();
     }
 
+    /* XỬ LÝ LINK CHIA SẺ */
     function applyLinkChanges() {
       const val = linkInput.value.trim();
       if (val !== '') {
