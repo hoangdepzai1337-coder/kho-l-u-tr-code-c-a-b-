@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Kho Code</title>
+  <title id="page-title-meta">Kho Code</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -245,7 +245,8 @@
       flex: 1; display: flex; flex-direction: column;
       justify-content: center; align-items: center; gap: 10px;
     }
-    .title { color: var(--main-color); font-size: 32px; font-weight: 600; letter-spacing: 4px; text-shadow: 0 0 20px rgba(var(--main-color-rgb),0.5); }
+    .title { color: var(--main-color); font-size: 32px; font-weight: 600; letter-spacing: 4px; text-shadow: 0 0 20px rgba(var(--main-color-rgb),0.5); cursor: pointer; transition: color 0.2s; }
+    .title:hover { opacity: 0.8; }
     .subtitle { color: #ffffff66; font-size: 13px; font-family: 'Fira Code', monospace; letter-spacing: 2px; cursor: pointer; transition: color 0.2s; }
     .subtitle:hover { color: var(--main-color); }
 
@@ -394,6 +395,17 @@
       <div class="custom-color-row">
         <label>Hoặc chọn màu tùy ý:</label>
         <input type="color" id="custom-color-picker" value="#00ffcc" oninput="setThemeColor(this.value)">
+      </div>
+
+      <!-- PHẦN TÙY CHỈNH CHỮ LỚN (TIÊU ĐỀ CHÍNH) -->
+      <div class="setting-section-title">🔤 Tùy Chỉnh Chữ Lớn (Kho Code)</div>
+      <div class="bg-input-group">
+        <label>Nội dung chữ lớn:</label>
+        <input type="text" id="setting-title-input" value="KHO CODE" oninput="previewTitle(this.value)">
+      </div>
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="cancelTitleChanges()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyTitleChanges()">Áp dụng</div>
       </div>
 
       <!-- PHẦN TÙY CHỈNH CHỮ KÝ (SUBTITLE) -->
@@ -557,7 +569,7 @@
 
   <!-- CENTER -->
   <div class="center">
-    <div class="title">KHO CODE</div>
+    <div class="title" id="title-display" onclick="openSetting()" title="Nhấn để đổi chữ lớn">KHO CODE</div>
     <div class="subtitle" id="subtitle-display" onclick="openSetting()" title="Nhấn để đổi chữ nhỏ">// by hoangdepzai1337</div>
   </div>
 
@@ -578,8 +590,11 @@
 
   <script>
     const bg = document.getElementById('bg');
+    const titleDisplay = document.getElementById('title-display');
+    const titleInput = document.getElementById('setting-title-input');
     const subtitleDisplay = document.getElementById('subtitle-display');
     const subtitleInput = document.getElementById('setting-subtitle-input');
+    const pageTitleMeta = document.getElementById('page-title-meta');
     
     // GIỮ NGUYÊN HIỆU ỨNG ẢNH THEO CHUỘT
     document.addEventListener('mousemove', (e) => {
@@ -587,6 +602,27 @@
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
     });
+
+    // XỬ LÝ XEM TRƯỚC VÀ ĐỔI CHỮ LỚN (TITLE)
+    function previewTitle(val) {
+      titleDisplay.textContent = val;
+    }
+
+    function applyTitleChanges() {
+      const val = titleInput.value.trim();
+      if (val !== '') {
+        titleDisplay.textContent = val;
+        pageTitleMeta.textContent = val;
+        closeSetting();
+      } else {
+        alert('Nội dung chữ lớn không được để trống!');
+      }
+    }
+
+    function cancelTitleChanges() {
+      titleInput.value = titleDisplay.textContent;
+      closeSetting();
+    }
 
     // XỬ LÝ XEM TRƯỚC VÀ ĐỔI CHỮ NHỎ (SUBTITLE / CREDIT)
     function previewSubtitle(val) {
