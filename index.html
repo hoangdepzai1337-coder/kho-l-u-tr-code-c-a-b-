@@ -16,8 +16,7 @@
 
     .bg {
       position: fixed;
-      top: -20px;
-      left: -20px;
+      top: -20px; left: -20px;
       width: calc(100% + 40px);
       height: calc(100% + 40px);
       background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=3840');
@@ -27,7 +26,6 @@
       z-index: -1;
     }
 
-    /* SIDEBAR WRAPPER */
     .sidebar-wrap {
       position: fixed;
       top: 0;
@@ -36,15 +34,13 @@
       align-items: center;
       z-index: 100;
     }
-
     .sidebar-wrap.left { left: 0; }
     .sidebar-wrap.right { right: 0; }
 
-    /* MŨI TÊN */
     .arrow {
       width: 28px;
       height: 60px;
-      background: rgba(0, 255, 204, 0.15);
+      background: rgba(0,255,204,0.15);
       border: 1px solid #00ffcc55;
       display: flex;
       align-items: center;
@@ -52,40 +48,31 @@
       cursor: pointer;
       color: #00ffcc;
       font-size: 16px;
-      transition: background 0.2s;
       backdrop-filter: blur(6px);
       user-select: none;
       flex-shrink: 0;
     }
-
     .sidebar-wrap.left .arrow { border-radius: 0 8px 8px 0; }
     .sidebar-wrap.right .arrow { border-radius: 8px 0 0 8px; }
+    .sidebar-wrap.left .arrow::before { content: '▶'; }
+    .sidebar-wrap.left:hover .arrow::before { content: '◀'; }
+    .sidebar-wrap.right .arrow::before { content: '◀'; }
+    .sidebar-wrap.right:hover .arrow::before { content: '▶'; }
 
-    .arrow:hover { background: rgba(0, 255, 204, 0.3); }
-
-    /* SIDEBAR */
     .sidebar {
       width: 0;
       height: 100vh;
-      background: rgba(10, 10, 20, 0.85);
+      background: rgba(10,10,20,0.85);
       backdrop-filter: blur(14px);
       overflow: hidden;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex;
       flex-direction: column;
       padding: 0;
     }
-
     .sidebar-wrap.left .sidebar { border-right: 1px solid #00ffcc33; order: -1; }
     .sidebar-wrap.right .sidebar { border-left: 1px solid #00ffcc33; }
-
-    .sidebar-wrap:hover .sidebar { width: 280px; padding: 24px 12px; }
-
-    /* Mũi tên đổi chiều khi mở */
-    .sidebar-wrap.left:hover .arrow::before { content: '◀'; }
-    .sidebar-wrap.left .arrow::before { content: '▶'; }
-    .sidebar-wrap.right:hover .arrow::before { content: '▶'; }
-    .sidebar-wrap.right .arrow::before { content: '◀'; }
+    .sidebar-wrap:hover .sidebar { width: 280px; padding: 24px 12px; overflow-y: auto; }
 
     .sidebar h2 {
       color: #00ffcc;
@@ -99,7 +86,6 @@
       opacity: 0;
       transition: opacity 0.2s 0.2s;
     }
-
     .sidebar-wrap:hover .sidebar h2 { opacity: 1; }
 
     .car-item {
@@ -107,7 +93,6 @@
       overflow: hidden;
       border: 1px solid #00ffcc22;
       cursor: pointer;
-      transition: border 0.2s, transform 0.2s;
       margin-bottom: 10px;
       flex-shrink: 0;
       opacity: 0;
@@ -115,40 +100,20 @@
       transition: opacity 0.25s, transform 0.25s, border 0.2s;
       white-space: nowrap;
     }
-
     .sidebar-wrap.right .car-item { transform: translateX(10px); }
-
-    .sidebar-wrap:hover .car-item {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
+    .sidebar-wrap:hover .car-item { opacity: 1; transform: translateX(0); }
     .sidebar-wrap:hover .car-item:nth-child(2) { transition-delay: 0.08s; }
     .sidebar-wrap:hover .car-item:nth-child(3) { transition-delay: 0.14s; }
     .sidebar-wrap:hover .car-item:nth-child(4) { transition-delay: 0.20s; }
-    .sidebar-wrap:hover .car-item:nth-child(5) { transition-delay: 0.26s; }
+    .sidebar-wrap:hover .car-item:hover { border: 1px solid #00ffcc; transform: scale(1.02) !important; }
 
-    .car-item:hover {
-      border: 1px solid #00ffcc;
-      transform: scale(1.02) !important;
-    }
-
-    .car-item img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      display: block;
-    }
-
+    .car-item img { width: 100%; height: 150px; object-fit: cover; display: block; }
     .car-item span {
-      display: block;
-      color: #00ffcc;
-      font-size: 11px;
-      padding: 6px 8px;
+      display: block; color: #00ffcc;
+      font-size: 11px; padding: 6px 8px;
       background: rgba(0,0,0,0.6);
     }
 
-    /* CENTER */
     .center {
       flex: 1;
       display: flex;
@@ -157,33 +122,153 @@
       align-items: center;
       gap: 16px;
     }
+    .title { color: #00ffcc; font-size: 32px; letter-spacing: 6px; text-shadow: 0 0 20px #00ffcc88; }
+    .subtitle { color: #ffffff66; font-size: 13px; letter-spacing: 2px; }
 
-    .title {
-      color: #00ffcc;
-      font-size: 32px;
-      letter-spacing: 6px;
-      text-shadow: 0 0 20px #00ffcc88;
+    /* POPUP */
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      animation: fadeIn 0.25s ease;
+    }
+    .popup-overlay.open { display: flex; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .popup {
+      width: 90vw;
+      max-width: 900px;
+      max-height: 90vh;
+      background: rgba(10,10,25,0.97);
+      border: 1px solid #00ffcc44;
+      border-radius: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.3s ease;
     }
 
-    .subtitle {
-      color: #ffffff66;
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .popup-header {
+      position: relative;
+      height: 320px;
+      overflow: hidden;
+      border-radius: 16px 16px 0 0;
+      flex-shrink: 0;
+    }
+    .popup-header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .popup-header-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 20px 24px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    }
+    .popup-header-overlay h1 {
+      color: #00ffcc;
+      font-size: 26px;
+      letter-spacing: 3px;
+    }
+    .popup-header-overlay p {
+      color: #ffffff88;
       font-size: 13px;
-      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 36px; height: 36px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid #00ffcc55;
+      border-radius: 50%;
+      color: #00ffcc;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-close:hover { background: #00ffcc22; }
+
+    .popup-body { padding: 24px; }
+
+    .spec-section { margin-bottom: 24px; }
+    .spec-section h3 {
+      color: #00ffcc;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #00ffcc22;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .spec-item {
+      background: rgba(0,255,204,0.04);
+      border: 1px solid #00ffcc15;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .spec-item .label {
+      color: #ffffff55;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .spec-item .value {
+      color: #ffffff;
+      font-size: 13px;
     }
   </style>
 </head>
 <body>
   <div class="bg" id="bg"></div>
 
+  <!-- POPUP -->
+  <div class="popup-overlay" id="popup-overlay" onclick="closePopup(event)">
+    <div class="popup" id="popup">
+      <div class="popup-header">
+        <img id="popup-img" src="" alt="">
+        <div class="popup-header-overlay">
+          <h1 id="popup-name"></h1>
+          <p id="popup-sub"></p>
+        </div>
+        <div class="popup-close" onclick="closePopupDirect()">✕</div>
+      </div>
+      <div class="popup-body" id="popup-body"></div>
+    </div>
+  </div>
+
   <!-- SIDEBAR TRÁI -->
   <div class="sidebar-wrap left">
     <div class="sidebar">
       <h2>🚗 Xe Tao</h2>
-      <div class="car-item">
+      <div class="car-item" onclick="openCar('urus')">
         <img src="https://www.topgear.com/sites/default/files/cars-car/image/2024/10/1-Lamborghini-Urus-SE-review-2024.jpg?w=1280&h=720" alt="Lamborghini Urus">
         <span>Lamborghini Urus</span>
       </div>
-      <div class="car-item">
+      <div class="car-item" onclick="openCar('sf90')">
         <img src="https://static0.topspeedimages.com/wordpress/wp-content/uploads/2023/02/ferrari-sf90-stradale.jpg?w=1600&h=900&fit=crop" alt="Ferrari SF90">
         <span>Ferrari SF90</span>
       </div>
@@ -202,11 +287,11 @@
     <div class="arrow"></div>
     <div class="sidebar">
       <h2>🏎️ Dream Car</h2>
-      <div class="car-item">
+      <div class="car-item" onclick="openCar('chiron')">
         <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Bugatti_Chiron_1.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original" alt="Bugatti Chiron">
         <span>Bugatti Chiron</span>
       </div>
-      <div class="car-item">
+      <div class="car-item" onclick="openCar('mclaren')">
         <img src="https://imageio.forbes.com/specials-images/imageserve/627be3167b47f51af48ee821/McLaren-765LT-Spider--1/960x0.jpg?format=jpg&width=960" alt="McLaren P1">
         <span>McLaren P1</span>
       </div>
@@ -219,6 +304,233 @@
       const x = (e.clientX / window.innerWidth - 0.5) * 20;
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
       bg.style.transform = `translate(${x}px, ${y}px)`;
+    });
+
+    const cars = {
+      urus: {
+        name: 'Lamborghini Urus',
+        sub: 'Super SUV · 2019',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/2019_Lamborghini_Urus_front_8.15.19.jpg/1280px-2019_Lamborghini_Urus_front_8.15.19.jpg',
+        specs: {
+          'Kích thước & Khối lượng': [
+            { label: 'Chiều dài × Rộng × Cao', value: '5.112 × 2.016 × 1.638 mm' },
+            { label: 'Chiều dài cơ sở', value: '3.003 mm' },
+            { label: 'Khoảng sáng gầm xe', value: '248 mm' },
+            { label: 'Bán kính vòng quay', value: '6.0 m' },
+            { label: 'Trọng lượng không tải', value: '2.200 kg' },
+          ],
+          'Động cơ & Hiệu suất': [
+            { label: 'Loại động cơ', value: 'V8 Twin-Turbo Xăng' },
+            { label: 'Dung tích xi-lanh', value: '3.996 cc (4.0L)' },
+            { label: 'Công suất cực đại', value: '650 HP @ 6.000 rpm' },
+            { label: 'Mô-men xoắn cực đại', value: '850 Nm @ 2.250 rpm' },
+            { label: '0–100 km/h', value: '3.6 giây' },
+            { label: 'Tốc độ tối đa', value: '305 km/h' },
+          ],
+          'Vận hành & Truyền động': [
+            { label: 'Hộp số', value: 'Tự động 8 cấp (ZF 8HP)' },
+            { label: 'Hệ thống dẫn động', value: 'AWD (4 bánh toàn thời gian)' },
+            { label: 'Hệ thống treo trước', value: 'Độc lập, đa liên kết, giảm chấn khí' },
+            { label: 'Hệ thống treo sau', value: 'Độc lập, đa liên kết' },
+            { label: 'Phanh trước/sau', value: 'Đĩa carbon-ceramic 440/370 mm' },
+          ],
+          'Tiêu thụ nhiên liệu': [
+            { label: 'Trong đô thị', value: '18.0 L/100km' },
+            { label: 'Ngoài đô thị', value: '11.0 L/100km' },
+            { label: 'Kết hợp', value: '13.5 L/100km' },
+          ],
+          'Ngoại thất & Nội thất': [
+            { label: 'Hệ thống đèn', value: 'LED Matrix toàn phần, tự động bật/tắt' },
+            { label: 'Mâm & Lốp', value: '23" hợp kim, 285/35 R23' },
+            { label: 'Ghế ngồi', value: 'Da Alcantara, chỉnh điện 18 hướng, sưởi/làm mát' },
+            { label: 'Màn hình', value: '10.1" + 8.6" cảm ứng, Apple CarPlay/Android Auto' },
+            { label: 'Hệ thống âm thanh', value: 'Bang & Olufsen 3D 1.700W 21 loa' },
+          ],
+          'An toàn': [
+            { label: 'Túi khí', value: '8 túi khí (trước, bên, rèm, gối)' },
+            { label: 'ABS + ESP', value: 'Có' },
+            { label: 'Hỗ trợ giữ làn', value: 'Có (Lane Assist)' },
+            { label: 'Phanh khẩn cấp', value: 'AEB tự động' },
+            { label: 'Camera', value: 'Camera 360°, cảm biến toàn vòng' },
+          ],
+        }
+      },
+      sf90: {
+        name: 'Ferrari SF90 Stradale',
+        sub: 'Hybrid Supercar · 2020',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/2020_Ferrari_SF90_Stradale%2C_front_8.15.19.jpg/1280px-2020_Ferrari_SF90_Stradale%2C_front_8.15.19.jpg',
+        specs: {
+          'Kích thước & Khối lượng': [
+            { label: 'Chiều dài × Rộng × Cao', value: '4.591 × 1.972 × 1.186 mm' },
+            { label: 'Chiều dài cơ sở', value: '2.650 mm' },
+            { label: 'Khoảng sáng gầm xe', value: '125 mm' },
+            { label: 'Bán kính vòng quay', value: '5.3 m' },
+            { label: 'Trọng lượng không tải', value: '1.570 kg' },
+          ],
+          'Động cơ & Hiệu suất': [
+            { label: 'Loại động cơ', value: 'V8 Twin-Turbo + 3 Motor Điện (Plug-in Hybrid)' },
+            { label: 'Dung tích xi-lanh', value: '3.990 cc (4.0L)' },
+            { label: 'Công suất cực đại', value: '1.000 HP tổng hợp' },
+            { label: 'Mô-men xoắn cực đại', value: '800 Nm' },
+            { label: '0–100 km/h', value: '2.5 giây' },
+            { label: 'Tốc độ tối đa', value: '340 km/h' },
+          ],
+          'Vận hành & Truyền động': [
+            { label: 'Hộp số', value: 'Ly hợp kép 8 cấp (DCT)' },
+            { label: 'Hệ thống dẫn động', value: 'AWD (Hybrid 4WD)' },
+            { label: 'Hệ thống treo trước', value: 'Độc lập, điều chỉnh điện tử' },
+            { label: 'Hệ thống treo sau', value: 'Đa liên kết, điều chỉnh điện tử' },
+            { label: 'Phanh trước/sau', value: 'Carbon-ceramic 398/360 mm' },
+          ],
+          'Tiêu thụ nhiên liệu': [
+            { label: 'Chế độ thuần điện', value: '25 km (WLTP)' },
+            { label: 'Kết hợp', value: '8.0 L/100km' },
+            { label: 'Dung tích pin', value: '7.9 kWh' },
+          ],
+          'Ngoại thất & Nội thất': [
+            { label: 'Hệ thống đèn', value: 'LED toàn phần, DRL đặc trưng Ferrari' },
+            { label: 'Mâm & Lốp', value: '20" trước / 21" sau, Michelin Pilot Sport' },
+            { label: 'Ghế ngồi', value: 'Carbon racing seat, bọc da Alcantara' },
+            { label: 'Vô lăng', value: 'Multifunctional steering wheel, HUD' },
+            { label: 'Màn hình', value: '16" curved digital cockpit' },
+          ],
+          'An toàn': [
+            { label: 'Túi khí', value: '6 túi khí' },
+            { label: 'ABS + ESP', value: 'Ferrari SSC (Side Slip Control) Gen 7' },
+            { label: 'Kiểm soát lực kéo', value: 'F-Trac, E-Diff3' },
+            { label: 'Hệ thống ổn định', value: 'Ferrari Peak Performance (FPP)' },
+            { label: 'Camera', value: 'Camera lùi + cảm biến đa hướng' },
+          ],
+        }
+      },
+      chiron: {
+        name: 'Bugatti Chiron',
+        sub: 'Hypercar · 2017',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/2017_Bugatti_Chiron.jpg/1280px-2017_Bugatti_Chiron.jpg',
+        specs: {
+          'Kích thước & Khối lượng': [
+            { label: 'Chiều dài × Rộng × Cao', value: '4.544 × 2.038 × 1.212 mm' },
+            { label: 'Chiều dài cơ sở', value: '2.711 mm' },
+            { label: 'Khoảng sáng gầm xe', value: '125 mm' },
+            { label: 'Bán kính vòng quay', value: '5.8 m' },
+            { label: 'Trọng lượng không tải', value: '1.995 kg' },
+          ],
+          'Động cơ & Hiệu suất': [
+            { label: 'Loại động cơ', value: 'W16 Quad-Turbo Xăng' },
+            { label: 'Dung tích xi-lanh', value: '7.993 cc (8.0L)' },
+            { label: 'Công suất cực đại', value: '1.500 HP @ 6.700 rpm' },
+            { label: 'Mô-men xoắn cực đại', value: '1.600 Nm @ 2.000–6.000 rpm' },
+            { label: '0–100 km/h', value: '2.4 giây' },
+            { label: 'Tốc độ tối đa', value: '420 km/h (giới hạn điện tử 380)' },
+          ],
+          'Vận hành & Truyền động': [
+            { label: 'Hộp số', value: 'Ly hợp kép 7 cấp DSG' },
+            { label: 'Hệ thống dẫn động', value: 'AWD (4 bánh toàn thời gian)' },
+            { label: 'Hệ thống treo trước', value: 'Độc lập, thủy lực điều chỉnh điện tử' },
+            { label: 'Hệ thống treo sau', value: 'Độc lập, thủy lực điều chỉnh điện tử' },
+            { label: 'Phanh', value: 'Carbon-ceramic 420/400 mm, 8 piston' },
+          ],
+          'Tiêu thụ nhiên liệu': [
+            { label: 'Trong đô thị', value: '35.0 L/100km' },
+            { label: 'Ngoài đô thị', value: '15.0 L/100km' },
+            { label: 'Kết hợp', value: '22.5 L/100km' },
+          ],
+          'Ngoại thất & Nội thất': [
+            { label: 'Hệ thống đèn', value: 'LED toàn phần, DRL chữ C đặc trưng' },
+            { label: 'Mâm & Lốp', value: '20" Bugatti tiêu chuẩn, Michelin Pilot Sport Cup 2' },
+            { label: 'Ghế ngồi', value: 'Da bò thủ công, chỉnh điện 16 hướng' },
+            { label: 'Nội thất', value: 'Carbon + da thủ công, cá nhân hóa không giới hạn' },
+            { label: 'Âm thanh', value: 'Hệ thống tùy chỉnh cao cấp' },
+          ],
+          'An toàn': [
+            { label: 'Túi khí', value: '8 túi khí' },
+            { label: 'ABS + ESP', value: 'Hệ thống Bosch cao cấp' },
+            { label: 'Kiểm soát lực kéo', value: 'Bugatti Dynamic Torque Vectoring' },
+            { label: 'Cánh gió chủ động', value: 'Rear wing tự động theo tốc độ' },
+            { label: 'Camera', value: 'Camera lùi + cảm biến đa hướng' },
+          ],
+        }
+      },
+      mclaren: {
+        name: 'McLaren P1',
+        sub: 'Hybrid Hypercar · 2013',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/McLaren_P1_%2814413596473%29.jpg/1280px-McLaren_P1_%2814413596473%29.jpg',
+        specs: {
+          'Kích thước & Khối lượng': [
+            { label: 'Chiều dài × Rộng × Cao', value: '4.588 × 1.946 × 1.188 mm' },
+            { label: 'Chiều dài cơ sở', value: '2.670 mm' },
+            { label: 'Khoảng sáng gầm xe', value: '100 mm (chế độ Race)' },
+            { label: 'Bán kính vòng quay', value: '5.2 m' },
+            { label: 'Trọng lượng không tải', value: '1.395 kg' },
+          ],
+          'Động cơ & Hiệu suất': [
+            { label: 'Loại động cơ', value: 'V8 Twin-Turbo + Motor Điện (Hybrid)' },
+            { label: 'Dung tích xi-lanh', value: '3.799 cc (3.8L)' },
+            { label: 'Công suất cực đại', value: '916 HP tổng hợp' },
+            { label: 'Mô-men xoắn cực đại', value: '900 Nm' },
+            { label: '0–100 km/h', value: '2.8 giây' },
+            { label: 'Tốc độ tối đa', value: '350 km/h' },
+          ],
+          'Vận hành & Truyền động': [
+            { label: 'Hộp số', value: 'Ly hợp kép 7 cấp (SSG)' },
+            { label: 'Hệ thống dẫn động', value: 'RWD (Cầu sau)' },
+            { label: 'Hệ thống treo trước', value: 'Độc lập, thủy lực RaceActive' },
+            { label: 'Hệ thống treo sau', value: 'Độc lập, thủy lực RaceActive' },
+            { label: 'Phanh', value: 'Carbon-ceramic 390/380 mm' },
+          ],
+          'Tiêu thụ nhiên liệu': [
+            { label: 'Chế độ thuần điện', value: '10 km' },
+            { label: 'Kết hợp', value: '8.3 L/100km' },
+            { label: 'Dung tích pin', value: '4.7 kWh (NiMH)' },
+          ],
+          'Ngoại thất & Nội thất': [
+            { label: 'Hệ thống đèn', value: 'LED toàn phần, DRL đặc trưng McLaren' },
+            { label: 'Mâm & Lốp', value: '19"/20" carbon forged, Pirelli P Zero Corsa' },
+            { label: 'Ghế ngồi', value: 'Carbon racing seat, bọc da/Alcantara' },
+            { label: 'Thân xe', value: '100% carbon fiber (MonoCage)' },
+            { label: 'Cánh gió', value: 'DRS chủ động, lực ép xuống 600 kg @ 257 km/h' },
+          ],
+          'An toàn': [
+            { label: 'Túi khí', value: '6 túi khí' },
+            { label: 'ABS + ESP', value: 'McLaren Brake Steer + Dynamic Stability' },
+            { label: 'Kiểm soát lực kéo', value: 'Variable Drift Control (VDC)' },
+            { label: 'Khung bảo vệ', value: 'Carbon MonoCage Roll Structure' },
+            { label: 'Camera', value: 'Camera lùi + cảm biến' },
+          ],
+        }
+      }
+    };
+
+    function openCar(id) {
+      const car = cars[id];
+      document.getElementById('popup-img').src = car.img;
+      document.getElementById('popup-name').textContent = car.name;
+      document.getElementById('popup-sub').textContent = car.sub;
+
+      let html = '';
+      for (const [section, items] of Object.entries(car.specs)) {
+        html += `<div class="spec-section"><h3>${section}</h3><div class="spec-grid">`;
+        items.forEach(item => {
+          html += `<div class="spec-item"><div class="label">${item.label}</div><div class="value">${item.value}</div></div>`;
+        });
+        html += `</div></div>`;
+      }
+      document.getElementById('popup-body').innerHTML = html;
+      document.getElementById('popup-overlay').classList.add('open');
+    }
+
+    function closePopup(e) {
+      if (e.target === document.getElementById('popup-overlay')) {
+        document.getElementById('popup-overlay').classList.remove('open');
+      }
+    }
+
+    function closePopupDirect() {
+      document.getElementById('popup-overlay').classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePopupDirect();
     });
   </script>
 </body>
