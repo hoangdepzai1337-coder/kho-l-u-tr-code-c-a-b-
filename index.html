@@ -495,7 +495,7 @@
     .music-player {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: 72px; z-index: 150;
-      background: rgba(10, 10, 20, 0.9);
+      background: rgba(10, 10, 20, var(--menu-opacity));
       backdrop-filter: blur(14px);
       border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
       display: flex; align-items: center;
@@ -504,10 +504,10 @@
     }
     .music-player.hidden { transform: translateY(110%); }
 
-    .mp-toggle {
+        .mp-toggle {
       position: fixed; bottom: 20px; right: 20px; z-index: 148;
       width: 48px; height: 48px;
-      background: rgba(10, 10, 20, 0.85);
+      background: rgba(10, 10, 20, var(--menu-opacity));
       border: 1px solid rgba(var(--main-color-rgb), 0.4);
       border-radius: 50%;
       color: var(--main-color); font-size: 20px;
@@ -582,10 +582,10 @@
     .mp-volume-fill { height: 100%; background: var(--main-color); border-radius: 2px; width: 70%; transition: width 0.1s; }
     .mp-volume-bar:hover { height: 6px; }
 
-    .mp-playlist {
+        .mp-playlist {
       position: fixed; bottom: 72px; right: 0;
       width: 320px; max-height: 380px;
-      background: rgba(10, 10, 20, 0.95);
+      background: rgba(10, 10, 20, var(--menu-opacity));
       backdrop-filter: blur(14px);
       border: 1px solid rgba(var(--main-color-rgb), 0.2);
       border-right: none;
