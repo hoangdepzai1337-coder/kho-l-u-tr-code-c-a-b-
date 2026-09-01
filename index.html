@@ -1548,7 +1548,7 @@
       }
     });
 
-       // SEEK BAR — kéo như YouTube
+ // SEEK BAR — kéo như YouTube
     let isDraggingBar = false;
     function seekToX(e) {
       if (!mpAudio.duration) return;
@@ -1591,6 +1591,31 @@
       isDraggingVol = false;
     });
 
+    // Touch cho mobile
+    mpBar.addEventListener('touchstart', function(e) {
+      isDraggingBar = true;
+      seekToX(e.touches[0]);
+    });
+    document.addEventListener('touchmove', function(e) {
+      if (isDraggingBar) {
+        e.preventDefault();
+        seekToX(e.touches[0]);
+      }
+    }, { passive: false });
+    document.addEventListener('touchend', function() {
+      isDraggingBar = false;
+    });
+
+    mpVolBar.addEventListener('touchstart', function(e) {
+      isDraggingVol = true;
+      volToX(e.touches[0]);
+    });
+    document.addEventListener('touchmove', function(e) {
+      if (isDraggingVol) volToX(e.touches[0]);
+    });
+    document.addEventListener('touchend', function() {
+      isDraggingVol = false;
+    });
     // Touch cho mobile
     mpBar.addEventListener('touchstart', function(e) {
       isDraggingBar = true;
