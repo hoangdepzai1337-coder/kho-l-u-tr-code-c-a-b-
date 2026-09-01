@@ -1344,7 +1344,7 @@
 
     initDefaultCars();
 
-    // ===== MUSIC PLAYER =====
+        // ===== MUSIC PLAYER (MP3 + YOUTUBE) =====
     const mpAudio = document.getElementById('mp-audio');
     const mpPlayer = document.getElementById('musicPlayer');
     const mpToggle = document.getElementById('mp-toggle');
@@ -1377,8 +1377,277 @@
     let isShuffle = false;
     let isLoop = false;
     let lastVolume = 0.7;
+    let ytPlayer = null;
+    let ytReady = false;
+    let currentType = 'audio';
+    let ytTimeInterval = null;
+
+    // Load YouTube API
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    window.onYouTubeIframeAPIReady = function() {
+      ytPlayer = new YT.Player('mp-yt-player', {
+        height: '1', width: '1',
+        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'modestbranding': 1 },
+        events: {
+          'onReady': function() { ytReady = true; ytPlayer.setVolume(lastVolume * 100); },
+          'onStateChange': function(e) {
+            if (e.data == YT.PlayerState.PLAYING) {
+              isPlaying = true; mpPlayBtn.textContent = '⏸';
+              if (currentType === 'youtube') {
+                mpDuration.textContent = fmtTime(ytPlayer.getDuration());
+                mpArtistEl.textContent = 'Bài ' + (currentSongIdx + 1) + '/' + songs.length;
+                startYTTimeUpdate();
+              }
+            } else if (e.data == YT.PlayerState.PAUSED) {
+              isPlaying = false; mpPlayBtn.textContent = '▶';
+              stopYTTimeUpdate();
+            } else if (e.data == YT.PlayerState.ENDED) {
+              stopYTTimeUpdate();
+              if (isLoop && currentType === 'youtube') { ytPlayer.seekTo(0); ytPlayer.playVideo(); }
+              else { nextSong(); }
+            } else if (e.data == YT.PlayerState.CUED) {
+              if (currentType === 'youtube' && ytPlayer.getDuration) {
+                mpDuration.textContent = fmtTime(ytPlayer.getDuration());
+              }
+            }
+          },
+          'onError': function() {
+            isPlaying = false; mpPlayBtn.textContent = '▶';
+            if (currentSongIdx !== -1) mpArtistEl.textContent = 'Lỗi phát YouTube';
+          }
+        }
+      });
+    };
+
+    function startYTTimeUpdate() {
+      stopYTTimeUpdate();
+      ytTimeInterval = setInterval(function() {
+        if (ytPlayer && ytPlayer.getCurrentTime) {
+          var cur = ytPlayer.getCurrentTime();
+          var dur = ytPlayer.getDuration();
+          if (dur) {
+            mpBarFill.style.width = ((cur / dur) * 100) + '%';
+            mpCurrentTime.textContent = fmtTime(cur);
+          }
+        }
+      }, 250);
+    }
+    function stopYTTimeUpdate() {
+      if (ytTimeInterval) { clearInterval(ytTimeInterval); ytTimeInterval = null; }
+    }
+
+    function extractYTId(url) {
+      if (!url) return null;
+      var regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+      var match = url.match(regex);
+      return match ? match[1] : null;
+    }
 
     function loadSongs() {
+      const stored = localStorage.getItem('myspace_songs');
+      if (stored) { try { songs = JSON.parse(stored); } catch(e) { songs = []; } }
+      if (songs.length === 0) {
+        songs = [{ name: 'Test — SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', icon: '🎵' }];
+        saveSongs();
+      }
+      renderPlaylist();
+    }
+    function saveSongs() {
+      try { const toSave = songs.filter(s => !s.url || s.url.length < 2000000); localStorage.setItem('myspace_songs', JSON.stringify(toSave)); }
+      catch(e) { console.warn('localStorage đầy:', e); }
+    }
+    function fmtTime(sec) {
+      if (!sec || isNaN(sec)) return '0:00';
+      const m = Math.floor(sec / 60); const s = Math.floor(sec % 60);
+      return m + ':' + (s < 10 ? '0' + s : s);
+    }
+    function renderPlaylist() {
+      if (songs.length === 0) {
+        mpPlaylistList.innerHTML = '<div class="mp-playlist-empty">Chưa có bài nào. Nhấn + để thêm.</div>';
+        mpPlaylistCount.textContent = '0 bài'; return;
+      }
+      mpPlaylistCount.textContent = songs.length + ' bài';
+      mpPlaylistList.innerHTML = songs.map(function(s, i) {
+        return '<div class="mp-track ' + (i === currentSongIdx ? 'active' : '') + '" onclick="playSong(' + i + ')">' +
+          '<span class="mp-track-icon">' + (s.icon || '🎵') + '</span>' +
+          '<div class="mp-track-info"><div class="mp-track-name">' + s.name + '</div></div>' +
+          '<div class="mp-track-del" onclick="event.stopPropagation(); deleteSong(' + i + ')">✕</div></div>';
+      }).join('');
+    }
+    function playSong(idx) {
+      if (idx < 0 || idx >= songs.length) return;
+      currentSongIdx = idx;
+      var song = songs[idx];
+      var url = song.url || '';
+      var ytId = extractYTId(url);
+
+      mpAudio.pause();
+      if (ytPlayer && ytPlayer.stopVideo) { try { ytPlayer.stopVideo(); } catch(e) {} }
+      stopYTTimeUpdate();
+
+      mpTitleEl.textContent = song.name;
+      mpArtistEl.textContent = 'Đang tải...';
+      mpThumb.textContent = song.icon || '🎵';
+
+      if (ytId) {
+        currentType = 'youtube';
+        if (ytReady && ytPlayer) {
+          ytPlayer.loadVideoById(ytId);
+        } else {
+          setTimeout(function() { if (currentSongIdx === idx) playSong(idx); }, 500);
+        }
+      } else {
+        currentType = 'audio';
+        mpAudio.src = url; mpAudio.load();
+        mpAudio.play().then(function() {
+          isPlaying = true; mpPlayBtn.textContent = '⏸';
+          mpArtistEl.textContent = 'Bài ' + (idx + 1) + '/' + songs.length;
+        }).catch(function(err) {
+          isPlaying = false; mpPlayBtn.textContent = '▶'; mpArtistEl.textContent = 'Lỗi phát nhạc';
+          alert('Không thể phát bài này.\n\nLý do:\n- Link sai/hết hạn\n- File không hợp lệ\n- CORS chặn\n\nThử link .mp3 khác hoặc link YouTube.');
+        });
+      }
+      renderPlaylist();
+    }
+    function togglePlay() {
+      if (currentSongIdx === -1 && songs.length > 0) { playSong(0); return; }
+      if (currentSongIdx === -1) return;
+      if (currentType === 'youtube') {
+        if (!ytPlayer) return;
+        if (isPlaying) { ytPlayer.pauseVideo(); }
+        else { ytPlayer.playVideo(); }
+      } else {
+        if (isPlaying) { mpAudio.pause(); isPlaying = false; mpPlayBtn.textContent = '▶'; }
+        else { mpAudio.play().then(function() { isPlaying = true; mpPlayBtn.textContent = '⏸'; }).catch(function() { mpPlayBtn.textContent = '▶'; }); }
+      }
+    }
+    function nextSong() {
+      if (songs.length === 0) return;
+      if (isShuffle) { var r; do { r = Math.floor(Math.random() * songs.length); } while (r === currentSongIdx && songs.length > 1); playSong(r); }
+      else { playSong((currentSongIdx + 1) % songs.length); }
+    }
+    function prevSong() {
+      if (songs.length === 0) return;
+      if (currentType === 'audio' && mpAudio.currentTime > 3) { mpAudio.currentTime = 0; return; }
+      if (currentType === 'youtube' && ytPlayer && ytPlayer.getCurrentTime && ytPlayer.getCurrentTime() > 3) { ytPlayer.seekTo(0, true); return; }
+      playSong((currentSongIdx - 1 + songs.length) % songs.length);
+    }
+    function deleteSong(idx) {
+      if (idx === currentSongIdx) {
+        if (currentType === 'youtube') {
+          if (ytPlayer && ytPlayer.stopVideo) { try { ytPlayer.stopVideo(); } catch(e) {} }
+          stopYTTimeUpdate();
+        } else {
+          mpAudio.pause(); mpAudio.removeAttribute('src'); mpAudio.load();
+        }
+        currentSongIdx = -1; isPlaying = false; mpPlayBtn.textContent = '▶';
+        mpTitleEl.textContent = 'Chưa chọn bài'; mpArtistEl.textContent = 'MySpace Music'; mpThumb.textContent = '🎵';
+        mpBarFill.style.width = '0%'; mpCurrentTime.textContent = '0:00'; mpDuration.textContent = '0:00';
+      }
+      songs.splice(idx, 1);
+      if (currentSongIdx > idx) currentSongIdx--;
+      if (currentSongIdx >= songs.length) currentSongIdx = -1;
+      saveSongs(); renderPlaylist();
+    }
+    function addSong() {
+      var name = document.getElementById('mp-add-name').value.trim();
+      var url = document.getElementById('mp-add-url').value.trim();
+      if (!name || !url) { alert('Cần tên bài và link/tệp nhạc!'); return; }
+      songs.push({ name: name, url: url, icon: '🎵' });
+      saveSongs(); renderPlaylist(); closeMpAddModal();
+      if (currentSongIdx === -1) playSong(songs.length - 1);
+    }
+    function closeMpAddModal() {
+      mpAddOverlay.classList.remove('open');
+      document.getElementById('mp-add-name').value = ''; document.getElementById('mp-add-url').value = ''; mpAddFile.value = '';
+    }
+
+    mpPlayBtn.addEventListener('click', togglePlay);
+    mpNextBtn.addEventListener('click', nextSong);
+    mpPrevBtn.addEventListener('click', prevSong);
+    mpShuffleBtn.addEventListener('click', function() { isShuffle = !isShuffle; mpShuffleBtn.classList.toggle('active', isShuffle); });
+    mpLoopBtn.addEventListener('click', function() { isLoop = !isLoop; mpLoopBtn.classList.toggle('active', isLoop); });
+    mpPlaylistBtn.addEventListener('click', function(e) { e.stopPropagation(); mpPlaylist.classList.toggle('open'); });
+    mpAddBtn.addEventListener('click', function() { mpAddOverlay.classList.add('open'); });
+    mpMinBtn.addEventListener('click', function() { mpPlayer.classList.add('hidden'); mpToggle.classList.add('show'); mpPlaylist.classList.remove('open'); });
+    mpToggle.addEventListener('click', function() { mpPlayer.classList.remove('hidden'); mpToggle.classList.remove('show'); });
+    mpAddFile.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        var file = e.target.files[0];
+        if (!file.type.startsWith('audio/')) { alert('File không phải audio.'); e.target.value = ''; return; }
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('mp-add-url').value = ev.target.result;
+          var nameInput = document.getElementById('mp-add-name');
+          if (!nameInput.value.trim()) { nameInput.value = file.name.replace(/\.[^/.]+$/, ''); }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Audio tag events (chỉ cho MP3)
+    mpAudio.addEventListener('loadedmetadata', function() { mpDuration.textContent = fmtTime(mpAudio.duration); if (currentSongIdx !== -1 && currentType === 'audio') mpArtistEl.textContent = 'Bài ' + (currentSongIdx + 1) + '/' + songs.length; });
+    mpAudio.addEventListener('timeupdate', function() { if (mpAudio.duration && currentType === 'audio') { var pct = (mpAudio.currentTime / mpAudio.duration) * 100; mpBarFill.style.width = pct + '%'; mpCurrentTime.textContent = fmtTime(mpAudio.currentTime); } });
+    mpAudio.addEventListener('ended', function() { if (isLoop && currentType === 'audio') { mpAudio.currentTime = 0; mpAudio.play(); } else { nextSong(); } });
+    mpAudio.addEventListener('error', function() { if (currentType === 'audio') { isPlaying = false; mpPlayBtn.textContent = '▶'; if (currentSongIdx !== -1) mpArtistEl.textContent = 'Lỗi tải âm thanh'; } });
+
+    // SEEK BAR
+    let isDraggingBar = false;
+    function seekToX(e) {
+      var rect = mpBar.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      if (currentType === 'youtube') {
+        if (ytPlayer && ytPlayer.getDuration) { var dur = ytPlayer.getDuration(); if (dur) { ytPlayer.seekTo(pct * dur, true); mpBarFill.style.width = (pct * 100) + '%'; mpCurrentTime.textContent = fmtTime(pct * dur); } }
+      } else {
+        if (!mpAudio.duration) return;
+        mpAudio.currentTime = pct * mpAudio.duration; mpBarFill.style.width = (pct * 100) + '%'; mpCurrentTime.textContent = fmtTime(mpAudio.currentTime);
+      }
+    }
+    mpBar.addEventListener('mousedown', function(e) { isDraggingBar = true; seekToX(e); });
+    document.addEventListener('mousemove', function(e) { if (isDraggingBar) seekToX(e); });
+    document.addEventListener('mouseup', function() { isDraggingBar = false; });
+
+    // VOLUME
+    let isDraggingVol = false;
+    function volToX(e) {
+      var rect = mpVolBar.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      lastVolume = pct; mpVolFill.style.width = (pct * 100) + '%';
+      if (currentType === 'youtube') { if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(pct * 100); }
+      else { mpAudio.volume = pct; }
+    }
+    mpVolBar.addEventListener('mousedown', function(e) { isDraggingVol = true; volToX(e); });
+    document.addEventListener('mousemove', function(e) { if (isDraggingVol) volToX(e); });
+    document.addEventListener('mouseup', function() { isDraggingVol = false; });
+
+    // Touch
+    mpBar.addEventListener('touchstart', function(e) { isDraggingBar = true; seekToX(e.touches[0]); });
+    document.addEventListener('touchmove', function(e) { if (isDraggingBar) { e.preventDefault(); seekToX(e.touches[0]); } }, { passive: false });
+    document.addEventListener('touchend', function() { isDraggingBar = false; });
+    mpVolBar.addEventListener('touchstart', function(e) { isDraggingVol = true; volToX(e.touches[0]); });
+    document.addEventListener('touchmove', function(e) { if (isDraggingVol) volToX(e.touches[0]); });
+    document.addEventListener('touchend', function() { isDraggingVol = false; });
+
+    mpAudio.volume = lastVolume;
+    mpVolFill.style.width = (lastVolume * 100) + '%';
+
+    document.addEventListener('click', function(e) {
+      if (!mpPlaylist.contains(e.target) && e.target !== mpPlaylistBtn && !mpPlaylistBtn.contains(e.target)) mpPlaylist.classList.remove('open');
+      if (e.target === mpAddOverlay) closeMpAddModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (mpAddOverlay.classList.contains('open')) { if (e.key === 'Escape') closeMpAddModal(); return; }
+      if (e.code === 'Space' && currentSongIdx !== -1) { e.preventDefault(); togglePlay(); }
+      if (e.code === 'ArrowRight' && e.shiftKey) { e.preventDefault(); nextSong(); }
+      if (e.code === 'ArrowLeft' && e.shiftKey) { e.preventDefault(); prevSong(); }
+    });
+
+    loadSongs();
       const stored = localStorage.getItem('myspace_songs');
       if (stored) {
         try { songs = JSON.parse(stored); } catch(e) { songs = []; }
