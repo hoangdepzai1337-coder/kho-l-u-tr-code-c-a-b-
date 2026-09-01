@@ -26,6 +26,12 @@
       transition: transform 0.1s ease-out; z-index: -1;
     }
 
+    /* CANVAS HIỆU ỨNG TUYẾT */
+    #snow-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 1;
+    }
+
     /* NÚT SETTING GÓC MÀN HÌNH */
     .setting-btn {
       position: fixed; top: 20px; right: 20px; z-index: 200;
@@ -417,6 +423,7 @@
     .center {
       flex: 1; display: flex; flex-direction: column;
       justify-content: center; align-items: center; gap: 10px;
+      z-index: 2;
     }
     .title { color: var(--main-color); font-size: 32px; font-weight: 600; letter-spacing: 4px; text-shadow: 0 0 20px rgba(var(--main-color-rgb),0.5); cursor: pointer; transition: color 0.2s; }
     .title:hover { opacity: 0.8; }
@@ -717,6 +724,7 @@
 </head>
 <body>
   <div class="bg" id="bg"></div>
+  <canvas id="snow-canvas"></canvas>
 
   <!-- NÚT SETTING GÓC MÀN HÌNH -->
   <div class="setting-btn" onclick="openSetting()" title="Cài đặt giao diện">⚙️</div>
@@ -1344,6 +1352,106 @@
     });
 
     initDefaultCars();
+
+    // ===== HIỆU ỨNG TUYẾT & HIỆU ỨNG HÚT CHUỘT =====
+    const snowCanvas = document.getElementById('snow-canvas');
+    const snowCtx = snowCanvas.getContext('2d');
+    let snowflakes = [];
+    const numSnowflakes = 100;
+
+    let mouse = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      isDown: false
+    };
+
+    window.addEventListener('resize', () => {
+      snowCanvas.width = window.innerWidth;
+      snowCanvas.height = window.innerHeight;
+    });
+    snowCanvas.width = window.innerWidth;
+    snowCanvas.height = window.innerHeight;
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mousedown', () => { mouse.isDown = true; });
+    window.addEventListener('mouseup', () => { mouse.isDown = false; });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchstart', (e) => {
+      mouse.isDown = true;
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+      }
+    });
+
+    window.addEventListener('touchend', () => { mouse.isDown = false; });
+
+    class Snowflake {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * snowCanvas.width;
+        this.y = Math.random() * snowCanvas.height;
+        this.radius = Math.random() * 2.5 + 1;
+        this.baseSpeedY = Math.random() * 1 + 0.5;
+        this.speedY = this.baseSpeedY;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.alpha = Math.random() * 0.7 + 0.3;
+      }
+      update() {
+        // Hiệu ứng hút khi bấm chuột/chạm màn hình
+        if (mouse.isDown) {
+          let dx = mouse.x - this.x;
+          let dy = mouse.y - this.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 400 && dist > 5) {
+            let force = (400 - dist) / 400;
+            this.x += (dx / dist) * force * 6;
+            this.y += (dy / dist) * force * 6;
+          }
+        }
+
+        this.y += this.speedY;
+        this.x += this.speedX;
+
+        if (this.y > snowCanvas.height || this.x < 0 || this.x > snowCanvas.width) {
+          this.reset();
+          this.y = 0;
+        }
+      }
+      draw() {
+        snowCtx.beginPath();
+        snowCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        snowCtx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+        snowCtx.fill();
+      }
+    }
+
+    for (let i = 0; i < numSnowflakes; i++) {
+      snowflakes.push(new Snowflake());
+    }
+
+    function animateSnow() {
+      snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+      snowflakes.forEach(flake => {
+        flake.update();
+        flake.draw();
+      });
+      requestAnimationFrame(animateSnow);
+    }
+    animateSnow();
 
     // ===== MUSIC PLAYER (MP3 + YOUTUBE) =====
     const mpAudio = document.getElementById('mp-audio');
