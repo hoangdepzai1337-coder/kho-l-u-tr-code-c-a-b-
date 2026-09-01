@@ -1548,21 +1548,73 @@
       }
     });
 
-    // Seek bar
-    mpBar.addEventListener('click', function(e) {
+       // SEEK BAR — kéo như YouTube
+    let isDraggingBar = false;
+    function seekToX(e) {
       if (!mpAudio.duration) return;
-      var rect = mpBar.getBoundingClientRect();
-      var pct = (e.clientX - rect.left) / rect.width;
+      const rect = mpBar.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       mpAudio.currentTime = pct * mpAudio.duration;
+      mpBarFill.style.width = (pct * 100) + '%';
+      mpCurrentTime.textContent = fmtTime(mpAudio.currentTime);
+    }
+
+    mpBar.addEventListener('mousedown', function(e) {
+      isDraggingBar = true;
+      seekToX(e);
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (isDraggingBar) seekToX(e);
+    });
+    document.addEventListener('mouseup', function() {
+      isDraggingBar = false;
     });
 
-    // Volume
-    mpVolBar.addEventListener('click', function(e) {
-      var rect = mpVolBar.getBoundingClientRect();
-      var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    // VOLUME — kéo ngang
+    let isDraggingVol = false;
+    function volToX(e) {
+      const rect = mpVolBar.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       mpAudio.volume = pct;
       mpVolFill.style.width = (pct * 100) + '%';
       lastVolume = pct;
+    }
+
+    mpVolBar.addEventListener('mousedown', function(e) {
+      isDraggingVol = true;
+      volToX(e);
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (isDraggingVol) volToX(e);
+    });
+    document.addEventListener('mouseup', function() {
+      isDraggingVol = false;
+    });
+
+    // Touch cho mobile
+    mpBar.addEventListener('touchstart', function(e) {
+      isDraggingBar = true;
+      seekToX(e.touches[0]);
+    });
+    document.addEventListener('touchmove', function(e) {
+      if (isDraggingBar) {
+        e.preventDefault();
+        seekToX(e.touches[0]);
+      }
+    }, { passive: false });
+    document.addEventListener('touchend', function() {
+      isDraggingBar = false;
+    });
+
+    mpVolBar.addEventListener('touchstart', function(e) {
+      isDraggingVol = true;
+      volToX(e.touches[0]);
+    });
+    document.addEventListener('touchmove', function(e) {
+      if (isDraggingVol) volToX(e.touches[0]);
+    });
+    document.addEventListener('touchend', function() {
+      isDraggingVol = false;
     });
 
     mpAudio.volume = lastVolume;
