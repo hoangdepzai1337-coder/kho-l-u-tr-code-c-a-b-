@@ -26,12 +26,6 @@
       transition: transform 0.1s ease-out; z-index: -1;
     }
 
-    /* CANVAS HIỆU ỨNG TUYẾT */
-    #snow-canvas {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      pointer-events: none; z-index: 1;
-    }
-
     /* NÚT SETTING GÓC MÀN HÌNH */
     .setting-btn {
       position: fixed; top: 20px; right: 20px; z-index: 200;
@@ -51,7 +45,7 @@
       border-color: var(--main-color);
     }
 
-    /* POPUP SETTING MÀU & ẢNH */
+    /* POPUP SETTING CHUNG */
     .setting-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.8);
       z-index: 1001; display: none; align-items: center; justify-content: center;
@@ -309,6 +303,7 @@
       border: 2px solid var(--main-color); box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.3);
       background-color: #1a1a2e;
     }
+
     /* GIAO DIỆN CHÍNH (SIDEBAR TRÁI / PHẢI) */
     .sidebar-wrap {
       position: fixed; top: 0; height: 100vh;
@@ -337,14 +332,21 @@
       overflow: hidden; transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex; flex-direction: column;
     }
-    .sidebar-wrap.left .sidebar { border-right: 1px solid rgba(var(--main-color-rgb),0.2); order: -1; }
-    .sidebar-wrap.right .sidebar { border-left: 1px solid rgba(var(--main-color-rgb),0.2); }
+    .sidebar-wrap.left .sidebar {
+      border-right: 1px solid rgba(var(--main-color-rgb),0.2);
+      border-radius: 0 22px 22px 0;
+      order: -1;
+    }
+    .sidebar-wrap.right .sidebar {
+      border-left: 1px solid rgba(var(--main-color-rgb),0.2);
+      border-radius: 22px 0 0 22px;
+    }
     .sidebar-wrap:hover .sidebar { width: 280px; }
 
-        .sidebar-inner {
+    .sidebar-inner {
       width: 280px; height: 100%;
       display: flex; flex-direction: column;
-      padding: 24px 12px 90px; overflow-y: auto;
+      padding: 24px 12px 12px; overflow-y: auto;
     }
 
     .sidebar-header-row {
@@ -423,7 +425,6 @@
     .center {
       flex: 1; display: flex; flex-direction: column;
       justify-content: center; align-items: center; gap: 10px;
-      z-index: 2;
     }
     .title { color: var(--main-color); font-size: 32px; font-weight: 600; letter-spacing: 4px; text-shadow: 0 0 20px rgba(var(--main-color-rgb),0.5); cursor: pointer; transition: color 0.2s; }
     .title:hover { opacity: 0.8; }
@@ -455,7 +456,7 @@
       text-decoration: underline;
     }
 
-    /* POPUP THÔNG SỐ */
+    /* POPUP THÔNG SỐ XE */
     .popup-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.85);
       z-index: 999; display: none; align-items: center; justify-content: center;
@@ -570,6 +571,15 @@
       border: 1px solid #ffffff22; border-radius: 8px;
       color: #ffffff66; font-size: 13px; font-weight: 500; cursor: pointer;
     }
+  
+
+    /* ===== BỔ SUNG TỪ XỊN NHẤT: TUYẾT + MUSIC PLAYER ===== */
+    /* CANVAS HIỆU ỨNG TUYẾT */
+    #snow-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 1;
+    }
+
 
     /* ===== MUSIC PLAYER ===== */
     .music-player {
@@ -720,11 +730,14 @@
       .mp-left, .mp-right { display: none; }
       .mp-center { max-width: 100%; }
     }
-  </style>
+
+</style>
 </head>
 <body>
   <div class="bg" id="bg"></div>
   <canvas id="snow-canvas"></canvas>
+
+
 
   <!-- NÚT SETTING GÓC MÀN HÌNH -->
   <div class="setting-btn" onclick="openSetting()" title="Cài đặt giao diện">⚙️</div>
@@ -733,22 +746,25 @@
   <div class="top-sidebar-wrap">
     <div class="top-sidebar">
       <div class="top-sidebar-inner">
-        <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar" onerror="handleImageError(this)">
-        
-        <div class="creator-name-row">
-          <div class="creator-name" id="creator-name-display">hoangdepzai</div>
+        <div class="creator-avatar-container" onclick="openAvatarModal()" title="Nhấn để đổi ảnh đại diện">
+          <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar" onerror="handleImageError(this)">
+          <div class="avatar-status-badge" id="avatar-badge-display" onclick="event.stopPropagation(); openBadgeModal();" title="Nhấn để đổi icon hình ảnh cho badge">Pp</div>
         </div>
-
-        <div class="avatar-edit-group">
-          <label>Đổi Ảnh Avatar (URL hoặc Tải lên):</label>
-          <div class="file-upload-row">
-            <input type="text" id="avatar-url-input" placeholder="https://..." oninput="previewAvatarUrl(this.value)">
-            <label class="btn-file-select" for="avatar-file-input">📁 Chọn ảnh</label>
-            <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this, 'avatar')">
+        
+        <div class="creator-info-content">
+          <div class="creator-name-row">
+            <div class="creator-name" id="creator-name-display">hoang1337_94828</div>
+            <div class="edit-name-btn" onclick="promptChangeName()" title="Đổi tên">✏️</div>
+            <div class="edit-name-btn" onclick="openBadgeModal()" title="Đổi icon đỏ thành hình ảnh">🖼️</div>
+            
+            <!-- Ô TAG RBLX (BẤM VÀO ĐÂY ĐỂ ĐỔI CHỮ VÀ ICON TRƯỚC) -->
+            <div class="rblx-tag" id="rblx-tag-box" onclick="openTagModal()" title="Nhấn để đổi tag và icon">
+              <span id="rblx-tag-icon">◆</span> <span id="rblx-tag-text">RBLX</span>
+            </div>
           </div>
-          <div class="avatar-actions">
-            <div class="avatar-btn-cancel" onclick="cancelAvatarChange()">Hủy</div>
-            <div class="avatar-btn-apply" onclick="applyAvatarChange()">Áp dụng</div>
+
+          <div class="creator-sub-row">
+            <span class="creator-sub-icon" id="creator-sub-icon-display" onclick="promptChangeSubIcon()" title="Nhấn để đổi icon phía dưới">🔥</span>
           </div>
         </div>
       </div>
@@ -756,7 +772,101 @@
     <div class="top-arrow"></div>
   </div>
 
-  <!-- MODAL CÀI ĐẶT MÀU, ĐỘ MỜ & TẦN SỐ QUÉT -->
+  <!-- POPUP ĐỔI TAG VÀ ICON CỦA TAG -->
+  <div class="avatar-modal-overlay" id="tag-modal-overlay" onclick="closeTagModalEvent(event)">
+    <div class="avatar-modal-box">
+      <div class="avatar-modal-header">
+        <h2>🏷️ Tùy Chỉnh Tag RBLX</h2>
+        <div class="avatar-modal-close" onclick="closeTagModalDirect()">✕</div>
+      </div>
+      
+      <div class="bg-input-group">
+        <label>Nhập tên chữ Tag mới:</label>
+        <input type="text" id="tag-name-input" placeholder="VD: VIP, ROBLOX, DEV...">
+      </div>
+
+      <div class="bg-input-group">
+        <label>Chọn kiểu icon trước tag:</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="tag-icon-input" placeholder="Dán link ảnh (URL) hoặc ký tự (VD: ◆, ★)" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="closeTagModalDirect()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyNewTag()">Áp dụng</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP ĐỔI AVATAR -->
+  <div class="avatar-modal-overlay" id="avatar-modal-overlay" onclick="closeAvatarModal(event)">
+    <div class="avatar-modal-box">
+      <div class="avatar-modal-header">
+        <h2>🖼️ Đổi Ảnh Đại Diện</h2>
+        <div class="avatar-modal-close" onclick="closeAvatarModalDirect()">✕</div>
+      </div>
+      
+      <div class="avatar-preview-container">
+        <img id="avatar-modal-preview" class="avatar-preview-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Preview" onerror="handleImageError(this)">
+      </div>
+
+      <div class="bg-input-group">
+        <label>Dán link ảnh (URL):</label>
+        <input type="text" id="avatar-url-input" placeholder="https://..." oninput="previewAvatarUrl(this.value)">
+      </div>
+
+      <div class="bg-input-group">
+        <label>Hoặc chọn tệp từ máy tính:</label>
+        <div class="file-upload-row">
+          <div class="btn-file-select" style="width: 100%; text-align: center;" onclick="document.getElementById('avatar-file-input').click()">📁 Chọn tệp ảnh</div>
+          <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarFileSelect(this)">
+        </div>
+      </div>
+
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="closeAvatarModalDirect()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyNewAvatar()">Áp dụng</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP ĐỔI ICON MÀU ĐỎ -->
+  <div class="avatar-modal-overlay" id="badge-modal-overlay" onclick="closeBadgeModalEvent(event)">
+    <div class="avatar-modal-box">
+      <div class="avatar-modal-header">
+        <h2>✨ Đổi Icon Màu Đỏ</h2>
+        <div class="avatar-modal-close" onclick="closeBadgeModalDirect()">✕</div>
+      </div>
+      
+      <div class="avatar-preview-container">
+        <div style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--main-color); display: flex; align-items: center; justify-content: center; background: #1a1a2e; overflow: hidden;">
+          <img id="badge-modal-preview" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;" onerror="handleImageError(this)">
+          <span id="badge-modal-preview-text" style="color: #fff; font-size: 16px;">Pp</span>
+        </div>
+      </div>
+
+      <div class="bg-input-group">
+        <label>Dán link ảnh icon mới (URL):</label>
+        <input type="text" id="badge-url-input" placeholder="https://..." oninput="previewBadgeUrl(this.value)">
+      </div>
+
+      <div class="bg-input-group">
+        <label>Hoặc chọn tệp ảnh từ máy:</label>
+        <div class="file-upload-row">
+          <div class="btn-file-select" style="width: 100%; text-align: center;" onclick="document.getElementById('badge-file-input').click()">📁 Chọn tệp ảnh icon</div>
+          <input type="file" id="badge-file-input" accept="image/*" style="display:none;" onchange="handleBadgeFileSelect(this)">
+        </div>
+      </div>
+
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="closeBadgeModalDirect()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyNewBadge()">Áp dụng</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CÀI ĐẶT CHUNG -->
   <div class="setting-overlay" id="setting-overlay" onclick="closeSettingModal(event)">
     <div class="setting-box">
       <div class="setting-header">
@@ -804,7 +914,7 @@
 
       <div class="setting-section-title">🔗 Tùy Chỉnh Link Chia Sẻ Dưới Chữ</div>
       <div class="bg-input-group">
-        <label>Nhập URL đường dẫn (VD: https://github.com/...):</label>
+        <label>Nhập URL đường dẫn:</label>
         <input type="text" id="setting-link-input" placeholder="https://..." value="https://github.com">
       </div>
       <div class="bg-actions">
@@ -829,7 +939,7 @@
     </div>
   </div>
 
-  <!-- POPUP THÔNG SỐ -->
+  <!-- POPUP THÔNG SỐ XE -->
   <div class="popup-overlay" id="popup-overlay" onclick="closePopup(event)">
     <div class="popup">
       <div class="popup-header">
@@ -1059,6 +1169,7 @@
   <div id="mp-yt-player" style="position: fixed; bottom: -1000px; left: -1000px; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></div>
   <audio id="mp-audio" preload="metadata"></audio>
 
+
   <script>
     const bg = document.getElementById('bg');
     const titleDisplay = document.getElementById('title-display');
@@ -1069,6 +1180,8 @@
     
     let currentMaxHz = 120;
     let lastFrameTime = 0;
+    let pendingAvatarUrl = '';
+    let pendingBadgeContent = '';
 
     function handleImageError(img) {
       if (!img.dataset.fallback) {
@@ -1082,9 +1195,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           const resultUrl = e.target.result;
-          if (type === 'avatar') {
-            document.getElementById('avatar-url-input').value = resultUrl;
-          } else if (type === 'bg') {
+          if (type === 'bg') {
             document.getElementById('setting-bg-url').value = resultUrl;
             previewSettingBg(resultUrl);
           } else if (type === 'car') {
@@ -1093,6 +1204,185 @@
           }
         };
         reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    /* QUẢN LÝ POPUP ĐỔI TAG VÀ ICON TAG */
+    function openTagModal() {
+      document.getElementById('tag-name-input').value = document.getElementById('rblx-tag-text').textContent;
+      const iconSpan = document.getElementById('rblx-tag-icon');
+      const imgChild = iconSpan.querySelector('img');
+      document.getElementById('tag-icon-input').value = imgChild ? imgChild.src : iconSpan.textContent;
+      document.getElementById('tag-modal-overlay').classList.add('open');
+    }
+
+    function closeTagModalDirect() {
+      document.getElementById('tag-modal-overlay').classList.remove('open');
+    }
+
+    function closeTagModalEvent(e) {
+      if (e.target === document.getElementById('tag-modal-overlay')) {
+        closeTagModalDirect();
+      }
+    }
+
+    function applyNewTag() {
+      const newText = document.getElementById('tag-name-input').value.trim();
+      const newIcon = document.getElementById('tag-icon-input').value.trim();
+      
+      if (newText) {
+        document.getElementById('rblx-tag-text').textContent = newText;
+      }
+      
+      const iconSpan = document.getElementById('rblx-tag-icon');
+      if (newIcon) {
+        if (newIcon.startsWith('http') || newIcon.startsWith('data:image')) {
+          iconSpan.innerHTML = `<img src="${newIcon}" alt="Icon" onerror="handleImageError(this)">`;
+        } else {
+          iconSpan.textContent = newIcon;
+        }
+      }
+      closeTagModalDirect();
+    }
+
+    /* QUẢN LÝ POPUP ĐỔI AVATAR */
+    function openAvatarModal() {
+      const currentSrc = document.getElementById('creator-avatar-img').src;
+      document.getElementById('avatar-modal-preview').src = currentSrc;
+      document.getElementById('avatar-url-input').value = '';
+      pendingAvatarUrl = currentSrc;
+      document.getElementById('avatar-modal-overlay').classList.add('open');
+    }
+
+    function closeAvatarModalDirect() {
+      document.getElementById('avatar-modal-overlay').classList.remove('open');
+    }
+
+    function closeAvatarModal(e) {
+      if (e.target === document.getElementById('avatar-modal-overlay')) {
+        closeAvatarModalDirect();
+      }
+    }
+
+    function previewAvatarUrl(url) {
+      const trimmed = url.trim();
+      const prev = document.getElementById('avatar-modal-preview');
+      if (trimmed) {
+        prev.src = trimmed;
+        pendingAvatarUrl = trimmed;
+      }
+    }
+
+    function handleAvatarFileSelect(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const resultUrl = e.target.result;
+          document.getElementById('avatar-modal-preview').src = resultUrl;
+          document.getElementById('avatar-url-input').value = '';
+          pendingAvatarUrl = resultUrl;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function applyNewAvatar() {
+      if (pendingAvatarUrl) {
+        document.getElementById('creator-avatar-img').src = pendingAvatarUrl;
+        closeAvatarModalDirect();
+      } else {
+        alert('Vui lòng chọn tệp hoặc nhập link ảnh hợp lệ!');
+      }
+    }
+
+    /* QUẢN LÝ POPUP ĐỔI ICON MÀU ĐỎ */
+    function openBadgeModal() {
+      const badgeEl = document.getElementById('avatar-badge-display');
+      const imgChild = badgeEl.querySelector('img');
+      const currentVal = imgChild ? imgChild.src : badgeEl.textContent;
+      
+      const prevImg = document.getElementById('badge-modal-preview');
+      const prevText = document.getElementById('badge-modal-preview-text');
+      
+      if (imgChild) {
+        prevImg.src = imgChild.src;
+        prevImg.style.display = 'block';
+        prevText.style.display = 'none';
+      } else {
+        prevText.textContent = currentVal;
+        prevText.style.display = 'block';
+        prevImg.style.display = 'none';
+      }
+      
+      document.getElementById('badge-url-input').value = '';
+      pendingBadgeContent = currentVal;
+      document.getElementById('badge-modal-overlay').classList.add('open');
+    }
+
+    function closeBadgeModalDirect() {
+      document.getElementById('badge-modal-overlay').classList.remove('open');
+    }
+
+    function closeBadgeModalEvent(e) {
+      if (e.target === document.getElementById('badge-modal-overlay')) {
+        closeBadgeModalDirect();
+      }
+    }
+
+    function previewBadgeUrl(url) {
+      const trimmed = url.trim();
+      const prevImg = document.getElementById('badge-modal-preview');
+      const prevText = document.getElementById('badge-modal-preview-text');
+      if (trimmed) {
+        prevImg.src = trimmed;
+        prevImg.style.display = 'block';
+        prevText.style.display = 'none';
+        pendingBadgeContent = trimmed;
+      }
+    }
+
+    function handleBadgeFileSelect(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const resultUrl = e.target.result;
+          const prevImg = document.getElementById('badge-modal-preview');
+          const prevText = document.getElementById('badge-modal-preview-text');
+          prevImg.src = resultUrl;
+          prevImg.style.display = 'block';
+          prevText.style.display = 'none';
+          document.getElementById('badge-url-input').value = '';
+          pendingBadgeContent = resultUrl;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function applyNewBadge() {
+      const badgeEl = document.getElementById('avatar-badge-display');
+      if (pendingBadgeContent.startsWith('http') || pendingBadgeContent.startsWith('data:image')) {
+        badgeEl.innerHTML = `<img src="${pendingBadgeContent}" alt="Badge Icon" onerror="handleImageError(this)">`;
+      } else {
+        badgeEl.textContent = pendingBadgeContent;
+      }
+      closeBadgeModalDirect();
+    }
+
+    function promptChangeName() {
+      const nameEl = document.getElementById('creator-name-display');
+      const currentName = nameEl.textContent;
+      const newName = prompt('Nhập tên hiển thị mới:', currentName);
+      if (newName !== null && newName.trim() !== '') {
+        nameEl.textContent = newName.trim();
+      }
+    }
+
+    function promptChangeSubIcon() {
+      const iconEl = document.getElementById('creator-sub-icon-display');
+      const current = iconEl.textContent;
+      const newVal = prompt('Nhập icon mới (Emoji hoặc ký tự):', current);
+      if (newVal !== null && newVal.trim() !== '') {
+        iconEl.textContent = newVal.trim();
       }
     }
 
@@ -1110,6 +1400,7 @@
       if (!lastFrameTime) lastFrameTime = timestamp;
       const elapsed = timestamp - lastFrameTime;
       const interval = 1000 / currentMaxHz;
+
       if (elapsed >= interval) {
         lastFrameTime = timestamp - (elapsed % interval);
       }
@@ -1134,39 +1425,62 @@
       }, true);
     }
 
-    function previewAvatarUrl(val) {}
-
-    function applyAvatarChange() {
-      const url = document.getElementById('avatar-url-input').value.trim();
-      const avatarImg = document.getElementById('creator-avatar-img');
-      if (url) { avatarImg.src = url; } else { alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!'); }
+    function previewTitle(val) {
+      titleDisplay.textContent = val;
     }
-    function cancelAvatarChange() { document.getElementById('avatar-url-input').value = ''; }
 
-    function previewTitle(val) { titleDisplay.textContent = val; }
     function applyTitleChanges() {
       const val = titleInput.value.trim();
-      if (val !== '') { titleDisplay.textContent = val; pageTitleMeta.textContent = val; closeSetting(); }
-      else { alert('Nội dung chữ lớn không được để trống!'); }
+      if (val !== '') {
+        titleDisplay.textContent = val;
+        pageTitleMeta.textContent = val;
+        closeSetting();
+      } else {
+        alert('Nội dung chữ lớn không được để trống!');
+      }
     }
-    function cancelTitleChanges() { titleInput.value = titleDisplay.textContent; closeSetting(); }
+
+    function cancelTitleChanges() {
+      titleInput.value = titleDisplay.textContent;
+      closeSetting();
+    }
 
     function applyLinkChanges() {
       const val = linkInput.value.trim();
-      if (val !== '') { linkDisplay.href = val; linkDisplay.textContent = val; closeSetting(); }
-      else { alert('Đường dẫn link không được để trống!'); }
+      if (val !== '') {
+        linkDisplay.href = val;
+        linkDisplay.textContent = val;
+        closeSetting();
+      } else {
+        alert('Đường dẫn link không được để trống!');
+      }
     }
-    function cancelLinkChanges() { linkInput.value = linkDisplay.href; closeSetting(); }
+
+    function cancelLinkChanges() {
+      linkInput.value = linkDisplay.href;
+      closeSetting();
+    }
 
     function previewSettingBg(url) {
       const prev = document.getElementById('setting-bg-preview');
-      if (url) { prev.src = url; prev.style.display = 'block'; } else { prev.style.display = 'none'; }
+      if (url) {
+        prev.src = url;
+        prev.style.display = 'block';
+      } else {
+        prev.style.display = 'none';
+      }
     }
+
     function applyBgChanges() {
       const url = document.getElementById('setting-bg-url').value.trim();
-      if (url) { bg.style.backgroundImage = `url('${url}')`; closeSetting(); }
-      else { alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!'); }
+      if (url) {
+        bg.style.backgroundImage = `url('${url}')`;
+        closeSetting();
+      } else {
+        alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!');
+      }
     }
+
     function cancelBgChanges() {
       document.getElementById('setting-bg-url').value = '';
       document.getElementById('setting-bg-preview').style.display = 'none';
@@ -1184,9 +1498,15 @@
       }
     }
 
-    function openSetting() { document.getElementById('setting-overlay').classList.add('open'); }
-    function closeSetting() { document.getElementById('setting-overlay').classList.remove('open'); }
-    function closeSettingModal(e) { if (e.target === document.getElementById('setting-overlay')) closeSetting(); }
+    function openSetting() {
+      document.getElementById('setting-overlay').classList.add('open');
+    }
+    function closeSetting() {
+      document.getElementById('setting-overlay').classList.remove('open');
+    }
+    function closeSettingModal(e) {
+      if (e.target === document.getElementById('setting-overlay')) closeSetting();
+    }
 
     function hexToRgb(hex) {
       let c = hex.replace('#', '');
@@ -1194,6 +1514,7 @@
       const num = parseInt(c, 16);
       return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
     }
+
     function setThemeColor(colorHex) {
       document.documentElement.style.setProperty('--main-color', colorHex);
       document.documentElement.style.setProperty('--main-color-rgb', hexToRgb(colorHex));
@@ -1254,6 +1575,7 @@
       const list = document.getElementById('list-' + side);
       const existing = document.getElementById('car-item-' + id);
       if (existing) existing.remove();
+
       const item = document.createElement('div');
       item.className = 'car-item';
       item.id = 'car-item-' + id;
@@ -1263,18 +1585,87 @@
           <span onclick="openCar('${id}')">${car.name}</span>
           <div class="edit-btn" onclick="openForm('${side}','${id}')" title="Chỉnh sửa">✏️</div>
           <div class="del-btn" onclick="deleteCar('${id}','${side}')" title="Xóa">✕</div>
-        </div>`;
+        </div>
+      `;
       list.appendChild(item);
     }
 
     function initDefaultCars() {
       const defaults = [
-        { id: 'urus', side: 'left', name: 'Lamborghini Urus', sub: 'Super SUV · 2019', img: 'https://images.unsplash.com/photo-1621135802920-133df287f89c?w=800', size: '5.112 × 2.016 × 1.638 mm', wheelbase: '3.003 mm', clearance: '248 mm', radius: '6.0 m', weight: '2.200 kg', engine: 'V8 Twin-Turbo Xăng', displacement: '3.996 cc (4.0L)', power: '650 HP @ 6.000 rpm', torque: '850 Nm @ 2.250 rpm', sprint: '3.6 giây', topspeed: '305 km/h', gearbox: 'Tự động 8 cấp (ZF 8HP)', drive: 'AWD toàn thời gian', suspF: 'Độc lập, đa liên kết, khí', suspR: 'Độc lập, đa liên kết', brake: 'Carbon-ceramic 440/370 mm', fuelCity: '18.0 L/100km', fuelHwy: '11.0 L/100km', fuelCombo: '13.5 L/100km', lights: 'LED Matrix, tự động', wheels: '23" hợp kim, 285/35 R23', seats: 'Alcantara, chỉnh điện 18 hướng', screen: '10.1" + 8.6", CarPlay', audio: 'B&O 3D 1.700W 21 loa', airbag: '8 túi khí', abs: 'Có', lane: 'Lane Assist', aeb: 'AEB tự động', camera: 'Camera 360°' },
-        { id: 'sf90', side: 'left', name: 'Ferrari SF90 Stradale', sub: 'Hybrid Supercar · 2020', img: 'https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=800', size: '4.591 × 1.972 × 1.186 mm', wheelbase: '2.650 mm', clearance: '125 mm', radius: '5.3 m', weight: '1.570 kg', engine: 'V8 Turbo + 3 Motor Điện (PHEV)', displacement: '3.990 cc (4.0L)', power: '1.000 HP tổng hợp', torque: '800 Nm', sprint: '2.5 giây', topspeed: '340 km/h', gearbox: 'DCT 8 cấp', drive: 'AWD Hybrid', suspF: 'Độc lập, điện tử', suspR: 'Đa liên kết, điện tử', brake: 'Carbon-ceramic 398/360 mm', fuelCity: '—', fuelHwy: '—', fuelCombo: '8.0 L/100km', lights: 'LED toàn phần, DRL Ferrari', wheels: '20"/21", Michelin Pilot Sport', seats: 'Carbon racing, Alcantara', screen: '16" curved digital cockpit', audio: 'Premium custom', airbag: '6 túi khí', abs: 'SSC Gen 7', lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến đa hướng' },
-        { id: 'chiron', side: 'right', name: 'Bugatti Chiron', sub: 'Hypercar · 2017', img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', size: '4.544 × 2.038 × 1.212 mm', wheelbase: '2.711 mm', clearance: '125 mm', radius: '5.8 m', weight: '1.995 kg', engine: 'W16 Quad-Turbo Xăng', displacement: '7.993 cc (8.0L)', power: '1.500 HP @ 6.700 rpm', torque: '1.600 Nm @ 2.000–6.000 rpm', sprint: '2.4 giây', topspeed: '420 km/h', gearbox: 'DSG 7 cấp ly hợp kép', drive: 'AWD toàn thời gian', suspF: 'Thủy lực điện tử', suspR: 'Thủy lực điện tử', brake: 'Carbon-ceramic 420/400 mm, 8 piston', fuelCity: '35.0 L/100km', fuelHwy: '15.0 L/100km', fuelCombo: '22.5 L/100km', lights: 'LED, DRL chữ C Bugatti', wheels: '20" Bugatti, Michelin Cup 2', seats: 'Da thủ công, chỉnh điện 16 hướng', screen: 'Custom Bugatti', audio: 'Custom premium', airbag: '8 túi khí', abs: 'Bosch cao cấp', lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến đa hướng' },
-        { id: 'mclaren', side: 'right', name: 'McLaren P1', sub: 'Hybrid Hypercar · 2013', img: 'https://images.unsplash.com/photo-1541348263662-e068662d82af?w=800', size: '4.588 × 1.946 × 1.188 mm', wheelbase: '2.670 mm', clearance: '100 mm (Race)', radius: '5.2 m', weight: '1.395 kg', engine: 'V8 Turbo + Motor Điện (Hybrid)', displacement: '3.799 cc (3.8L)', power: '916 HP tổng hợp', torque: '900 Nm', sprint: '2.8 giây', topspeed: '350 km/h', gearbox: 'SSG 7 cấp', drive: 'RWD (Cầu sau)', suspF: 'Thủy lực RaceActive', suspR: 'Thủy lực RaceActive', brake: 'Carbon-ceramic 390/380 mm', fuelCity: '—', fuelHwy: '—', fuelCombo: '8.3 L/100km', lights: 'LED, DRL McLaren', wheels: '19/20" carbon forged, Pirelli', seats: 'Carbon seat, da/Alcantara', screen: 'Digital cockpit', audio: 'Premium', airbag: '6 túi khí', abs: 'McLaren Brake Steer + DSC', lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến' },
+        {
+          id: 'urus', side: 'left',
+          name: 'Lamborghini Urus', sub: 'Super SUV · 2019',
+          img: 'https://images.unsplash.com/photo-1621135802920-133df287f89c?w=800',
+          size: '5.112 × 2.016 × 1.638 mm', wheelbase: '3.003 mm', clearance: '248 mm',
+          radius: '6.0 m', weight: '2.200 kg', engine: 'V8 Twin-Turbo Xăng',
+          displacement: '3.996 cc (4.0L)', power: '650 HP @ 6.000 rpm',
+          torque: '850 Nm @ 2.250 rpm', sprint: '3.6 giây', topspeed: '305 km/h',
+          gearbox: 'Tự động 8 cấp (ZF 8HP)', drive: 'AWD toàn thời gian',
+          suspF: 'Độc lập, đa liên kết, khí', suspR: 'Độc lập, đa liên kết',
+          brake: 'Carbon-ceramic 440/370 mm', fuelCity: '18.0 L/100km',
+          fuelHwy: '11.0 L/100km', fuelCombo: '13.5 L/100km',
+          lights: 'LED Matrix, tự động', wheels: '23" hợp kim, 285/35 R23',
+          seats: 'Alcantara, chỉnh điện 18 hướng', screen: '10.1" + 8.6", CarPlay',
+          audio: 'B&O 3D 1.700W 21 loa', airbag: '8 túi khí', abs: 'Có',
+          lane: 'Lane Assist', aeb: 'AEB tự động', camera: 'Camera 360°',
+        },
+        {
+          id: 'sf90', side: 'left',
+          name: 'Ferrari SF90 Stradale', sub: 'Hybrid Supercar · 2020',
+          img: 'https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=800',
+          size: '4.591 × 1.972 × 1.186 mm', wheelbase: '2.650 mm', clearance: '125 mm',
+          radius: '5.3 m', weight: '1.570 kg', engine: 'V8 Turbo + 3 Motor Điện (PHEV)',
+          displacement: '3.990 cc (4.0L)', power: '1.000 HP tổng hợp',
+          torque: '800 Nm', sprint: '2.5 giây', topspeed: '340 km/h',
+          gearbox: 'DCT 8 cấp', drive: 'AWD Hybrid',
+          suspF: 'Độc lập, điện tử', suspR: 'Đa liên kết, điện tử',
+          brake: 'Carbon-ceramic 398/360 mm', fuelCity: '—',
+          fuelHwy: '—', fuelCombo: '8.0 L/100km',
+          lights: 'LED toàn phần, DRL Ferrari', wheels: '20"/21", Michelin Pilot Sport',
+          seats: 'Carbon racing, Alcantara', screen: '16" curved digital cockpit',
+          audio: 'Premium custom', airbag: '6 túi khí', abs: 'SSC Gen 7',
+          lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến đa hướng',
+        },
+        {
+          id: 'chiron', side: 'right',
+          name: 'Bugatti Chiron', sub: 'Hypercar · 2017',
+          img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
+          size: '4.544 × 2.038 × 1.212 mm', wheelbase: '2.711 mm', clearance: '125 mm',
+          radius: '5.8 m', weight: '1.995 kg', engine: 'W16 Quad-Turbo Xăng',
+          displacement: '7.993 cc (8.0L)', power: '1.500 HP @ 6.700 rpm',
+          torque: '1.600 Nm @ 2.000–6.000 rpm', sprint: '2.4 giây', topspeed: '420 km/h',
+          gearbox: 'DSG 7 cấp ly hợp kép', drive: 'AWD toàn thời gian',
+          suspF: 'Thủy lực điện tử', suspR: 'Thủy lực điện tử',
+          brake: 'Carbon-ceramic 420/400 mm, 8 piston', fuelCity: '35.0 L/100km',
+          fuelHwy: '15.0 L/100km', fuelCombo: '22.5 L/100km',
+          lights: 'LED, DRL chữ C Bugatti', wheels: '20" Bugatti, Michelin Cup 2',
+          seats: 'Da thủ công, chỉnh điện 16 hướng', screen: 'Custom Bugatti',
+          audio: 'Custom premium', airbag: '8 túi khí', abs: 'Bosch cao cấp',
+          lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến đa hướng',
+        },
+        {
+          id: 'mclaren', side: 'right',
+          name: 'McLaren P1', sub: 'Hybrid Hypercar · 2013',
+          img: 'https://images.unsplash.com/photo-1541348263662-e068662d82af?w=800',
+          size: '4.588 × 1.946 × 1.188 mm', wheelbase: '2.670 mm', clearance: '100 mm (Race)',
+          radius: '5.2 m', weight: '1.395 kg', engine: 'V8 Turbo + Motor Điện (Hybrid)',
+          displacement: '3.799 cc (3.8L)', power: '916 HP tổng hợp',
+          torque: '900 Nm', sprint: '2.8 giây', topspeed: '350 km/h',
+          gearbox: 'SSG 7 cấp', drive: 'RWD (Cầu sau)',
+          suspF: 'Thủy lực RaceActive', suspR: 'Thủy lực RaceActive',
+          brake: 'Carbon-ceramic 390/380 mm', fuelCity: '—',
+          fuelHwy: '—', fuelCombo: '8.3 L/100km',
+          lights: 'LED, DRL McLaren', wheels: '19/20" carbon forged, Pirelli',
+          seats: 'Carbon seat, da/Alcantara', screen: 'Digital cockpit',
+          audio: 'Premium', airbag: '6 túi khí', abs: 'McLaren Brake Steer + DSC',
+          lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến',
+        },
       ];
-      defaults.forEach(d => { cars[d.id] = { ...d, specs: makeSpecs(d) }; addCarToList(d.id, d.side); });
+
+      defaults.forEach(d => {
+        cars[d.id] = { ...d, specs: makeSpecs(d) };
+        addCarToList(d.id, d.side);
+      });
     }
 
     function setTarget(side) {
@@ -1283,44 +1674,104 @@
       document.getElementById('target-right').classList.toggle('active', side === 'right');
     }
 
-    const fields = ['img','name','sub','size','wheelbase','clearance','radius','weight','engine','displacement','power','torque','sprint','topspeed','gearbox','drive','susp-f','susp-r','brake','fuel-city','fuel-hwy','fuel-combo','lights','wheels','seats','screen','audio','airbag','abs','lane','aeb','camera'];
-    const fieldMap = { 'img':'img','name':'name','sub':'sub','size':'size','wheelbase':'wheelbase','clearance':'clearance','radius':'radius','weight':'weight','engine':'engine','displacement':'displacement','power':'power','torque':'torque','sprint':'sprint','topspeed':'topspeed','gearbox':'gearbox','drive':'drive','susp-f':'suspF','susp-r':'suspR','brake':'brake','fuel-city':'fuelCity','fuel-hwy':'fuelHwy','fuel-combo':'fuelCombo','lights':'lights','wheels':'wheels','seats':'seats','screen':'screen','audio':'audio','airbag':'airbag','abs':'abs','lane':'lane','aeb':'aeb','camera':'camera' };
+    const fields = ['img','name','sub','size','wheelbase','clearance','radius','weight',
+      'engine','displacement','power','torque','sprint','topspeed',
+      'gearbox','drive','susp-f','susp-r','brake',
+      'fuel-city','fuel-hwy','fuel-combo',
+      'lights','wheels','seats','screen','audio',
+      'airbag','abs','lane','aeb','camera'];
+
+    const fieldMap = {
+      'img':'img','name':'name','sub':'sub','size':'size','wheelbase':'wheelbase',
+      'clearance':'clearance','radius':'radius','weight':'weight','engine':'engine',
+      'displacement':'displacement','power':'power','torque':'torque','sprint':'sprint',
+      'topspeed':'topspeed','gearbox':'gearbox','drive':'drive','susp-f':'suspF',
+      'susp-r':'suspR','brake':'brake','fuel-city':'fuelCity','fuel-hwy':'fuelHwy',
+      'fuel-combo':'fuelCombo','lights':'lights','wheels':'wheels','seats':'seats',
+      'screen':'screen','audio':'audio','airbag':'airbag','abs':'abs','lane':'lane',
+      'aeb':'aeb','camera':'camera'
+    };
 
     function openForm(side, id) {
-      editingId = id; formTarget = side; setTarget(side);
+      editingId = id;
+      formTarget = side;
+      setTarget(side);
+
       const targetRow = document.getElementById('sidebar-target-row');
       const submitBtn = document.getElementById('form-submit-btn');
       const formTitle = document.getElementById('form-title');
+
       document.getElementById('target-left-text').textContent = document.getElementById('title-left').textContent + ' (Trái)';
       document.getElementById('target-right-text').textContent = document.getElementById('title-right').textContent + ' (Phải)';
+
       if (id) {
         formTitle.textContent = '✏️ Chỉnh Sửa Xe';
         submitBtn.textContent = '✓ Lưu thay đổi';
         targetRow.style.display = 'none';
+
         const car = cars[id];
-        fields.forEach(f => { const key = fieldMap[f]; const el = document.getElementById('f-' + f); if (el && car[key]) el.value = car[key]; });
+        fields.forEach(f => {
+          const key = fieldMap[f];
+          const el = document.getElementById('f-' + f);
+          if (el && car[key]) el.value = car[key];
+        });
         previewImg(car.img);
       } else {
         formTitle.textContent = '➕ Thêm Xe Mới';
         submitBtn.textContent = '✓ Thêm xe';
         targetRow.style.display = 'flex';
-        fields.forEach(f => { const el = document.getElementById('f-' + f); if (el) el.value = ''; });
+        fields.forEach(f => {
+          const el = document.getElementById('f-' + f);
+          if (el) el.value = '';
+        });
         document.getElementById('img-preview').style.display = 'none';
       }
+
       document.getElementById('form-overlay').classList.add('open');
     }
-    function closeForm() { document.getElementById('form-overlay').classList.remove('open'); editingId = null; }
-    function previewImg(url) { const prev = document.getElementById('img-preview'); if (url) { prev.src = url; prev.style.display = 'block'; } else { prev.style.display = 'none'; } }
+
+    function closeForm() {
+      document.getElementById('form-overlay').classList.remove('open');
+      editingId = null;
+    }
+
+    function previewImg(url) {
+      const prev = document.getElementById('img-preview');
+      if (url) {
+        prev.src = url; prev.style.display = 'block';
+      } else { prev.style.display = 'none'; }
+    }
+
     function g(id) { return document.getElementById(id)?.value.trim() || ''; }
 
     function submitCar() {
-      const name = g('f-name'); const img = g('f-img');
+      const name = g('f-name');
+      const img = g('f-img');
       if (!name || !img) { alert('Cần có tên xe và ảnh!'); return; }
-      const data = { name, img, sub: g('f-sub'), size: g('f-size'), wheelbase: g('f-wheelbase'), clearance: g('f-clearance'), radius: g('f-radius'), weight: g('f-weight'), engine: g('f-engine'), displacement: g('f-displacement'), power: g('f-power'), torque: g('f-torque'), sprint: g('f-sprint'), topspeed: g('f-topspeed'), gearbox: g('f-gearbox'), drive: g('f-drive'), suspF: g('f-susp-f'), suspR: g('f-susp-r'), brake: g('f-brake'), fuelCity: g('f-fuel-city'), fuelHwy: g('f-fuel-hwy'), fuelCombo: g('f-fuel-combo'), lights: g('f-lights'), wheels: g('f-wheels'), seats: g('f-seats'), screen: g('f-screen'), audio: g('f-audio'), airbag: g('f-airbag'), abs: g('f-abs'), lane: g('f-lane'), aeb: g('f-aeb'), camera: g('f-camera') };
+
+      const data = {
+        name, img,
+        sub: g('f-sub'),
+        size: g('f-size'), wheelbase: g('f-wheelbase'), clearance: g('f-clearance'),
+        radius: g('f-radius'), weight: g('f-weight'), engine: g('f-engine'),
+        displacement: g('f-displacement'), power: g('f-power'), torque: g('f-torque'),
+        sprint: g('f-sprint'), topspeed: g('f-topspeed'), gearbox: g('f-gearbox'),
+        drive: g('f-drive'), suspF: g('f-susp-f'), suspR: g('f-susp-r'),
+        brake: g('f-brake'), fuelCity: g('f-fuel-city'), fuelHwy: g('f-fuel-hwy'),
+        fuelCombo: g('f-fuel-combo'), lights: g('f-lights'), wheels: g('f-wheels'),
+        seats: g('f-seats'), screen: g('f-screen'), audio: g('f-audio'),
+        airbag: g('f-airbag'), abs: g('f-abs'), lane: g('f-lane'),
+        aeb: g('f-aeb'), camera: g('f-camera'),
+      };
+
       const id = editingId || ('car_' + Date.now());
       const side = editingId ? (cars[editingId]?.side || formTarget) : formTarget;
-      data.specs = makeSpecs(data); data.side = side;
-      cars[id] = data; addCarToList(id, side); closeForm();
+
+      data.specs = makeSpecs(data);
+      data.side = side;
+      cars[id] = data;
+      addCarToList(id, side);
+      closeForm();
     }
 
     function deleteCar(id, side) {
@@ -1331,29 +1782,37 @@
     }
 
     function openCar(id) {
-      const car = cars[id]; if (!car) return;
+      const car = cars[id];
+      if (!car) return;
       document.getElementById('popup-img').src = car.img;
       document.getElementById('popup-name').textContent = car.name;
       document.getElementById('popup-sub').textContent = car.sub;
       let html = '';
       for (const [section, items] of Object.entries(car.specs)) {
         html += `<div class="spec-section"><h3>${section}</h3><div class="spec-grid">`;
-        items.forEach(i => { html += `<div class="spec-item"><div class="label">${i.label}</div><div class="value">${i.value}</div></div>`; });
+        items.forEach(i => {
+          html += `<div class="spec-item"><div class="label">${i.label}</div><div class="value">${i.value}</div></div>`;
+        });
         html += `</div></div>`;
       }
       document.getElementById('popup-body').innerHTML = html;
       document.getElementById('popup-overlay').classList.add('open');
     }
 
-    function closePopup(e) { if (e.target === document.getElementById('popup-overlay')) document.getElementById('popup-overlay').classList.remove('open'); }
-    function closePopupDirect() { document.getElementById('popup-overlay').classList.remove('open'); }
+    function closePopup(e) {
+      if (e.target === document.getElementById('popup-overlay'))
+        document.getElementById('popup-overlay').classList.remove('open');
+    }
+    function closePopupDirect() {
+      document.getElementById('popup-overlay').classList.remove('open');
+    }
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closePopupDirect(); closeForm(); closeSetting(); }
+      if (e.key === 'Escape') { closePopupDirect(); closeForm(); closeSetting(); closeAvatarModalDirect(); closeBadgeModalDirect(); closeTagModalDirect(); }
     });
 
-    initDefaultCars();
 
-    // ===== HIỆU ỨNG TUYẾT & HIỆU ỨNG HÚT CHUỘT =====
+
+    // ===== BỔ SUNG TỪ XỊN NHẤT: HIỆU ỨNG TUYẾT =====
     const snowCanvas = document.getElementById('snow-canvas');
     const snowCtx = snowCanvas.getContext('2d');
     let snowflakes = [];
@@ -1397,7 +1856,7 @@
 
     window.addEventListener('touchend', () => { mouse.isDown = false; });
 
-    class Snowflake {
+class Snowflake {
       constructor() {
         this.reset();
       }
@@ -1434,7 +1893,11 @@
       draw() {
         snowCtx.beginPath();
         snowCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        snowCtx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+        
+        // Lấy trực tiếp chuỗi màu RGB từ biến CSS (--main-color-rgb) để tuyết đổi màu theo menu
+        const mainRgb = getComputedStyle(document.documentElement).getPropertyValue('--main-color-rgb').trim();
+        snowCtx.fillStyle = `rgba(${mainRgb}, ${this.alpha})`;
+        
         snowCtx.fill();
       }
     }
@@ -1453,6 +1916,8 @@
     }
     animateSnow();
 
+
+    // ===== BỔ SUNG TỪ XỊN NHẤT: MUSIC PLAYER MP3 + YOUTUBE =====
     // ===== MUSIC PLAYER (MP3 + YOUTUBE) =====
     const mpAudio = document.getElementById('mp-audio');
     const mpPlayer = document.getElementById('musicPlayer');
@@ -1500,7 +1965,7 @@
     window.onYouTubeIframeAPIReady = function() {
       ytPlayer = new YT.Player('mp-yt-player', {
         height: '1', width: '1',
-        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'modestbranding': 1 },
+        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'playsinline': 1 },
         events: {
           'onReady': function() { ytReady = true; ytPlayer.setVolume(lastVolume * 100); },
           'onStateChange': function(e) {
@@ -1551,8 +2016,17 @@
 
     function extractYTId(url) {
       if (!url) return null;
-      var regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-      var match = url.match(regex);
+      try {
+        var u = new URL(url.trim());
+        var host = u.hostname.replace(/^www\./, '').toLowerCase();
+        if (host === 'youtu.be') return u.pathname.split('/').filter(Boolean)[0] || null;
+        if (host === 'youtube.com' || host === 'm.youtube.com') {
+          if (u.searchParams.get('v')) return u.searchParams.get('v');
+          var parts = u.pathname.split('/').filter(Boolean);
+          if (parts[0] === 'shorts' || parts[0] === 'embed' || parts[0] === 'live' || parts[0] === 'v') return parts[1] || null;
+        }
+      } catch (e) {}
+      var match = url.match(/(?:youtube\.com\/(?:watch\?.*?v=|shorts\/|embed\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i);
       return match ? match[1] : null;
     }
 
@@ -1605,9 +2079,15 @@
       if (ytId) {
         currentType = 'youtube';
         if (ytReady && ytPlayer) {
-          ytPlayer.loadVideoById(ytId);
+          // Không tự phát ngay: trình duyệt có thể chặn autoplay của iframe YouTube.
+          // Nạp video trước, sau đó người dùng bấm ▶ để phát.
+          ytPlayer.cueVideoById(ytId);
+          mpArtistEl.textContent = 'YouTube • Nhấn ▶ để phát';
+          isPlaying = false;
+          mpPlayBtn.textContent = '▶';
         } else {
-          setTimeout(function() { if (currentSongIdx === idx) playSong(idx); }, 500);
+          mpArtistEl.textContent = 'Đang tải YouTube...';
+          setTimeout(function() { if (currentSongIdx === idx) playSong(idx); }, 800);
         }
       } else {
         currentType = 'audio';
@@ -1757,6 +2237,8 @@
     });
 
     loadSongs();
+
+    initDefaultCars();
   </script>
 </body>
 </html>
