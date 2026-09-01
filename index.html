@@ -12,7 +12,7 @@
     :root {
       --main-color: #00ffcc;
       --main-color-rgb: 0, 255, 204;
-      --menu-opacity: 0.85; /* Độ mờ mặc định của menu */
+      --menu-opacity: 0.85;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -490,6 +490,156 @@
       border: 1px solid #ffffff22; border-radius: 8px;
       color: #ffffff66; font-size: 13px; font-weight: 500; cursor: pointer;
     }
+
+    /* ===== MUSIC PLAYER ===== */
+    .music-player {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 72px; z-index: 150;
+      background: rgba(10, 10, 20, 0.9);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
+      display: flex; align-items: center;
+      padding: 0 20px; gap: 16px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .music-player.hidden { transform: translateY(110%); }
+
+    .mp-toggle {
+      position: fixed; bottom: 20px; right: 20px; z-index: 148;
+      width: 48px; height: 48px;
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(var(--main-color-rgb), 0.4);
+      border-radius: 50%;
+      color: var(--main-color); font-size: 20px;
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; backdrop-filter: blur(8px);
+      transition: all 0.2s;
+      box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.2);
+    }
+    .mp-toggle:hover { background: rgba(var(--main-color-rgb), 0.2); transform: scale(1.05); }
+    .mp-toggle.show { display: flex; }
+
+    .mp-left { display: flex; align-items: center; gap: 12px; width: 180px; flex-shrink: 0; }
+    .mp-thumb {
+      width: 44px; height: 44px; border-radius: 8px;
+      background: rgba(var(--main-color-rgb), 0.1);
+      border: 1px solid rgba(var(--main-color-rgb), 0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .mp-info { overflow: hidden; }
+    .mp-title {
+      color: #fff; font-size: 13px; font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .mp-artist {
+      color: rgba(255,255,255,0.4); font-size: 11px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .mp-center {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 6px; max-width: 500px; margin: 0 auto;
+    }
+    .mp-controls { display: flex; align-items: center; gap: 8px; }
+    .mp-btn {
+      width: 34px; height: 34px;
+      background: rgba(var(--main-color-rgb), 0.08);
+      border: 1px solid rgba(var(--main-color-rgb), 0.2);
+      border-radius: 50%;
+      color: var(--main-color); font-size: 14px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .mp-btn:hover { background: rgba(var(--main-color-rgb), 0.2); }
+    .mp-btn.play {
+      width: 40px; height: 40px;
+      background: rgba(var(--main-color-rgb), 0.15);
+      border-color: var(--main-color); font-size: 16px;
+    }
+    .mp-btn.play:hover { background: rgba(var(--main-color-rgb), 0.3); }
+    .mp-btn.active { background: rgba(var(--main-color-rgb), 0.25); border-color: var(--main-color); }
+
+    .mp-progress { width: 100%; display: flex; align-items: center; gap: 8px; }
+    .mp-time {
+      color: rgba(255,255,255,0.4); font-size: 10px;
+      font-family: 'Fira Code', monospace; min-width: 36px; text-align: center;
+    }
+    .mp-bar {
+      flex: 1; height: 4px; background: rgba(255,255,255,0.1);
+      border-radius: 2px; cursor: pointer; position: relative; overflow: hidden;
+      transition: height 0.15s;
+    }
+    .mp-bar:hover { height: 6px; }
+    .mp-bar-fill { height: 100%; background: var(--main-color); border-radius: 2px; transition: width 0.1s linear; width: 0%; }
+
+    .mp-right { display: flex; align-items: center; gap: 8px; width: 180px; flex-shrink: 0; justify-content: flex-end; }
+    .mp-volume-bar {
+      width: 70px; height: 4px; background: rgba(255,255,255,0.1);
+      border-radius: 2px; cursor: pointer; position: relative; overflow: hidden;
+      transition: height 0.15s;
+    }
+    .mp-volume-fill { height: 100%; background: var(--main-color); border-radius: 2px; width: 70%; transition: width 0.1s; }
+    .mp-volume-bar:hover { height: 6px; }
+
+    .mp-playlist {
+      position: fixed; bottom: 72px; right: 0;
+      width: 320px; max-height: 380px;
+      background: rgba(10, 10, 20, 0.95);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(var(--main-color-rgb), 0.2);
+      border-right: none;
+      border-radius: 12px 0 0 0;
+      z-index: 149; display: none; flex-direction: column; overflow: hidden;
+    }
+    .mp-playlist.open { display: flex; animation: slideUp 0.25s ease; }
+    .mp-playlist-header {
+      padding: 14px 16px; border-bottom: 1px solid rgba(var(--main-color-rgb), 0.15);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .mp-playlist-header h3 { color: var(--main-color); font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+    .mp-playlist-count { color: rgba(255,255,255,0.4); font-size: 11px; font-family: 'Fira Code', monospace; }
+    .mp-playlist-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .mp-track {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 6px; cursor: pointer;
+      transition: background 0.2s; margin-bottom: 4px;
+    }
+    .mp-track:hover { background: rgba(var(--main-color-rgb), 0.08); }
+    .mp-track.active { background: rgba(var(--main-color-rgb), 0.12); }
+    .mp-track-icon { font-size: 16px; flex-shrink: 0; }
+    .mp-track-info { flex: 1; overflow: hidden; }
+    .mp-track-name { color: #fff; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mp-track.active .mp-track-name { color: var(--main-color); }
+    .mp-track-del {
+      width: 22px; height: 22px;
+      background: rgba(255,50,50,0.1); border: 1px solid rgba(255,50,50,0.3);
+      border-radius: 4px; color: #ff6666; font-size: 10px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s; flex-shrink: 0;
+    }
+    .mp-track:hover .mp-track-del { opacity: 1; }
+    .mp-playlist-empty { text-align: center; padding: 30px 16px; color: rgba(255,255,255,0.3); font-size: 12px; }
+
+    .mp-add-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      z-index: 1002; display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .mp-add-overlay.open { display: flex; }
+    .mp-add-box {
+      width: 90vw; max-width: 420px;
+      background: rgba(10,10,25,0.97);
+      border: 1px solid rgba(var(--main-color-rgb), 0.4);
+      border-radius: 16px; padding: 24px;
+      animation: slideUp 0.3s ease;
+    }
+    .mp-add-box h2 { color: var(--main-color); font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+
+    @media (max-width: 768px) {
+      .mp-left, .mp-right { display: none; }
+      .mp-center { max-width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -549,14 +699,12 @@
         <input type="color" id="custom-color-picker" value="#00ffcc" oninput="setThemeColor(this.value)">
       </div>
 
-      <!-- ĐIỀU CHỈNH ĐỘ MỜ MENU -->
       <div class="setting-section-title">🎚️ Độ Mờ Đậm Menu</div>
       <div class="bg-input-group">
         <label>Điều chỉnh độ trong suốt: <span id="opacity-val-label">0.85</span></label>
         <input type="range" id="menu-opacity-range" min="0.1" max="1.0" step="0.05" value="0.85" oninput="changeMenuOpacity(this.value)">
       </div>
 
-      <!-- ĐIỀU CHỈNH TẦN SỐ QUÉT HZ (60 - 120) -->
       <div class="setting-section-title">⚡ Tần Số Quét Màn Hình (Hz)</div>
       <div class="bg-input-group">
         <label>Giới hạn tốc độ khung hình: <span id="hz-val-label">120</span> Hz</label>
@@ -762,6 +910,73 @@
     </div>
   </div>
 
+  <!-- ===== MUSIC PLAYER ===== -->
+  <div class="mp-toggle" id="mp-toggle" title="Mở trình phát nhạc">🎵</div>
+
+  <div class="music-player" id="musicPlayer">
+    <div class="mp-left">
+      <div class="mp-thumb" id="mp-thumb">🎵</div>
+      <div class="mp-info">
+        <div class="mp-title" id="mp-title">Chưa chọn bài</div>
+        <div class="mp-artist" id="mp-artist">MySpace Music</div>
+      </div>
+    </div>
+    <div class="mp-center">
+      <div class="mp-controls">
+        <button class="mp-btn" id="mp-shuffle" title="Ngẫu nhiên">🔀</button>
+        <button class="mp-btn" id="mp-prev" title="Trước">⏮</button>
+        <button class="mp-btn play" id="mp-play" title="Phát">▶</button>
+        <button class="mp-btn" id="mp-next" title="Sau">⏭</button>
+        <button class="mp-btn" id="mp-loop" title="Lặp lại">🔁</button>
+      </div>
+      <div class="mp-progress">
+        <span class="mp-time" id="mp-current">0:00</span>
+        <div class="mp-bar" id="mp-bar"><div class="mp-bar-fill" id="mp-bar-fill"></div></div>
+        <span class="mp-time" id="mp-duration">0:00</span>
+      </div>
+    </div>
+    <div class="mp-right">
+      <button class="mp-btn" id="mp-min" title="Thu nhỏ" style="width:30px;height:30px;font-size:12px;">⤓</button>
+      <button class="mp-btn" id="mp-add-btn" title="Thêm bài" style="font-size:18px;">+</button>
+      <div class="mp-volume-bar" id="mp-volume-bar"><div class="mp-volume-fill" id="mp-volume-fill"></div></div>
+      <button class="mp-btn" id="mp-playlist-btn" title="Danh sách phát">☰</button>
+    </div>
+  </div>
+
+  <div class="mp-playlist" id="mp-playlist">
+    <div class="mp-playlist-header">
+      <h3>Danh Sách Phát</h3>
+      <span class="mp-playlist-count" id="mp-playlist-count">0 bài</span>
+    </div>
+    <div class="mp-playlist-list" id="mp-playlist-list">
+      <div class="mp-playlist-empty">Chưa có bài nào. Nhấn + để thêm.</div>
+    </div>
+  </div>
+
+  <div class="mp-add-overlay" id="mp-add-overlay">
+    <div class="mp-add-box">
+      <h2>➕ Thêm Bài Hát</h2>
+      <div class="mp-add-group" style="margin-bottom: 14px;">
+        <label style="display:block;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:'Fira Code',monospace;">Tên bài hát</label>
+        <input type="text" id="mp-add-name" placeholder="VD: Lofi Chill Night" style="width:100%;background:rgba(var(--main-color-rgb),0.05);border:1px solid rgba(var(--main-color-rgb),0.2);border-radius:8px;padding:10px 12px;color:#fff;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border 0.2s;">
+      </div>
+      <div class="mp-add-group" style="margin-bottom: 14px;">
+        <label style="display:block;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:'Fira Code',monospace;">Link nhạc (URL) hoặc tải file lên</label>
+        <div class="file-upload-row">
+          <input type="text" id="mp-add-url" placeholder="https://...mp3" style="flex:1;background:rgba(var(--main-color-rgb),0.05);border:1px solid rgba(var(--main-color-rgb),0.2);border-radius:6px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;padding:8px 10px;outline:none;">
+          <label class="btn-file-select" for="mp-add-file">📁 Chọn file</label>
+          <input type="file" id="mp-add-file" accept="audio/*" style="display:none;">
+        </div>
+      </div>
+      <div class="mp-add-actions">
+        <div class="btn-cancel" onclick="closeMpAddModal()" style="flex:1;text-align:center;padding:10px;cursor:pointer;">Hủy</div>
+        <div class="btn-submit" onclick="addSong()" style="flex:1;text-align:center;padding:10px;cursor:pointer;">Thêm</div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="mp-audio" preload="metadata"></audio>
+
   <script>
     const bg = document.getElementById('bg');
     const titleDisplay = document.getElementById('title-display');
@@ -770,7 +985,7 @@
     const linkInput = document.getElementById('setting-link-input');
     const linkDisplay = document.getElementById('credit-link-display');
     
-    let currentMaxHz = 120; // Mặc định tần số quét
+    let currentMaxHz = 120;
     let lastFrameTime = 0;
 
     function handleImageError(img) {
@@ -799,33 +1014,27 @@
       }
     }
 
-    // ĐIỀU CHỈNH ĐỘ MỜ MENU DỰA TRÊN SLIDER
     function changeMenuOpacity(val) {
       document.documentElement.style.setProperty('--menu-opacity', val);
       document.getElementById('opacity-val-label').textContent = val;
     }
 
-    // ĐIỀU CHỈNH TẦN SỐ QUÉT HZ
     function changeRefreshRate(val) {
       currentMaxHz = parseInt(val);
       document.getElementById('hz-val-label').textContent = currentMaxHz;
     }
 
-    // GIỚI HẠN KHUNG HÌNH (FPS / HZ LIMITER)
     function throttleLoop(timestamp) {
       if (!lastFrameTime) lastFrameTime = timestamp;
       const elapsed = timestamp - lastFrameTime;
       const interval = 1000 / currentMaxHz;
-
       if (elapsed >= interval) {
         lastFrameTime = timestamp - (elapsed % interval);
-        // Có thể thực hiện các thao tác cập nhật động mượt mà tại đây theo Hz đã chọn
       }
       requestAnimationFrame(throttleLoop);
     }
     requestAnimationFrame(throttleLoop);
 
-    // PARALLAX PC
     document.addEventListener('mousemove', (e) => {
       if (window.innerWidth > 768) {
         const x = (e.clientX / window.innerWidth - 0.5) * 20;
@@ -834,7 +1043,6 @@
       }
     });
 
-    // PARALLAX MOBILE
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', (e) => {
         if (e.gamma === null || window.innerWidth > 768) return;
@@ -849,74 +1057,34 @@
     function applyAvatarChange() {
       const url = document.getElementById('avatar-url-input').value.trim();
       const avatarImg = document.getElementById('creator-avatar-img');
-      if (url) {
-        avatarImg.src = url;
-      } else {
-        alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!');
-      }
+      if (url) { avatarImg.src = url; } else { alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!'); }
     }
+    function cancelAvatarChange() { document.getElementById('avatar-url-input').value = ''; }
 
-    function cancelAvatarChange() {
-      document.getElementById('avatar-url-input').value = '';
-    }
-
-    function previewTitle(val) {
-      titleDisplay.textContent = val;
-    }
-
+    function previewTitle(val) { titleDisplay.textContent = val; }
     function applyTitleChanges() {
       const val = titleInput.value.trim();
-      if (val !== '') {
-        titleDisplay.textContent = val;
-        pageTitleMeta.textContent = val;
-        closeSetting();
-      } else {
-        alert('Nội dung chữ lớn không được để trống!');
-      }
+      if (val !== '') { titleDisplay.textContent = val; pageTitleMeta.textContent = val; closeSetting(); }
+      else { alert('Nội dung chữ lớn không được để trống!'); }
     }
+    function cancelTitleChanges() { titleInput.value = titleDisplay.textContent; closeSetting(); }
 
-    function cancelTitleChanges() {
-      titleInput.value = titleDisplay.textContent;
-      closeSetting();
-    }
-
-    /* XỬ LÝ LINK CHIA SẺ */
     function applyLinkChanges() {
       const val = linkInput.value.trim();
-      if (val !== '') {
-        linkDisplay.href = val;
-        linkDisplay.textContent = val;
-        closeSetting();
-      } else {
-        alert('Đường dẫn link không được để trống!');
-      }
+      if (val !== '') { linkDisplay.href = val; linkDisplay.textContent = val; closeSetting(); }
+      else { alert('Đường dẫn link không được để trống!'); }
     }
-
-    function cancelLinkChanges() {
-      linkInput.value = linkDisplay.href;
-      closeSetting();
-    }
+    function cancelLinkChanges() { linkInput.value = linkDisplay.href; closeSetting(); }
 
     function previewSettingBg(url) {
       const prev = document.getElementById('setting-bg-preview');
-      if (url) {
-        prev.src = url;
-        prev.style.display = 'block';
-      } else {
-        prev.style.display = 'none';
-      }
+      if (url) { prev.src = url; prev.style.display = 'block'; } else { prev.style.display = 'none'; }
     }
-
     function applyBgChanges() {
       const url = document.getElementById('setting-bg-url').value.trim();
-      if (url) {
-        bg.style.backgroundImage = `url('${url}')`;
-        closeSetting();
-      } else {
-        alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!');
-      }
+      if (url) { bg.style.backgroundImage = `url('${url}')`; closeSetting(); }
+      else { alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!'); }
     }
-
     function cancelBgChanges() {
       document.getElementById('setting-bg-url').value = '';
       document.getElementById('setting-bg-preview').style.display = 'none';
@@ -934,15 +1102,9 @@
       }
     }
 
-    function openSetting() {
-      document.getElementById('setting-overlay').classList.add('open');
-    }
-    function closeSetting() {
-      document.getElementById('setting-overlay').classList.remove('open');
-    }
-    function closeSettingModal(e) {
-      if (e.target === document.getElementById('setting-overlay')) closeSetting();
-    }
+    function openSetting() { document.getElementById('setting-overlay').classList.add('open'); }
+    function closeSetting() { document.getElementById('setting-overlay').classList.remove('open'); }
+    function closeSettingModal(e) { if (e.target === document.getElementById('setting-overlay')) closeSetting(); }
 
     function hexToRgb(hex) {
       let c = hex.replace('#', '');
@@ -950,7 +1112,6 @@
       const num = parseInt(c, 16);
       return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
     }
-
     function setThemeColor(colorHex) {
       document.documentElement.style.setProperty('--main-color', colorHex);
       document.documentElement.style.setProperty('--main-color-rgb', hexToRgb(colorHex));
@@ -1011,7 +1172,6 @@
       const list = document.getElementById('list-' + side);
       const existing = document.getElementById('car-item-' + id);
       if (existing) existing.remove();
-
       const item = document.createElement('div');
       item.className = 'car-item';
       item.id = 'car-item-' + id;
@@ -1021,87 +1181,18 @@
           <span onclick="openCar('${id}')">${car.name}</span>
           <div class="edit-btn" onclick="openForm('${side}','${id}')" title="Chỉnh sửa">✏️</div>
           <div class="del-btn" onclick="deleteCar('${id}','${side}')" title="Xóa">✕</div>
-        </div>
-      `;
+        </div>`;
       list.appendChild(item);
     }
 
     function initDefaultCars() {
       const defaults = [
-        {
-          id: 'urus', side: 'left',
-          name: 'Lamborghini Urus', sub: 'Super SUV · 2019',
-          img: 'https://images.unsplash.com/photo-1621135802920-133df287f89c?w=800',
-          size: '5.112 × 2.016 × 1.638 mm', wheelbase: '3.003 mm', clearance: '248 mm',
-          radius: '6.0 m', weight: '2.200 kg', engine: 'V8 Twin-Turbo Xăng',
-          displacement: '3.996 cc (4.0L)', power: '650 HP @ 6.000 rpm',
-          torque: '850 Nm @ 2.250 rpm', sprint: '3.6 giây', topspeed: '305 km/h',
-          gearbox: 'Tự động 8 cấp (ZF 8HP)', drive: 'AWD toàn thời gian',
-          suspF: 'Độc lập, đa liên kết, khí', suspR: 'Độc lập, đa liên kết',
-          brake: 'Carbon-ceramic 440/370 mm', fuelCity: '18.0 L/100km',
-          fuelHwy: '11.0 L/100km', fuelCombo: '13.5 L/100km',
-          lights: 'LED Matrix, tự động', wheels: '23" hợp kim, 285/35 R23',
-          seats: 'Alcantara, chỉnh điện 18 hướng', screen: '10.1" + 8.6", CarPlay',
-          audio: 'B&O 3D 1.700W 21 loa', airbag: '8 túi khí', abs: 'Có',
-          lane: 'Lane Assist', aeb: 'AEB tự động', camera: 'Camera 360°',
-        },
-        {
-          id: 'sf90', side: 'left',
-          name: 'Ferrari SF90 Stradale', sub: 'Hybrid Supercar · 2020',
-          img: 'https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=800',
-          size: '4.591 × 1.972 × 1.186 mm', wheelbase: '2.650 mm', clearance: '125 mm',
-          radius: '5.3 m', weight: '1.570 kg', engine: 'V8 Turbo + 3 Motor Điện (PHEV)',
-          displacement: '3.990 cc (4.0L)', power: '1.000 HP tổng hợp',
-          torque: '800 Nm', sprint: '2.5 giây', topspeed: '340 km/h',
-          gearbox: 'DCT 8 cấp', drive: 'AWD Hybrid',
-          suspF: 'Độc lập, điện tử', suspR: 'Đa liên kết, điện tử',
-          brake: 'Carbon-ceramic 398/360 mm', fuelCity: '—',
-          fuelHwy: '—', fuelCombo: '8.0 L/100km',
-          lights: 'LED toàn phần, DRL Ferrari', wheels: '20"/21", Michelin Pilot Sport',
-          seats: 'Carbon racing, Alcantara', screen: '16" curved digital cockpit',
-          audio: 'Premium custom', airbag: '6 túi khí', abs: 'SSC Gen 7',
-          lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến đa hướng',
-        },
-        {
-          id: 'chiron', side: 'right',
-          name: 'Bugatti Chiron', sub: 'Hypercar · 2017',
-          img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
-          size: '4.544 × 2.038 × 1.212 mm', wheelbase: '2.711 mm', clearance: '125 mm',
-          radius: '5.8 m', weight: '1.995 kg', engine: 'W16 Quad-Turbo Xăng',
-          displacement: '7.993 cc (8.0L)', power: '1.500 HP @ 6.700 rpm',
-          torque: '1.600 Nm @ 2.000–6.000 rpm', sprint: '2.4 giây', topspeed: '420 km/h',
-          gearbox: 'DSG 7 cấp ly hợp kép', drive: 'AWD toàn thời gian',
-          suspF: 'Thủy lực điện tử', suspR: 'Thủy lực điện tử',
-          brake: 'Carbon-ceramic 420/400 mm, 8 piston', fuelCity: '35.0 L/100km',
-          fuelHwy: '15.0 L/100km', fuelCombo: '22.5 L/100km',
-          lights: 'LED, DRL chữ C Bugatti', wheels: '20" Bugatti, Michelin Cup 2',
-          seats: 'Da thủ công, chỉnh điện 16 hướng', screen: 'Custom Bugatti',
-          audio: 'Custom premium', airbag: '8 túi khí', abs: 'Bosch cao cấp',
-          lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến đa hướng',
-        },
-        {
-          id: 'mclaren', side: 'right',
-          name: 'McLaren P1', sub: 'Hybrid Hypercar · 2013',
-          img: 'https://images.unsplash.com/photo-1541348263662-e068662d82af?w=800',
-          size: '4.588 × 1.946 × 1.188 mm', wheelbase: '2.670 mm', clearance: '100 mm (Race)',
-          radius: '5.2 m', weight: '1.395 kg', engine: 'V8 Turbo + Motor Điện (Hybrid)',
-          displacement: '3.799 cc (3.8L)', power: '916 HP tổng hợp',
-          torque: '900 Nm', sprint: '2.8 giây', topspeed: '350 km/h',
-          gearbox: 'SSG 7 cấp', drive: 'RWD (Cầu sau)',
-          suspF: 'Thủy lực RaceActive', suspR: 'Thủy lực RaceActive',
-          brake: 'Carbon-ceramic 390/380 mm', fuelCity: '—',
-          fuelHwy: '—', fuelCombo: '8.3 L/100km',
-          lights: 'LED, DRL McLaren', wheels: '19/20" carbon forged, Pirelli',
-          seats: 'Carbon seat, da/Alcantara', screen: 'Digital cockpit',
-          audio: 'Premium', airbag: '6 túi khí', abs: 'McLaren Brake Steer + DSC',
-          lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến',
-        },
+        { id: 'urus', side: 'left', name: 'Lamborghini Urus', sub: 'Super SUV · 2019', img: 'https://images.unsplash.com/photo-1621135802920-133df287f89c?w=800', size: '5.112 × 2.016 × 1.638 mm', wheelbase: '3.003 mm', clearance: '248 mm', radius: '6.0 m', weight: '2.200 kg', engine: 'V8 Twin-Turbo Xăng', displacement: '3.996 cc (4.0L)', power: '650 HP @ 6.000 rpm', torque: '850 Nm @ 2.250 rpm', sprint: '3.6 giây', topspeed: '305 km/h', gearbox: 'Tự động 8 cấp (ZF 8HP)', drive: 'AWD toàn thời gian', suspF: 'Độc lập, đa liên kết, khí', suspR: 'Độc lập, đa liên kết', brake: 'Carbon-ceramic 440/370 mm', fuelCity: '18.0 L/100km', fuelHwy: '11.0 L/100km', fuelCombo: '13.5 L/100km', lights: 'LED Matrix, tự động', wheels: '23" hợp kim, 285/35 R23', seats: 'Alcantara, chỉnh điện 18 hướng', screen: '10.1" + 8.6", CarPlay', audio: 'B&O 3D 1.700W 21 loa', airbag: '8 túi khí', abs: 'Có', lane: 'Lane Assist', aeb: 'AEB tự động', camera: 'Camera 360°' },
+        { id: 'sf90', side: 'left', name: 'Ferrari SF90 Stradale', sub: 'Hybrid Supercar · 2020', img: 'https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=800', size: '4.591 × 1.972 × 1.186 mm', wheelbase: '2.650 mm', clearance: '125 mm', radius: '5.3 m', weight: '1.570 kg', engine: 'V8 Turbo + 3 Motor Điện (PHEV)', displacement: '3.990 cc (4.0L)', power: '1.000 HP tổng hợp', torque: '800 Nm', sprint: '2.5 giây', topspeed: '340 km/h', gearbox: 'DCT 8 cấp', drive: 'AWD Hybrid', suspF: 'Độc lập, điện tử', suspR: 'Đa liên kết, điện tử', brake: 'Carbon-ceramic 398/360 mm', fuelCity: '—', fuelHwy: '—', fuelCombo: '8.0 L/100km', lights: 'LED toàn phần, DRL Ferrari', wheels: '20"/21", Michelin Pilot Sport', seats: 'Carbon racing, Alcantara', screen: '16" curved digital cockpit', audio: 'Premium custom', airbag: '6 túi khí', abs: 'SSC Gen 7', lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến đa hướng' },
+        { id: 'chiron', side: 'right', name: 'Bugatti Chiron', sub: 'Hypercar · 2017', img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', size: '4.544 × 2.038 × 1.212 mm', wheelbase: '2.711 mm', clearance: '125 mm', radius: '5.8 m', weight: '1.995 kg', engine: 'W16 Quad-Turbo Xăng', displacement: '7.993 cc (8.0L)', power: '1.500 HP @ 6.700 rpm', torque: '1.600 Nm @ 2.000–6.000 rpm', sprint: '2.4 giây', topspeed: '420 km/h', gearbox: 'DSG 7 cấp ly hợp kép', drive: 'AWD toàn thời gian', suspF: 'Thủy lực điện tử', suspR: 'Thủy lực điện tử', brake: 'Carbon-ceramic 420/400 mm, 8 piston', fuelCity: '35.0 L/100km', fuelHwy: '15.0 L/100km', fuelCombo: '22.5 L/100km', lights: 'LED, DRL chữ C Bugatti', wheels: '20" Bugatti, Michelin Cup 2', seats: 'Da thủ công, chỉnh điện 16 hướng', screen: 'Custom Bugatti', audio: 'Custom premium', airbag: '8 túi khí', abs: 'Bosch cao cấp', lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến đa hướng' },
+        { id: 'mclaren', side: 'right', name: 'McLaren P1', sub: 'Hybrid Hypercar · 2013', img: 'https://images.unsplash.com/photo-1541348263662-e068662d82af?w=800', size: '4.588 × 1.946 × 1.188 mm', wheelbase: '2.670 mm', clearance: '100 mm (Race)', radius: '5.2 m', weight: '1.395 kg', engine: 'V8 Turbo + Motor Điện (Hybrid)', displacement: '3.799 cc (3.8L)', power: '916 HP tổng hợp', torque: '900 Nm', sprint: '2.8 giây', topspeed: '350 km/h', gearbox: 'SSG 7 cấp', drive: 'RWD (Cầu sau)', suspF: 'Thủy lực RaceActive', suspR: 'Thủy lực RaceActive', brake: 'Carbon-ceramic 390/380 mm', fuelCity: '—', fuelHwy: '—', fuelCombo: '8.3 L/100km', lights: 'LED, DRL McLaren', wheels: '19/20" carbon forged, Pirelli', seats: 'Carbon seat, da/Alcantara', screen: 'Digital cockpit', audio: 'Premium', airbag: '6 túi khí', abs: 'McLaren Brake Steer + DSC', lane: 'Có', aeb: 'Có', camera: 'Lùi + cảm biến' },
       ];
-
-      defaults.forEach(d => {
-        cars[d.id] = { ...d, specs: makeSpecs(d) };
-        addCarToList(d.id, d.side);
-      });
+      defaults.forEach(d => { cars[d.id] = { ...d, specs: makeSpecs(d) }; addCarToList(d.id, d.side); });
     }
 
     function setTarget(side) {
@@ -1110,104 +1201,44 @@
       document.getElementById('target-right').classList.toggle('active', side === 'right');
     }
 
-    const fields = ['img','name','sub','size','wheelbase','clearance','radius','weight',
-      'engine','displacement','power','torque','sprint','topspeed',
-      'gearbox','drive','susp-f','susp-r','brake',
-      'fuel-city','fuel-hwy','fuel-combo',
-      'lights','wheels','seats','screen','audio',
-      'airbag','abs','lane','aeb','camera'];
-
-    const fieldMap = {
-      'img':'img','name':'name','sub':'sub','size':'size','wheelbase':'wheelbase',
-      'clearance':'clearance','radius':'radius','weight':'weight','engine':'engine',
-      'displacement':'displacement','power':'power','torque':'torque','sprint':'sprint',
-      'topspeed':'topspeed','gearbox':'gearbox','drive':'drive','susp-f':'suspF',
-      'susp-r':'suspR','brake':'brake','fuel-city':'fuelCity','fuel-hwy':'fuelHwy',
-      'fuel-combo':'fuelCombo','lights':'lights','wheels':'wheels','seats':'seats',
-      'screen':'screen','audio':'audio','airbag':'airbag','abs':'abs','lane':'lane',
-      'aeb':'aeb','camera':'camera'
-    };
+    const fields = ['img','name','sub','size','wheelbase','clearance','radius','weight','engine','displacement','power','torque','sprint','topspeed','gearbox','drive','susp-f','susp-r','brake','fuel-city','fuel-hwy','fuel-combo','lights','wheels','seats','screen','audio','airbag','abs','lane','aeb','camera'];
+    const fieldMap = { 'img':'img','name':'name','sub':'sub','size':'size','wheelbase':'wheelbase','clearance':'clearance','radius':'radius','weight':'weight','engine':'engine','displacement':'displacement','power':'power','torque':'torque','sprint':'sprint','topspeed':'topspeed','gearbox':'gearbox','drive':'drive','susp-f':'suspF','susp-r':'suspR','brake':'brake','fuel-city':'fuelCity','fuel-hwy':'fuelHwy','fuel-combo':'fuelCombo','lights':'lights','wheels':'wheels','seats':'seats','screen':'screen','audio':'audio','airbag':'airbag','abs':'abs','lane':'lane','aeb':'aeb','camera':'camera' };
 
     function openForm(side, id) {
-      editingId = id;
-      formTarget = side;
-      setTarget(side);
-
+      editingId = id; formTarget = side; setTarget(side);
       const targetRow = document.getElementById('sidebar-target-row');
       const submitBtn = document.getElementById('form-submit-btn');
       const formTitle = document.getElementById('form-title');
-
       document.getElementById('target-left-text').textContent = document.getElementById('title-left').textContent + ' (Trái)';
       document.getElementById('target-right-text').textContent = document.getElementById('title-right').textContent + ' (Phải)';
-
       if (id) {
         formTitle.textContent = '✏️ Chỉnh Sửa Xe';
         submitBtn.textContent = '✓ Lưu thay đổi';
         targetRow.style.display = 'none';
-
         const car = cars[id];
-        fields.forEach(f => {
-          const key = fieldMap[f];
-          const el = document.getElementById('f-' + f);
-          if (el && car[key]) el.value = car[key];
-        });
+        fields.forEach(f => { const key = fieldMap[f]; const el = document.getElementById('f-' + f); if (el && car[key]) el.value = car[key]; });
         previewImg(car.img);
       } else {
         formTitle.textContent = '➕ Thêm Xe Mới';
         submitBtn.textContent = '✓ Thêm xe';
         targetRow.style.display = 'flex';
-        fields.forEach(f => {
-          const el = document.getElementById('f-' + f);
-          if (el) el.value = '';
-        });
+        fields.forEach(f => { const el = document.getElementById('f-' + f); if (el) el.value = ''; });
         document.getElementById('img-preview').style.display = 'none';
       }
-
       document.getElementById('form-overlay').classList.add('open');
     }
-
-    function closeForm() {
-      document.getElementById('form-overlay').classList.remove('open');
-      editingId = null;
-    }
-
-    function previewImg(url) {
-      const prev = document.getElementById('img-preview');
-      if (url) {
-        prev.src = url; prev.style.display = 'block';
-      } else { prev.style.display = 'none'; }
-    }
-
+    function closeForm() { document.getElementById('form-overlay').classList.remove('open'); editingId = null; }
+    function previewImg(url) { const prev = document.getElementById('img-preview'); if (url) { prev.src = url; prev.style.display = 'block'; } else { prev.style.display = 'none'; } }
     function g(id) { return document.getElementById(id)?.value.trim() || ''; }
 
     function submitCar() {
-      const name = g('f-name');
-      const img = g('f-img');
+      const name = g('f-name'); const img = g('f-img');
       if (!name || !img) { alert('Cần có tên xe và ảnh!'); return; }
-
-      const data = {
-        name, img,
-        sub: g('f-sub'),
-        size: g('f-size'), wheelbase: g('f-wheelbase'), clearance: g('f-clearance'),
-        radius: g('f-radius'), weight: g('f-weight'), engine: g('f-engine'),
-        displacement: g('f-displacement'), power: g('f-power'), torque: g('f-torque'),
-        sprint: g('f-sprint'), topspeed: g('f-topspeed'), gearbox: g('f-gearbox'),
-        drive: g('f-drive'), suspF: g('f-susp-f'), suspR: g('f-susp-r'),
-        brake: g('f-brake'), fuelCity: g('f-fuel-city'), fuelHwy: g('f-fuel-hwy'),
-        fuelCombo: g('f-fuel-combo'), lights: g('f-lights'), wheels: g('f-wheels'),
-        seats: g('f-seats'), screen: g('f-screen'), audio: g('f-audio'),
-        airbag: g('f-airbag'), abs: g('f-abs'), lane: g('f-lane'),
-        aeb: g('f-aeb'), camera: g('f-camera'),
-      };
-
+      const data = { name, img, sub: g('f-sub'), size: g('f-size'), wheelbase: g('f-wheelbase'), clearance: g('f-clearance'), radius: g('f-radius'), weight: g('f-weight'), engine: g('f-engine'), displacement: g('f-displacement'), power: g('f-power'), torque: g('f-torque'), sprint: g('f-sprint'), topspeed: g('f-topspeed'), gearbox: g('f-gearbox'), drive: g('f-drive'), suspF: g('f-susp-f'), suspR: g('f-susp-r'), brake: g('f-brake'), fuelCity: g('f-fuel-city'), fuelHwy: g('f-fuel-hwy'), fuelCombo: g('f-fuel-combo'), lights: g('f-lights'), wheels: g('f-wheels'), seats: g('f-seats'), screen: g('f-screen'), audio: g('f-audio'), airbag: g('f-airbag'), abs: g('f-abs'), lane: g('f-lane'), aeb: g('f-aeb'), camera: g('f-camera') };
       const id = editingId || ('car_' + Date.now());
       const side = editingId ? (cars[editingId]?.side || formTarget) : formTarget;
-
-      data.specs = makeSpecs(data);
-      data.side = side;
-      cars[id] = data;
-      addCarToList(id, side);
-      closeForm();
+      data.specs = makeSpecs(data); data.side = side;
+      cars[id] = data; addCarToList(id, side); closeForm();
     }
 
     function deleteCar(id, side) {
@@ -1218,35 +1249,349 @@
     }
 
     function openCar(id) {
-      const car = cars[id];
-      if (!car) return;
+      const car = cars[id]; if (!car) return;
       document.getElementById('popup-img').src = car.img;
       document.getElementById('popup-name').textContent = car.name;
       document.getElementById('popup-sub').textContent = car.sub;
       let html = '';
       for (const [section, items] of Object.entries(car.specs)) {
         html += `<div class="spec-section"><h3>${section}</h3><div class="spec-grid">`;
-        items.forEach(i => {
-          html += `<div class="spec-item"><div class="label">${i.label}</div><div class="value">${i.value}</div></div>`;
-        });
+        items.forEach(i => { html += `<div class="spec-item"><div class="label">${i.label}</div><div class="value">${i.value}</div></div>`; });
         html += `</div></div>`;
       }
       document.getElementById('popup-body').innerHTML = html;
       document.getElementById('popup-overlay').classList.add('open');
     }
 
-    function closePopup(e) {
-      if (e.target === document.getElementById('popup-overlay'))
-        document.getElementById('popup-overlay').classList.remove('open');
-    }
-    function closePopupDirect() {
-      document.getElementById('popup-overlay').classList.remove('open');
-    }
+    function closePopup(e) { if (e.target === document.getElementById('popup-overlay')) document.getElementById('popup-overlay').classList.remove('open'); }
+    function closePopupDirect() { document.getElementById('popup-overlay').classList.remove('open'); }
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') { closePopupDirect(); closeForm(); closeSetting(); }
     });
 
     initDefaultCars();
+
+    // ===== MUSIC PLAYER =====
+    const mpAudio = document.getElementById('mp-audio');
+    const mpPlayer = document.getElementById('musicPlayer');
+    const mpToggle = document.getElementById('mp-toggle');
+    const mpPlayBtn = document.getElementById('mp-play');
+    const mpPrevBtn = document.getElementById('mp-prev');
+    const mpNextBtn = document.getElementById('mp-next');
+    const mpShuffleBtn = document.getElementById('mp-shuffle');
+    const mpLoopBtn = document.getElementById('mp-loop');
+    const mpMinBtn = document.getElementById('mp-min');
+    const mpTitleEl = document.getElementById('mp-title');
+    const mpArtistEl = document.getElementById('mp-artist');
+    const mpThumb = document.getElementById('mp-thumb');
+    const mpBar = document.getElementById('mp-bar');
+    const mpBarFill = document.getElementById('mp-bar-fill');
+    const mpCurrentTime = document.getElementById('mp-current');
+    const mpDuration = document.getElementById('mp-duration');
+    const mpVolBar = document.getElementById('mp-volume-bar');
+    const mpVolFill = document.getElementById('mp-volume-fill');
+    const mpPlaylist = document.getElementById('mp-playlist');
+    const mpPlaylistBtn = document.getElementById('mp-playlist-btn');
+    const mpPlaylistList = document.getElementById('mp-playlist-list');
+    const mpPlaylistCount = document.getElementById('mp-playlist-count');
+    const mpAddBtn = document.getElementById('mp-add-btn');
+    const mpAddOverlay = document.getElementById('mp-add-overlay');
+    const mpAddFile = document.getElementById('mp-add-file');
+
+    let songs = [];
+    let currentSongIdx = -1;
+    let isPlaying = false;
+    let isShuffle = false;
+    let isLoop = false;
+    let lastVolume = 0.7;
+
+    function loadSongs() {
+      const stored = localStorage.getItem('myspace_songs');
+      if (stored) {
+        try { songs = JSON.parse(stored); } catch(e) { songs = []; }
+      }
+      // Nếu chưa có bài nào, thêm bài test mặc định
+      if (songs.length === 0) {
+        songs = [{
+          name: 'Test — SoundHelix',
+          url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+          icon: '🎵'
+        }];
+        saveSongs();
+      }
+      renderPlaylist();
+    }
+
+    function saveSongs() {
+      try {
+        // Lọc bỏ bài có URL base64 quá dài (> 2MB) để tránh tràn localStorage
+        const toSave = songs.filter(s => !s.url || s.url.length < 2000000);
+        localStorage.setItem('myspace_songs', JSON.stringify(toSave));
+      } catch(e) {
+        console.warn('Không lưu được — localStorage đầy:', e);
+      }
+    }
+
+    function fmtTime(sec) {
+      if (!sec || isNaN(sec)) return '0:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return m + ':' + (s < 10 ? '0' + s : s);
+    }
+
+    function renderPlaylist() {
+      if (songs.length === 0) {
+        mpPlaylistList.innerHTML = '<div class="mp-playlist-empty">Chưa có bài nào. Nhấn + để thêm.</div>';
+        mpPlaylistCount.textContent = '0 bài';
+        return;
+      }
+      mpPlaylistCount.textContent = songs.length + ' bài';
+      mpPlaylistList.innerHTML = songs.map(function(s, i) {
+        return '<div class="mp-track ' + (i === currentSongIdx ? 'active' : '') + '" onclick="playSong(' + i + ')">' +
+          '<span class="mp-track-icon">' + (s.icon || '🎵') + '</span>' +
+          '<div class="mp-track-info"><div class="mp-track-name">' + s.name + '</div></div>' +
+          '<div class="mp-track-del" onclick="event.stopPropagation(); deleteSong(' + i + ')">✕</div></div>';
+      }).join('');
+    }
+
+    function playSong(idx) {
+      if (idx < 0 || idx >= songs.length) return;
+      currentSongIdx = idx;
+      var song = songs[idx];
+      mpAudio.src = song.url;
+      mpAudio.load();
+      mpTitleEl.textContent = song.name;
+      mpArtistEl.textContent = 'Đang tải...';
+      mpThumb.textContent = song.icon || '🎵';
+
+      mpAudio.play().then(function() {
+        isPlaying = true;
+        mpPlayBtn.textContent = '⏸';
+        mpArtistEl.textContent = 'Bài ' + (idx + 1) + '/' + songs.length;
+      }).catch(function(err) {
+        isPlaying = false;
+        mpPlayBtn.textContent = '▶';
+        mpArtistEl.textContent = 'Lỗi phát nhạc';
+        console.warn('Play error:', err);
+        alert('Không thể phát bài này.\n\nLý do có thể:\n- Link sai hoặc đã hết hạn\n- File không phải audio hợp lệ\n- Trang nguồn chặn CORS\n\nThử link khác hoặc upload file .mp3 trực tiếp.');
+      });
+      renderPlaylist();
+    }
+
+    function togglePlay() {
+      if (currentSongIdx === -1 && songs.length > 0) { playSong(0); return; }
+      if (currentSongIdx === -1) return;
+      if (isPlaying) {
+        mpAudio.pause();
+        isPlaying = false;
+        mpPlayBtn.textContent = '▶';
+      } else {
+        mpAudio.play().then(function() {
+          isPlaying = true;
+          mpPlayBtn.textContent = '⏸';
+        }).catch(function() {
+          mpPlayBtn.textContent = '▶';
+        });
+      }
+    }
+
+    function nextSong() {
+      if (songs.length === 0) return;
+      if (isShuffle) {
+        var r;
+        do { r = Math.floor(Math.random() * songs.length); }
+        while (r === currentSongIdx && songs.length > 1);
+        playSong(r);
+      } else {
+        playSong((currentSongIdx + 1) % songs.length);
+      }
+    }
+
+    function prevSong() {
+      if (songs.length === 0) return;
+      if (mpAudio.currentTime > 3) { mpAudio.currentTime = 0; return; }
+      playSong((currentSongIdx - 1 + songs.length) % songs.length);
+    }
+
+    function deleteSong(idx) {
+      if (idx === currentSongIdx) {
+        mpAudio.pause();
+        mpAudio.removeAttribute('src');
+        mpAudio.load();
+        currentSongIdx = -1;
+        isPlaying = false;
+        mpPlayBtn.textContent = '▶';
+        mpTitleEl.textContent = 'Chưa chọn bài';
+        mpArtistEl.textContent = 'MySpace Music';
+        mpThumb.textContent = '🎵';
+        mpBarFill.style.width = '0%';
+        mpCurrentTime.textContent = '0:00';
+        mpDuration.textContent = '0:00';
+      }
+      songs.splice(idx, 1);
+      if (currentSongIdx > idx) currentSongIdx--;
+      if (currentSongIdx >= songs.length) currentSongIdx = -1;
+      saveSongs();
+      renderPlaylist();
+    }
+
+    function addSong() {
+      var name = document.getElementById('mp-add-name').value.trim();
+      var url = document.getElementById('mp-add-url').value.trim();
+      if (!name || !url) { alert('Cần tên bài và link/tệp nhạc!'); return; }
+      songs.push({ name: name, url: url, icon: '🎵' });
+      saveSongs();
+      renderPlaylist();
+      closeMpAddModal();
+      if (currentSongIdx === -1) playSong(songs.length - 1);
+    }
+
+    function closeMpAddModal() {
+      mpAddOverlay.classList.remove('open');
+      document.getElementById('mp-add-name').value = '';
+      document.getElementById('mp-add-url').value = '';
+      mpAddFile.value = '';
+    }
+
+    // Event listeners
+    mpPlayBtn.addEventListener('click', togglePlay);
+    mpNextBtn.addEventListener('click', nextSong);
+    mpPrevBtn.addEventListener('click', prevSong);
+    mpShuffleBtn.addEventListener('click', function() {
+      isShuffle = !isShuffle;
+      mpShuffleBtn.classList.toggle('active', isShuffle);
+    });
+    mpLoopBtn.addEventListener('click', function() {
+      isLoop = !isLoop;
+      mpLoopBtn.classList.toggle('active', isLoop);
+    });
+    mpPlaylistBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      mpPlaylist.classList.toggle('open');
+    });
+    mpAddBtn.addEventListener('click', function() {
+      mpAddOverlay.classList.add('open');
+    });
+    mpMinBtn.addEventListener('click', function() {
+      mpPlayer.classList.add('hidden');
+      mpToggle.classList.add('show');
+      mpPlaylist.classList.remove('open');
+    });
+    mpToggle.addEventListener('click', function() {
+      mpPlayer.classList.remove('hidden');
+      mpToggle.classList.remove('show');
+    });
+
+    // File upload — đọc file audio
+    mpAddFile.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        var file = e.target.files[0];
+        // Kiểm tra có phải audio không
+        if (!file.type.startsWith('audio/')) {
+          alert('File không phải dạng audio. Chọn file .mp3, .wav, .ogg...');
+          e.target.value = '';
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('mp-add-url').value = ev.target.result;
+          // Tự động điền tên nếu trống
+          var nameInput = document.getElementById('mp-add-name');
+          if (!nameInput.value.trim()) {
+            nameInput.value = file.name.replace(/\.[^/.]+$/, '');
+          }
+        };
+        reader.onerror = function() {
+          alert('Không đọc được file.');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Audio events
+    mpAudio.addEventListener('loadedmetadata', function() {
+      mpDuration.textContent = fmtTime(mpAudio.duration);
+      if (currentSongIdx !== -1) {
+        mpArtistEl.textContent = 'Bài ' + (currentSongIdx + 1) + '/' + songs.length;
+      }
+    });
+
+    mpAudio.addEventListener('timeupdate', function() {
+      if (mpAudio.duration) {
+        var pct = (mpAudio.currentTime / mpAudio.duration) * 100;
+        mpBarFill.style.width = pct + '%';
+        mpCurrentTime.textContent = fmtTime(mpAudio.currentTime);
+      }
+    });
+
+    mpAudio.addEventListener('ended', function() {
+      if (isLoop) {
+        mpAudio.currentTime = 0;
+        mpAudio.play();
+      } else {
+        nextSong();
+      }
+    });
+
+    // Bắt lỗi khi audio không load được
+    mpAudio.addEventListener('error', function() {
+      isPlaying = false;
+      mpPlayBtn.textContent = '▶';
+      if (currentSongIdx !== -1) {
+        mpArtistEl.textContent = 'Lỗi tải âm thanh';
+      }
+    });
+
+    mpAudio.addEventListener('canplay', function() {
+      if (currentSongIdx !== -1) {
+        mpArtistEl.textContent = 'Bài ' + (currentSongIdx + 1) + '/' + songs.length;
+      }
+    });
+
+    // Seek bar
+    mpBar.addEventListener('click', function(e) {
+      if (!mpAudio.duration) return;
+      var rect = mpBar.getBoundingClientRect();
+      var pct = (e.clientX - rect.left) / rect.width;
+      mpAudio.currentTime = pct * mpAudio.duration;
+    });
+
+    // Volume
+    mpVolBar.addEventListener('click', function(e) {
+      var rect = mpVolBar.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      mpAudio.volume = pct;
+      mpVolFill.style.width = (pct * 100) + '%';
+      lastVolume = pct;
+    });
+
+    mpAudio.volume = lastVolume;
+    mpVolFill.style.width = (lastVolume * 100) + '%';
+
+    // Click ngoài playlist/modal để đóng
+    document.addEventListener('click', function(e) {
+      if (!mpPlaylist.contains(e.target) && e.target !== mpPlaylistBtn && !mpPlaylistBtn.contains(e.target)) {
+        mpPlaylist.classList.remove('open');
+      }
+      if (e.target === mpAddOverlay) closeMpAddModal();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (mpAddOverlay.classList.contains('open')) {
+        if (e.key === 'Escape') closeMpAddModal();
+        return;
+      }
+      if (e.code === 'Space' && currentSongIdx !== -1) {
+        e.preventDefault();
+        togglePlay();
+      }
+      if (e.code === 'ArrowRight' && e.shiftKey) { e.preventDefault(); nextSong(); }
+      if (e.code === 'ArrowLeft' && e.shiftKey) { e.preventDefault(); prevSong(); }
+    });
+
+    loadSongs();
   </script>
 </body>
 </html>
