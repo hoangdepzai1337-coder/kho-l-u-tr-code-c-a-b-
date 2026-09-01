@@ -172,6 +172,12 @@
       box-shadow: 0 8px 24px rgba(var(--accent-rgb),0.1);
     }
 
+    /* Card ẩn khi đang được phóng to */
+    .card.flying {
+      opacity: 0;
+      pointer-events: none;
+    }
+
     .card-img {
       width: 100%; height: 140px;
       background: var(--bg3);
@@ -213,7 +219,7 @@
       font-family: 'Fira Code', monospace;
     }
 
-    /* MODAL CHUNG */
+    /* MODAL THÊM MỚI */
     .modal-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.85);
@@ -269,12 +275,82 @@
 
     .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
 
-    /* HIỆU ỨNG PHÓNG TO CARD (ZOOM MODAL) */
-    .zoomed-card {
+    /* FLYING CARD — clone bay từ vị trí gốc ra center */
+    .fly-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .fly-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .fly-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0);
+      transition: background 0.3s ease;
+    }
+    .fly-overlay.active .fly-backdrop {
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    .fly-card {
+      position: absolute;
       background: var(--bg2);
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
+      width: 280px;
+      opacity: 0;
+      transform-origin: top left;
+      transition: 
+        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.2s ease;
+      will-change: transform, width, opacity;
+    }
+
+    /* Giai đoạn 1: clone ở vị trí card gốc */
+    .fly-card.stage-origin {
+      opacity: 1;
+    }
+
+    /* Giai đoạn 2: bay ra center + phóng to */
+    .fly-card.stage-fly {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+      width: 440px;
+      border-color: var(--accent);
+      box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.15);
+    }
+
+    .fly-card .card-img {
+      height: 140px;
+      transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .fly-card.stage-fly .card-img {
+      height: 180px;
+    }
+
+    /* Nội dung chi tiết hiện sau khi bay xong */
+    .fly-detail {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.3s ease 0.35s, opacity 0.25s ease 0.4s;
+    }
+    .fly-card.stage-fly .fly-detail {
+      max-height: 500px;
+      opacity: 1;
     }
 
     .link-action-bar { 
@@ -307,6 +383,29 @@
       padding: 12px; border-radius: 8px; border: 1px solid var(--border);
     }
     .edit-link-box.show { display: block; }
+
+    .fly-close-btn {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease 0.5s, background 0.2s;
+      z-index: 10;
+    }
+    .fly-card.stage-fly .fly-close-btn {
+      opacity: 1;
+    }
+    .fly-close-btn:hover {
+      background: rgba(255,60,60,0.3);
+      border-color: rgba(255,60,60,0.5);
+    }
   </style>
 </head>
 <body>
@@ -437,17 +536,16 @@
     </div>
   </div>
 
-  <!-- MODAL PHÓNG TO CARD & SỬA LINK -->
-  <div class="modal-overlay" id="detailModalOverlay">
-    <div class="modal" style="max-width: 440px; padding: 20px;">
-      <div class="zoomed-card" id="zoomedCardContainer">
-        <!-- Nội dung card phóng to được đưa vào đây -->
-      </div>
-      <button class="add-btn" id="closeDetailBtn" style="background: transparent; border-color: var(--muted); color: var(--muted); width:100%; margin-top: 16px;">Đóng</button>
+  <!-- FLY OVERLAY — card bay từ vị trí gốc ra center -->
+  <div class="fly-overlay" id="flyOverlay">
+    <div class="fly-backdrop" id="flyBackdrop"></div>
+    <div class="fly-card" id="flyCard">
+      <button class="fly-close-btn" id="flyCloseBtn">✕</button>
+      <div class="fly-card-content" id="flyCardContent"></div>
     </div>
   </div>
 
-  <!-- JAVASCRIPT XỬ LÝ -->
+  <!-- JAVASCRIPT -->
   <script>
     // 1. Chuyển đổi tab Sidebar
     const menuItems = document.querySelectorAll('.menu-item');
@@ -457,25 +555,35 @@
       item.addEventListener('click', () => {
         menuItems.forEach(i => i.classList.remove('active'));
         panels.forEach(p => p.classList.remove('active'));
-
         item.classList.add('active');
         document.getElementById(item.getAttribute('data-target')).classList.add('active');
       });
     });
 
-    // 2. Mở/Đóng Modal Thêm Mới
+    // 2. Modal thêm mới
     const modalOverlay = document.getElementById('modalOverlay');
     document.getElementById('openModalBtn').addEventListener('click', () => modalOverlay.classList.add('open'));
     document.getElementById('closeModalBtn').addEventListener('click', () => modalOverlay.classList.remove('open'));
 
-    // 3. Xử lý phóng to card khi bấm vào
-    const detailModal = document.getElementById('detailModalOverlay');
-    const zoomedCardContainer = document.getElementById('zoomedCardContainer');
+    // 3. FLY ANIMATION — card bay từ vị trí gốc ra giữa màn hình
+    const flyOverlay = document.getElementById('flyOverlay');
+    const flyCard = document.getElementById('flyCard');
+    const flyCardContent = document.getElementById('flyCardContent');
+    const flyBackdrop = document.getElementById('flyBackdrop');
+    const flyCloseBtn = document.getElementById('flyCloseBtn');
     let currentActiveCard = null;
 
     function attachCardClickEvent(card) {
       card.addEventListener('click', () => {
         currentActiveCard = card;
+
+        // Lấy tọa độ + kích thước card gốc
+        const rect = card.getBoundingClientRect();
+        const cardW = rect.width;
+        const cardH = rect.height;
+        const startX = rect.left;
+        const startY = rect.top;
+
         const icon = card.getAttribute('data-icon') || '📌';
         const tag = card.getAttribute('data-tag') || 'ITEM';
         const title = card.getAttribute('data-title');
@@ -483,24 +591,39 @@
         const link = card.getAttribute('data-link') || '';
         const meta = card.getAttribute('data-meta') || 'MySpace';
 
-        zoomedCardContainer.innerHTML = `
-          <div class="card-img" style="height: 160px; font-size: 50px;">${icon}</div>
+        // Tính toán vị trí center màn hình cho card phóng to
+        const targetW = 440;
+        const targetH = 560; // ước lượng, không quan trọng lắm vì content tự expand
+        const centerX = (window.innerWidth - targetW) / 2;
+        const centerY = (window.innerHeight - targetH) / 2;
+
+        // Tính transform: dịch từ center về vị trí card gốc
+        const translateX = startX - centerX;
+        const translateY = startY - centerY;
+        const scaleX = cardW / targetW;
+        const scaleY = cardH / targetH;
+
+        // Đặt nội dung cho fly-card
+        flyCardContent.innerHTML = `
+          <div class="card-img" style="font-size: 50px; height: 180px;">${icon}</div>
           <div class="card-body">
             <span class="card-tag">${tag}</span>
             <div class="card-title" style="font-size: 16px; margin-top: 4px;">${title}</div>
             <div class="card-desc" style="font-size: 13px; margin-bottom: 0;">${desc || 'Không có mô tả.'}</div>
-            
-            <div class="link-action-bar">
-              <a href="${link || '#'}" target="_blank" id="modalVisitBtn" class="visit-btn" style="${link ? '' : 'display:none;'}">🔗 Mở Liên Kết</a>
-              <button class="icon-btn" id="editLinkToggleBtn" title="Sửa link">✏️ Sửa link</button>
-            </div>
 
-            <div class="edit-link-box" id="editLinkBox">
-              <div class="form-group" style="margin-bottom: 8px;">
-                <label>Nhập Link mới:</label>
-                <input type="text" id="inputNewLink" value="${link}" placeholder="https://...">
+            <div class="fly-detail">
+              <div class="link-action-bar">
+                <a href="${link || '#'}" target="_blank" id="flyVisitBtn" class="visit-btn" style="${link ? '' : 'display:none;'}">🔗 Mở Liên Kết</a>
+                <button class="icon-btn" id="flyEditToggleBtn" title="Sửa link">✏️ Sửa link</button>
               </div>
-              <button class="add-btn" id="saveNewLinkBtn" style="width:100%; padding: 6px;">Lưu Link</button>
+
+              <div class="edit-link-box" id="flyEditLinkBox">
+                <div class="form-group" style="margin-bottom: 8px;">
+                  <label>Nhập Link mới:</label>
+                  <input type="text" id="flyInputNewLink" value="${link}" placeholder="https://...">
+                </div>
+                <button class="add-btn" id="flySaveNewLinkBtn" style="width:100%; padding: 6px;">Lưu Link</button>
+              </div>
             </div>
           </div>
           <div class="card-footer" style="padding: 10px 14px; background: var(--bg3);">
@@ -508,42 +631,113 @@
           </div>
         `;
 
-        // Bấm nút mở hộp sửa link
-        document.getElementById('editLinkToggleBtn').addEventListener('click', (e) => {
-          e.stopPropagation();
-          document.getElementById('editLinkBox').classList.toggle('show');
+        // Reset class
+        flyCard.classList.remove('stage-origin', 'stage-fly');
+        flyCard.style.width = targetW + 'px';
+
+        // Đặt card ở vị trí card gốc (dùng transform để di chuyển về start)
+        // transform-origin: top left
+        flyCard.style.transformOrigin = 'top left';
+        flyCard.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
+
+        // Ẩn card gốc
+        card.classList.add('flying');
+
+        // Hiện overlay
+        flyOverlay.classList.add('active');
+
+        // Force reflow rồi thêm class origin để hiện card clone
+        void flyCard.offsetWidth;
+        flyCard.classList.add('stage-origin');
+
+        // Dùng double rAF để đảm bảo trình duyệt render frame đầu tiên trước khi animate
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            // Bay ra center: transform về 0, scale về 1
+            flyCard.style.transform = 'translate(0, 0) scale(1)';
+            flyCard.classList.add('stage-fly');
+          });
         });
 
-        // Bấm lưu link mới
-        document.getElementById('saveNewLinkBtn').addEventListener('click', (e) => {
-          e.stopPropagation();
-          const newLink = document.getElementById('inputNewLink').value.trim();
-          currentActiveCard.setAttribute('data-link', newLink);
-          
-          const visitBtn = document.getElementById('modalVisitBtn');
-          if (newLink) {
-            visitBtn.href = newLink;
-            visitBtn.style.display = 'inline-block';
-          } else {
-            visitBtn.style.display = 'none';
-          }
+        // Gắn sự kiện cho các nút bên trong fly-card
+        const editToggleBtn = document.getElementById('flyEditToggleBtn');
+        if (editToggleBtn) {
+          editToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('flyEditLinkBox').classList.toggle('show');
+          });
+        }
 
-          document.getElementById('editLinkBox').classList.remove('show');
-          alert('Đã cập nhật link thành công!');
-        });
+        const saveLinkBtn = document.getElementById('flySaveNewLinkBtn');
+        if (saveLinkBtn) {
+          saveLinkBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const newLink = document.getElementById('flyInputNewLink').value.trim();
+            currentActiveCard.setAttribute('data-link', newLink);
 
-        detailModal.classList.add('open');
+            const visitBtn = document.getElementById('flyVisitBtn');
+            if (newLink) {
+              visitBtn.href = newLink;
+              visitBtn.style.display = 'inline-block';
+            } else {
+              visitBtn.style.display = 'none';
+            }
+
+            document.getElementById('flyEditLinkBox').classList.remove('show');
+          });
+        }
       });
     }
 
+    // Đóng fly overlay + bay ngược về vị trí gốc
+    function closeFly() {
+      if (!currentActiveCard) return;
+
+      const rect = currentActiveCard.getBoundingClientRect();
+      const cardW = rect.width;
+      const cardH = rect.height;
+
+      const currentFlyW = flyCard.offsetWidth;
+      const currentFlyH = flyCard.offsetHeight;
+
+      const startX = rect.left;
+      const startY = rect.top;
+      const centerX = (window.innerWidth - currentFlyW) / 2;
+      const centerY = (window.innerHeight - currentFlyH) / 2;
+
+      const translateX = startX - centerX;
+      const translateY = startY - centerY;
+      const scaleX = cardW / currentFlyW;
+      const scaleY = cardH / currentFlyH;
+
+      // Bay ngược về
+      flyCard.classList.remove('stage-fly');
+      flyCard.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
+
+      // Sau khi animation xong, ẩn overlay + hiện lại card gốc
+      setTimeout(() => {
+        flyOverlay.classList.remove('active');
+        flyCard.classList.remove('stage-origin');
+        flyCard.style.transform = '';
+        if (currentActiveCard) {
+          currentActiveCard.classList.remove('flying');
+        }
+        currentActiveCard = null;
+      }, 450);
+    }
+
+    flyCloseBtn.addEventListener('click', closeFly);
+    flyBackdrop.addEventListener('click', closeFly);
+
+    // ESC để đóng
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && flyOverlay.classList.contains('active')) {
+        closeFly();
+      }
+    });
+
     // Gắn sự kiện cho các card có sẵn
     document.querySelectorAll('.card').forEach(card => attachCardClickEvent(card));
-
-    document.getElementById('closeDetailBtn').addEventListener('click', () => detailModal.classList.remove('open'));
-    window.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) modalOverlay.classList.remove('open');
-      if (e.target === detailModal) detailModal.classList.remove('open');
-    });
 
     // 4. Thêm mục mới
     document.getElementById('submitBtn').addEventListener('click', () => {
@@ -583,7 +777,6 @@
       attachCardClickEvent(card);
       grid.prepend(card);
 
-      // Reset form & đóng modal
       document.getElementById('inputTitle').value = '';
       document.getElementById('inputLink').value = '';
       document.getElementById('inputDesc').value = '';
