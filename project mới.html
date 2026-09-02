@@ -1967,7 +1967,7 @@ class Snowflake {
         height: '1', width: '1',
         playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'playsinline': 1 },
         events: {
-          'onReady': function() { ytReady = true; ytPlayer.setVolume(lastVolume * 100); },
+          'onReady': function() { ytReady = true; if(ytPlayer.setVolume) ytPlayer.setVolume(lastVolume * 100); },
           'onStateChange': function(e) {
             if (e.data == YT.PlayerState.PLAYING) {
               isPlaying = true; mpPlayBtn.textContent = '⏸';
@@ -1983,15 +1983,11 @@ class Snowflake {
               stopYTTimeUpdate();
               if (isLoop && currentType === 'youtube') { ytPlayer.seekTo(0); ytPlayer.playVideo(); }
               else { nextSong(); }
-            } else if (e.data == YT.PlayerState.CUED) {
-              if (currentType === 'youtube' && ytPlayer.getDuration) {
-                mpDuration.textContent = fmtTime(ytPlayer.getDuration());
-              }
             }
           },
           'onError': function() {
             isPlaying = false; mpPlayBtn.textContent = '▶';
-            if (currentSongIdx !== -1) mpArtistEl.textContent = 'Lỗi phát YouTube';
+            if (currentSongIdx !== -1) mpArtistEl.textContent = 'Lỗi phát YouTube (link sai hoặc bị chặn)';
           }
         }
       });
@@ -2031,17 +2027,25 @@ class Snowflake {
     }
 
     function loadSongs() {
-      const stored = localStorage.getItem('myspace_songs');
-      if (stored) { try { songs = JSON.parse(stored); } catch(e) { songs = []; } }
-      if (songs.length === 0) {
+      try {
+        const stored = localStorage.getItem('myspace_songs');
+        if (stored) { try { songs = JSON.parse(stored); } catch(e) { songs = []; } }
+        if (songs.length === 0) {
+          songs = [{ name: 'Test — SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', icon: '🎵' }];
+          saveSongs();
+        }
+      } catch(e) {
+        // Dự phòng nếu trình duyệt chặn localStorage (vd: mở file trực tiếp bằng file://)
+        console.warn('Không đọc được localStorage:', e);
         songs = [{ name: 'Test — SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', icon: '🎵' }];
-        saveSongs();
       }
       renderPlaylist();
     }
     function saveSongs() {
-      try { const toSave = songs.filter(s => !s.url || s.url.length < 2000000); localStorage.setItem('myspace_songs', JSON.stringify(toSave)); }
-      catch(e) { console.warn('localStorage đầy:', e); }
+      try { 
+        const toSave = songs.filter(s => !s.url || s.url.length < 2000000); 
+        localStorage.setItem('myspace_songs', JSON.stringify(toSave)); 
+      } catch(e) { console.warn('Lỗi lưu localStorage:', e); }
     }
     function fmtTime(sec) {
       if (!sec || isNaN(sec)) return '0:00';
@@ -2061,6 +2065,7 @@ class Snowflake {
           '<div class="mp-track-del" onclick="event.stopPropagation(); deleteSong(' + i + ')">✕</div></div>';
       }).join('');
     }
+    
     function playSong(idx) {
       if (idx < 0 || idx >= songs.length) return;
       currentSongIdx = idx;
@@ -2079,15 +2084,30 @@ class Snowflake {
       if (ytId) {
         currentType = 'youtube';
         if (ytReady && ytPlayer) {
-          // Không tự phát ngay: trình duyệt có thể chặn autoplay của iframe YouTube.
-          // Nạp video trước, sau đó người dùng bấm ▶ để phát.
-          ytPlayer.cueVideoById(ytId);
-          mpArtistEl.textContent = 'YouTube • Nhấn ▶ để phát';
-          isPlaying = false;
-          mpPlayBtn.textContent = '▶';
+          ytPlayer.loadVideoById(ytId); // Lệnh này sẽ tự động Phát (Play) luôn
+          mpArtistEl.textContent = 'Đang phát YouTube...';
         } else {
-          mpArtistEl.textContent = 'Đang tải YouTube...';
-          setTimeout(function() { if (currentSongIdx === idx) playSong(idx); }, 800);
+          mpArtistEl.textContent = 'Đang chờ YouTube API...';
+          // Nếu API chưa sẵn sàng, thử lại sau 800ms
+          let attempts = 0;
+          let checkYT = setInterval(function() {
+            if (ytReady && ytPlayer) {
+              clearInterval(checkYT);
+              if (currentSongIdx === idx) {
+                 ytPlayer.loadVideoById(ytId);
+                 mpArtistEl.textContent = 'Đang phát YouTube...';
+              }
+            } else {
+              attempts++;
+              if (attempts > 10) { // Đợi khoảng 8 giây
+                clearInterval(checkYT);
+                if (currentSongIdx === idx) {
+                  mpArtistEl.textContent = 'Lỗi tải YouTube';
+                  alert('Không tải được YouTube. Có thể do mạng, Adblock, hoặc bạn mở file HTML trực tiếp (file://). Hãy up lên hosting hoặc dùng link MP3.');
+                }
+              }
+            }
+          }, 800);
         }
       } else {
         currentType = 'audio';
@@ -2097,23 +2117,37 @@ class Snowflake {
           mpArtistEl.textContent = 'Bài ' + (idx + 1) + '/' + songs.length;
         }).catch(function(err) {
           isPlaying = false; mpPlayBtn.textContent = '▶'; mpArtistEl.textContent = 'Lỗi phát nhạc';
-          alert('Không thể phát bài này.\n\nLý do:\n- Link sai/hết hạn\n- File không hợp lệ\n- CORS chặn\n\nThử link .mp3 khác hoặc link YouTube.');
+          alert('Không thể phát file MP3 này.\n\nLý do:\n- Link sai/hết hạn\n- CORS chặn\n\nThử lại link khác.');
         });
       }
       renderPlaylist();
     }
+
     function togglePlay() {
       if (currentSongIdx === -1 && songs.length > 0) { playSong(0); return; }
       if (currentSongIdx === -1) return;
+      
       if (currentType === 'youtube') {
-        if (!ytPlayer) return;
+        if (!ytReady || !ytPlayer) {
+          alert('Trình phát YouTube chưa sẵn sàng hoặc đang bị Adblock chặn. Hãy thử lại hoặc dùng link MP3!');
+          return;
+        }
         if (isPlaying) { ytPlayer.pauseVideo(); }
         else { ytPlayer.playVideo(); }
       } else {
-        if (isPlaying) { mpAudio.pause(); isPlaying = false; mpPlayBtn.textContent = '▶'; }
-        else { mpAudio.play().then(function() { isPlaying = true; mpPlayBtn.textContent = '⏸'; }).catch(function() { mpPlayBtn.textContent = '▶'; }); }
+        if (isPlaying) { 
+          mpAudio.pause(); isPlaying = false; mpPlayBtn.textContent = '▶'; 
+        } else { 
+          mpAudio.play().then(function() { 
+            isPlaying = true; mpPlayBtn.textContent = '⏸'; 
+          }).catch(function() { 
+            mpPlayBtn.textContent = '▶';
+            alert('Lỗi không thể phát nhạc. Trình duyệt có thể đã chặn tự động phát.');
+          }); 
+        }
       }
     }
+    
     function nextSong() {
       if (songs.length === 0) return;
       if (isShuffle) { var r; do { r = Math.floor(Math.random() * songs.length); } while (r === currentSongIdx && songs.length > 1); playSong(r); }
@@ -2145,7 +2179,7 @@ class Snowflake {
     function addSong() {
       var name = document.getElementById('mp-add-name').value.trim();
       var url = document.getElementById('mp-add-url').value.trim();
-      if (!name || !url) { alert('Cần tên bài và link/tệp nhạc!'); return; }
+      if (!name || !url) { alert('Cần nhập tên bài và link nhạc!'); return; }
       songs.push({ name: name, url: url, icon: '🎵' });
       saveSongs(); renderPlaylist(); closeMpAddModal();
       if (currentSongIdx === -1) playSong(songs.length - 1);
