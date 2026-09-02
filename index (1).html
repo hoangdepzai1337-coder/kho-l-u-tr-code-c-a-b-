@@ -8,10 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   
   <style>
-    /* KHAI BÁO BIẾN MÀU SẮC */
+    /* KHAI BÁO BIẾN MÀU SẮC & ĐỘ MỜ MENU */
     :root {
       --main-color: #00ffcc;
       --main-color-rgb: 0, 255, 204;
+      --menu-opacity: 0.85;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,7 +45,7 @@
       border-color: var(--main-color);
     }
 
-    /* POPUP SETTING MÀU & ẢNH */
+    /* POPUP SETTING CHUNG */
     .setting-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.8);
       z-index: 1001; display: none; align-items: center; justify-content: center;
@@ -99,7 +100,7 @@
       display: flex; flex-direction: column; gap: 8px;
     }
     .bg-input-group label { color: rgba(255,255,255,0.7); font-size: 11px; }
-    .bg-input-group input[type="text"] {
+    .bg-input-group input[type="text"], .bg-input-group input[type="range"] {
       background: rgba(var(--main-color-rgb), 0.05);
       border: 1px solid rgba(var(--main-color-rgb), 0.3);
       border-radius: 6px; color: #fff; font-family: 'Inter', sans-serif;
@@ -150,19 +151,21 @@
     .top-sidebar-wrap * { pointer-events: auto; }
 
     .top-sidebar {
-      width: 320px; height: 0;
-      background: rgba(10,10,20,0.9); backdrop-filter: blur(14px);
+      width: 420px; height: 0;
+      background: rgba(25, 25, 35, var(--menu-opacity)); backdrop-filter: blur(14px);
       overflow: hidden; transition: height 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex; flex-direction: column;
-      border-bottom: 1px solid rgba(var(--main-color-rgb),0.2);
-      border-radius: 0 0 16px 16px;
+      border: 1px solid rgba(var(--main-color-rgb), 0.25);
+      border-top: none;
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
-    .top-sidebar-wrap:hover .top-sidebar { height: 290px; }
+    .top-sidebar-wrap:hover .top-sidebar { height: 135px; }
 
     .top-sidebar-inner {
       width: 100%; height: 100%;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 20px 20px 16px; overflow-y: auto; text-align: center; gap: 12px;
+      display: flex; align-items: center;
+      padding: 16px 20px; gap: 14px; overflow: hidden;
     }
 
     .top-arrow {
@@ -181,53 +184,125 @@
     .top-arrow::before { content: '▼'; }
     .top-sidebar-wrap:hover .top-arrow::before { content: '▲'; }
 
+    .creator-avatar-container {
+      position: relative;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
     .creator-avatar {
-      width: 70px; height: 70px; border-radius: 50%;
+      width: 75px; height: 75px; border-radius: 50%;
       object-fit: cover; border: 2px solid var(--main-color);
       box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.4);
       background-color: #1a1a2e;
+      transition: transform 0.2s, filter 0.2s;
+    }
+    .creator-avatar-container:hover .creator-avatar {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
+    .avatar-status-badge {
+      position: absolute; bottom: 2px; right: 2px;
+      width: 26px; height: 26px; background: #ff4757;
+      border: 2px solid #141420; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 11px; cursor: pointer;
+      transition: transform 0.2s;
+      overflow: hidden;
+    }
+    .avatar-status-badge img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+    }
+    .avatar-status-badge:hover { transform: scale(1.15); }
+
+    .creator-info-content {
+      flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0;
     }
 
     .creator-name-row {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;
     }
 
     .creator-name {
       color: var(--main-color); font-size: 14px; font-weight: 600;
-      letter-spacing: 1px; font-family: 'Fira Code', monospace;
+      letter-spacing: 0.5px; font-family: 'Fira Code', monospace;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    .avatar-edit-group {
-      display: flex; flex-direction: column; gap: 6px; width: 100%;
-      background: rgba(var(--main-color-rgb), 0.04);
-      border: 1px solid rgba(var(--main-color-rgb), 0.15);
-      padding: 10px; border-radius: 8px;
-    }
-    .avatar-edit-group label {
-      color: rgba(255,255,255,0.7); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; text-align: left;
-    }
-    .avatar-edit-group input[type="text"] {
-      background: rgba(var(--main-color-rgb), 0.05);
+    .edit-name-btn {
+      background: rgba(var(--main-color-rgb), 0.1);
       border: 1px solid rgba(var(--main-color-rgb), 0.3);
-      border-radius: 4px; color: #fff; font-family: 'Inter', sans-serif;
-      font-size: 11px; padding: 6px 8px; outline: none; width: 100%;
+      border-radius: 4px; color: var(--main-color); font-size: 11px;
+      width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s, transform 0.2s; flex-shrink: 0;
     }
-    .avatar-edit-group input[type="text"]:focus { border-color: var(--main-color); }
+    .edit-name-btn:hover { background: rgba(var(--main-color-rgb), 0.3); transform: scale(1.1); }
 
-    .avatar-actions {
-      display: flex; gap: 6px; width: 100%; margin-top: 2px;
+    /* TAG RBLX CÓ THỂ BẤM VÀO ĐỂ SỬA */
+    .rblx-tag {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px; padding: 2px 8px;
+      color: #a0a0b0; font-size: 10px; font-family: 'Fira Code', monospace;
+      display: flex; align-items: center; gap: 4px;
+      flex-shrink: 0; cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
     }
-    .avatar-btn-cancel, .avatar-btn-apply {
-      flex: 1; padding: 6px; border-radius: 4px; font-size: 11px; font-weight: 500; cursor: pointer; text-align: center;
+    .rblx-tag:hover {
+      background: rgba(var(--main-color-rgb), 0.15);
+      border-color: var(--main-color);
+      color: #fff;
+      transform: scale(1.03);
     }
-    .avatar-btn-cancel {
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);
+    .rblx-tag span { font-size: 9px; color: var(--main-color); display: inline-flex; align-items: center; justify-content: center; }
+    .rblx-tag span img { width: 10px; height: 10px; object-fit: contain; }
+
+    .creator-sub-row {
+      display: flex; align-items: center; gap: 6px;
     }
-    .avatar-btn-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
-    .avatar-btn-apply {
-      background: rgba(var(--main-color-rgb), 0.15); border: 1px solid var(--main-color); color: var(--main-color); font-weight: 600;
+
+    .creator-sub-icon {
+      font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      padding: 2px 6px; background: rgba(var(--main-color-rgb), 0.08);
+      border: 1px solid rgba(var(--main-color-rgb), 0.2); border-radius: 6px;
+      transition: transform 0.2s, background 0.2s;
     }
-    .avatar-btn-apply:hover { background: rgba(var(--main-color-rgb), 0.3); }
+    .creator-sub-icon:hover { transform: scale(1.1); background: rgba(var(--main-color-rgb), 0.2); }
+
+    /* POPUP CHUNG CHO MODAL */
+    .avatar-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      z-index: 1005; display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+    .avatar-modal-overlay.open { display: flex; }
+
+    .avatar-modal-box {
+      width: 90vw; max-width: 380px;
+      background: rgba(10,10,25,0.96);
+      border: 1px solid rgba(var(--main-color-rgb), 0.4);
+      border-radius: 16px; padding: 24px;
+      animation: slideUp 0.3s ease;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .avatar-modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(var(--main-color-rgb), 0.2);
+      padding-bottom: 10px;
+    }
+    .avatar-modal-header h2 { color: var(--main-color); font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+    .avatar-modal-close { color: rgba(255,255,255,0.6); cursor: pointer; font-size: 16px; }
+    .avatar-modal-close:hover { color: var(--main-color); }
+
+    .avatar-preview-container {
+      display: flex; justify-content: center; margin: 4px 0;
+    }
+    .avatar-preview-img {
+      width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--main-color); box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.3);
+      background-color: #1a1a2e;
+    }
 
     /* GIAO DIỆN CHÍNH (SIDEBAR TRÁI / PHẢI) */
     .sidebar-wrap {
@@ -253,12 +328,19 @@
 
     .sidebar {
       width: 0; height: 100vh;
-      background: rgba(10,10,20,0.85); backdrop-filter: blur(14px);
+      background: rgba(10, 10, 20, var(--menu-opacity)); backdrop-filter: blur(14px);
       overflow: hidden; transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex; flex-direction: column;
     }
-    .sidebar-wrap.left .sidebar { border-right: 1px solid rgba(var(--main-color-rgb),0.2); order: -1; }
-    .sidebar-wrap.right .sidebar { border-left: 1px solid rgba(var(--main-color-rgb),0.2); }
+    .sidebar-wrap.left .sidebar {
+      border-right: 1px solid rgba(var(--main-color-rgb),0.2);
+      border-radius: 0 22px 22px 0;
+      order: -1;
+    }
+    .sidebar-wrap.right .sidebar {
+      border-left: 1px solid rgba(var(--main-color-rgb),0.2);
+      border-radius: 22px 0 0 22px;
+    }
     .sidebar-wrap:hover .sidebar { width: 280px; }
 
     .sidebar-inner {
@@ -360,7 +442,6 @@
       user-select: none;
     }
 
-    /* ĐOẠN CHỮ NHỎ CHỨA LINK Ở DƯỚI */
     .credit-link {
       color: rgba(255, 255, 255, 0.4);
       font-family: 'Fira Code', monospace;
@@ -375,7 +456,7 @@
       text-decoration: underline;
     }
 
-    /* POPUP THÔNG SỐ */
+    /* POPUP THÔNG SỐ XE */
     .popup-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.85);
       z-index: 999; display: none; align-items: center; justify-content: center;
@@ -490,10 +571,173 @@
       border: 1px solid #ffffff22; border-radius: 8px;
       color: #ffffff66; font-size: 13px; font-weight: 500; cursor: pointer;
     }
-  </style>
+  
+
+    /* ===== BỔ SUNG TỪ XỊN NHẤT: TUYẾT + MUSIC PLAYER ===== */
+    /* CANVAS HIỆU ỨNG TUYẾT */
+    #snow-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 1;
+    }
+
+
+    /* ===== MUSIC PLAYER ===== */
+    .music-player {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 72px; z-index: 150;
+      background: rgba(10, 10, 20, var(--menu-opacity));
+      backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
+      display: flex; align-items: center;
+      padding: 0 20px; gap: 16px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .music-player.hidden { transform: translateY(110%); }
+
+        .mp-toggle {
+      position: fixed; bottom: 20px; right: 20px; z-index: 148;
+      width: 48px; height: 48px;
+      background: rgba(10, 10, 20, var(--menu-opacity));
+      border: 1px solid rgba(var(--main-color-rgb), 0.4);
+      border-radius: 50%;
+      color: var(--main-color); font-size: 20px;
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; backdrop-filter: blur(8px);
+      transition: all 0.2s;
+      box-shadow: 0 0 15px rgba(var(--main-color-rgb), 0.2);
+    }
+    .mp-toggle:hover { background: rgba(var(--main-color-rgb), 0.2); transform: scale(1.05); }
+    .mp-toggle.show { display: flex; }
+
+    .mp-left { display: flex; align-items: center; gap: 12px; width: 180px; flex-shrink: 0; }
+    .mp-thumb {
+      width: 44px; height: 44px; border-radius: 8px;
+      background: rgba(var(--main-color-rgb), 0.1);
+      border: 1px solid rgba(var(--main-color-rgb), 0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .mp-info { overflow: hidden; }
+    .mp-title {
+      color: #fff; font-size: 13px; font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .mp-artist {
+      color: rgba(255,255,255,0.4); font-size: 11px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .mp-center {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 6px; max-width: 500px; margin: 0 auto;
+    }
+    .mp-controls { display: flex; align-items: center; gap: 8px; }
+    .mp-btn {
+      width: 34px; height: 34px;
+      background: rgba(var(--main-color-rgb), 0.08);
+      border: 1px solid rgba(var(--main-color-rgb), 0.2);
+      border-radius: 50%;
+      color: var(--main-color); font-size: 14px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .mp-btn:hover { background: rgba(var(--main-color-rgb), 0.2); }
+    .mp-btn.play {
+      width: 40px; height: 40px;
+      background: rgba(var(--main-color-rgb), 0.15);
+      border-color: var(--main-color); font-size: 16px;
+    }
+    .mp-btn.play:hover { background: rgba(var(--main-color-rgb), 0.3); }
+    .mp-btn.active { background: rgba(var(--main-color-rgb), 0.25); border-color: var(--main-color); }
+
+    .mp-progress { width: 100%; display: flex; align-items: center; gap: 8px; }
+    .mp-time {
+      color: rgba(255,255,255,0.4); font-size: 10px;
+      font-family: 'Fira Code', monospace; min-width: 36px; text-align: center;
+    }
+    .mp-bar {
+      flex: 1; height: 4px; background: rgba(255,255,255,0.1);
+      border-radius: 2px; cursor: pointer; position: relative; overflow: hidden;
+      transition: height 0.15s;
+    }
+    .mp-bar:hover { height: 6px; }
+    .mp-bar-fill { height: 100%; background: var(--main-color); border-radius: 2px; transition: width 0.1s linear; width: 0%; }
+
+    .mp-right { display: flex; align-items: center; gap: 8px; width: 180px; flex-shrink: 0; justify-content: flex-end; }
+    .mp-volume-bar {
+      width: 70px; height: 4px; background: rgba(255,255,255,0.1);
+      border-radius: 2px; cursor: pointer; position: relative; overflow: hidden;
+      transition: height 0.15s;
+    }
+    .mp-volume-fill { height: 100%; background: var(--main-color); border-radius: 2px; width: 70%; transition: width 0.1s; }
+    .mp-volume-bar:hover { height: 6px; }
+
+        .mp-playlist {
+      position: fixed; bottom: 72px; right: 0;
+      width: 320px; max-height: 380px;
+      background: rgba(10, 10, 20, var(--menu-opacity));
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(var(--main-color-rgb), 0.2);
+      border-right: none;
+      border-radius: 12px 0 0 0;
+      z-index: 149; display: none; flex-direction: column; overflow: hidden;
+    }
+    .mp-playlist.open { display: flex; animation: slideUp 0.25s ease; }
+    .mp-playlist-header {
+      padding: 14px 16px; border-bottom: 1px solid rgba(var(--main-color-rgb), 0.15);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .mp-playlist-header h3 { color: var(--main-color); font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+    .mp-playlist-count { color: rgba(255,255,255,0.4); font-size: 11px; font-family: 'Fira Code', monospace; }
+    .mp-playlist-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .mp-track {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 6px; cursor: pointer;
+      transition: background 0.2s; margin-bottom: 4px;
+    }
+    .mp-track:hover { background: rgba(var(--main-color-rgb), 0.08); }
+    .mp-track.active { background: rgba(var(--main-color-rgb), 0.12); }
+    .mp-track-icon { font-size: 16px; flex-shrink: 0; }
+    .mp-track-info { flex: 1; overflow: hidden; }
+    .mp-track-name { color: #fff; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mp-track.active .mp-track-name { color: var(--main-color); }
+    .mp-track-del {
+      width: 22px; height: 22px;
+      background: rgba(255,50,50,0.1); border: 1px solid rgba(255,50,50,0.3);
+      border-radius: 4px; color: #ff6666; font-size: 10px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s; flex-shrink: 0;
+    }
+    .mp-track:hover .mp-track-del { opacity: 1; }
+    .mp-playlist-empty { text-align: center; padding: 30px 16px; color: rgba(255,255,255,0.3); font-size: 12px; }
+
+    .mp-add-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      z-index: 1002; display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .mp-add-overlay.open { display: flex; }
+    .mp-add-box {
+      width: 90vw; max-width: 420px;
+      background: rgba(10,10,25,0.97);
+      border: 1px solid rgba(var(--main-color-rgb), 0.4);
+      border-radius: 16px; padding: 24px;
+      animation: slideUp 0.3s ease;
+    }
+    .mp-add-box h2 { color: var(--main-color); font-size: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+
+    @media (max-width: 768px) {
+      .mp-left, .mp-right { display: none; }
+      .mp-center { max-width: 100%; }
+    }
+
+</style>
 </head>
 <body>
   <div class="bg" id="bg"></div>
+  <canvas id="snow-canvas"></canvas>
+
+
 
   <!-- NÚT SETTING GÓC MÀN HÌNH -->
   <div class="setting-btn" onclick="openSetting()" title="Cài đặt giao diện">⚙️</div>
@@ -502,22 +746,25 @@
   <div class="top-sidebar-wrap">
     <div class="top-sidebar">
       <div class="top-sidebar-inner">
-        <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar" onerror="handleImageError(this)">
-        
-        <div class="creator-name-row">
-          <div class="creator-name" id="creator-name-display">hoangdepzai</div>
+        <div class="creator-avatar-container" onclick="openAvatarModal()" title="Nhấn để đổi ảnh đại diện">
+          <img id="creator-avatar-img" class="creator-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Avatar" onerror="handleImageError(this)">
+          <div class="avatar-status-badge" id="avatar-badge-display" onclick="event.stopPropagation(); openBadgeModal();" title="Nhấn để đổi icon hình ảnh cho badge">Pp</div>
         </div>
-
-        <div class="avatar-edit-group">
-          <label>Đổi Ảnh Avatar (URL hoặc Tải lên):</label>
-          <div class="file-upload-row">
-            <input type="text" id="avatar-url-input" placeholder="https://..." oninput="previewAvatarUrl(this.value)">
-            <label class="btn-file-select" for="avatar-file-input">📁 Chọn ảnh</label>
-            <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this, 'avatar')">
+        
+        <div class="creator-info-content">
+          <div class="creator-name-row">
+            <div class="creator-name" id="creator-name-display">hoang1337_94828</div>
+            <div class="edit-name-btn" onclick="promptChangeName()" title="Đổi tên">✏️</div>
+            <div class="edit-name-btn" onclick="openBadgeModal()" title="Đổi icon đỏ thành hình ảnh">🖼️</div>
+            
+            <!-- Ô TAG RBLX (BẤM VÀO ĐÂY ĐỂ ĐỔI CHỮ VÀ ICON TRƯỚC) -->
+            <div class="rblx-tag" id="rblx-tag-box" onclick="openTagModal()" title="Nhấn để đổi tag và icon">
+              <span id="rblx-tag-icon">◆</span> <span id="rblx-tag-text">RBLX</span>
+            </div>
           </div>
-          <div class="avatar-actions">
-            <div class="avatar-btn-cancel" onclick="cancelAvatarChange()">Hủy</div>
-            <div class="avatar-btn-apply" onclick="applyAvatarChange()">Áp dụng</div>
+
+          <div class="creator-sub-row">
+            <span class="creator-sub-icon" id="creator-sub-icon-display" onclick="promptChangeSubIcon()" title="Nhấn để đổi icon phía dưới">🔥</span>
           </div>
         </div>
       </div>
@@ -525,7 +772,101 @@
     <div class="top-arrow"></div>
   </div>
 
-  <!-- MODAL CÀI ĐẶT MÀU & ẢNH NỀN -->
+  <!-- POPUP ĐỔI TAG VÀ ICON CỦA TAG -->
+  <div class="avatar-modal-overlay" id="tag-modal-overlay" onclick="closeTagModalEvent(event)">
+    <div class="avatar-modal-box">
+      <div class="avatar-modal-header">
+        <h2>🏷️ Tùy Chỉnh Tag RBLX</h2>
+        <div class="avatar-modal-close" onclick="closeTagModalDirect()">✕</div>
+      </div>
+      
+      <div class="bg-input-group">
+        <label>Nhập tên chữ Tag mới:</label>
+        <input type="text" id="tag-name-input" placeholder="VD: VIP, ROBLOX, DEV...">
+      </div>
+
+      <div class="bg-input-group">
+        <label>Chọn kiểu icon trước tag:</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="tag-icon-input" placeholder="Dán link ảnh (URL) hoặc ký tự (VD: ◆, ★)" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="closeTagModalDirect()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyNewTag()">Áp dụng</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP ĐỔI AVATAR -->
+  <div class="avatar-modal-overlay" id="avatar-modal-overlay" onclick="closeAvatarModal(event)">
+    <div class="avatar-modal-box">
+      <div class="avatar-modal-header">
+        <h2>🖼️ Đổi Ảnh Đại Diện</h2>
+        <div class="avatar-modal-close" onclick="closeAvatarModalDirect()">✕</div>
+      </div>
+      
+      <div class="avatar-preview-container">
+        <img id="avatar-modal-preview" class="avatar-preview-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Preview" onerror="handleImageError(this)">
+      </div>
+
+      <div class="bg-input-group">
+        <label>Dán link ảnh (URL):</label>
+        <input type="text" id="avatar-url-input" placeholder="https://..." oninput="previewAvatarUrl(this.value)">
+      </div>
+
+      <div class="bg-input-group">
+        <label>Hoặc chọn tệp từ máy tính:</label>
+        <div class="file-upload-row">
+          <div class="btn-file-select" style="width: 100%; text-align: center;" onclick="document.getElementById('avatar-file-input').click()">📁 Chọn tệp ảnh</div>
+          <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarFileSelect(this)">
+        </div>
+      </div>
+
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="closeAvatarModalDirect()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyNewAvatar()">Áp dụng</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP ĐỔI ICON MÀU ĐỎ -->
+  <div class="avatar-modal-overlay" id="badge-modal-overlay" onclick="closeBadgeModalEvent(event)">
+    <div class="avatar-modal-box">
+      <div class="avatar-modal-header">
+        <h2>✨ Đổi Icon Màu Đỏ</h2>
+        <div class="avatar-modal-close" onclick="closeBadgeModalDirect()">✕</div>
+      </div>
+      
+      <div class="avatar-preview-container">
+        <div style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--main-color); display: flex; align-items: center; justify-content: center; background: #1a1a2e; overflow: hidden;">
+          <img id="badge-modal-preview" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;" onerror="handleImageError(this)">
+          <span id="badge-modal-preview-text" style="color: #fff; font-size: 16px;">Pp</span>
+        </div>
+      </div>
+
+      <div class="bg-input-group">
+        <label>Dán link ảnh icon mới (URL):</label>
+        <input type="text" id="badge-url-input" placeholder="https://..." oninput="previewBadgeUrl(this.value)">
+      </div>
+
+      <div class="bg-input-group">
+        <label>Hoặc chọn tệp ảnh từ máy:</label>
+        <div class="file-upload-row">
+          <div class="btn-file-select" style="width: 100%; text-align: center;" onclick="document.getElementById('badge-file-input').click()">📁 Chọn tệp ảnh icon</div>
+          <input type="file" id="badge-file-input" accept="image/*" style="display:none;" onchange="handleBadgeFileSelect(this)">
+        </div>
+      </div>
+
+      <div class="bg-actions">
+        <div class="btn-bg-cancel" onclick="closeBadgeModalDirect()">Hủy</div>
+        <div class="btn-bg-apply" onclick="applyNewBadge()">Áp dụng</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CÀI ĐẶT CHUNG -->
   <div class="setting-overlay" id="setting-overlay" onclick="closeSettingModal(event)">
     <div class="setting-box">
       <div class="setting-header">
@@ -549,6 +890,18 @@
         <input type="color" id="custom-color-picker" value="#00ffcc" oninput="setThemeColor(this.value)">
       </div>
 
+      <div class="setting-section-title">🎚️ Độ Mờ Đậm Menu</div>
+      <div class="bg-input-group">
+        <label>Điều chỉnh độ trong suốt: <span id="opacity-val-label">0.85</span></label>
+        <input type="range" id="menu-opacity-range" min="0.1" max="1.0" step="0.05" value="0.85" oninput="changeMenuOpacity(this.value)">
+      </div>
+
+      <div class="setting-section-title">⚡ Tần Số Quét Màn Hình (Hz)</div>
+      <div class="bg-input-group">
+        <label>Giới hạn tốc độ khung hình: <span id="hz-val-label">120</span> Hz</label>
+        <input type="range" id="hz-range" min="60" max="120" step="10" value="120" oninput="changeRefreshRate(this.value)">
+      </div>
+
       <div class="setting-section-title">🔤 Tùy Chỉnh Chữ Lớn (Kho Code)</div>
       <div class="bg-input-group">
         <label>Nội dung chữ lớn:</label>
@@ -559,10 +912,9 @@
         <div class="btn-bg-apply" onclick="applyTitleChanges()">Áp dụng</div>
       </div>
 
-      <!-- PHẦN THÊM LINK CHIA SẺ -->
       <div class="setting-section-title">🔗 Tùy Chỉnh Link Chia Sẻ Dưới Chữ</div>
       <div class="bg-input-group">
-        <label>Nhập URL đường dẫn (VD: https://github.com/...):</label>
+        <label>Nhập URL đường dẫn:</label>
         <input type="text" id="setting-link-input" placeholder="https://..." value="https://github.com">
       </div>
       <div class="bg-actions">
@@ -587,7 +939,7 @@
     </div>
   </div>
 
-  <!-- POPUP THÔNG SỐ -->
+  <!-- POPUP THÔNG SỐ XE -->
   <div class="popup-overlay" id="popup-overlay" onclick="closePopup(event)">
     <div class="popup">
       <div class="popup-header">
@@ -749,6 +1101,75 @@
     </div>
   </div>
 
+  <!-- ===== MUSIC PLAYER ===== -->
+  <div class="mp-toggle" id="mp-toggle" title="Mở trình phát nhạc">🎵</div>
+
+  <div class="music-player" id="musicPlayer">
+    <div class="mp-left">
+      <div class="mp-thumb" id="mp-thumb">🎵</div>
+      <div class="mp-info">
+        <div class="mp-title" id="mp-title">Chưa chọn bài</div>
+        <div class="mp-artist" id="mp-artist">MySpace Music</div>
+      </div>
+    </div>
+    <div class="mp-center">
+      <div class="mp-controls">
+        <button class="mp-btn" id="mp-shuffle" title="Ngẫu nhiên">🔀</button>
+        <button class="mp-btn" id="mp-prev" title="Trước">⏮</button>
+        <button class="mp-btn play" id="mp-play" title="Phát">▶</button>
+        <button class="mp-btn" id="mp-next" title="Sau">⏭</button>
+        <button class="mp-btn" id="mp-loop" title="Lặp lại">🔁</button>
+      </div>
+      <div class="mp-progress">
+        <span class="mp-time" id="mp-current">0:00</span>
+        <div class="mp-bar" id="mp-bar"><div class="mp-bar-fill" id="mp-bar-fill"></div></div>
+        <span class="mp-time" id="mp-duration">0:00</span>
+      </div>
+    </div>
+    <div class="mp-right">
+      <button class="mp-btn" id="mp-min" title="Thu nhỏ" style="width:30px;height:30px;font-size:12px;">⤓</button>
+      <button class="mp-btn" id="mp-add-btn" title="Thêm bài" style="font-size:18px;">+</button>
+      <div class="mp-volume-bar" id="mp-volume-bar"><div class="mp-volume-fill" id="mp-volume-fill"></div></div>
+      <button class="mp-btn" id="mp-playlist-btn" title="Danh sách phát">☰</button>
+    </div>
+  </div>
+
+  <div class="mp-playlist" id="mp-playlist">
+    <div class="mp-playlist-header">
+      <h3>Danh Sách Phát</h3>
+      <span class="mp-playlist-count" id="mp-playlist-count">0 bài</span>
+    </div>
+    <div class="mp-playlist-list" id="mp-playlist-list">
+      <div class="mp-playlist-empty">Chưa có bài nào. Nhấn + để thêm.</div>
+    </div>
+  </div>
+
+  <div class="mp-add-overlay" id="mp-add-overlay">
+    <div class="mp-add-box">
+      <h2>➕ Thêm Bài Hát</h2>
+      <div class="mp-add-group" style="margin-bottom: 14px;">
+        <label style="display:block;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:'Fira Code',monospace;">Tên bài hát</label>
+        <input type="text" id="mp-add-name" placeholder="VD: Lofi Chill Night" style="width:100%;background:rgba(var(--main-color-rgb),0.05);border:1px solid rgba(var(--main-color-rgb),0.2);border-radius:8px;padding:10px 12px;color:#fff;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border 0.2s;">
+      </div>
+      <div class="mp-add-group" style="margin-bottom: 14px;">
+        <label style="display:block;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:'Fira Code',monospace;">Link nhạc (URL) hoặc tải file lên</label>
+        <div class="file-upload-row">
+          <input type="text" id="mp-add-url" placeholder="https://...mp3" style="flex:1;background:rgba(var(--main-color-rgb),0.05);border:1px solid rgba(var(--main-color-rgb),0.2);border-radius:6px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;padding:8px 10px;outline:none;">
+          <label class="btn-file-select" for="mp-add-file">📁 Chọn file</label>
+          <input type="file" id="mp-add-file" accept="audio/*" style="display:none;">
+        </div>
+      </div>
+      <div class="mp-add-actions">
+        <div class="btn-cancel" onclick="closeMpAddModal()" style="flex:1;text-align:center;padding:10px;cursor:pointer;">Hủy</div>
+        <div class="btn-submit" onclick="addSong()" style="flex:1;text-align:center;padding:10px;cursor:pointer;">Thêm</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mp-yt-player" style="position: fixed; bottom: -1000px; left: -1000px; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></div>
+  <audio id="mp-audio" preload="metadata"></audio>
+
+
   <script>
     const bg = document.getElementById('bg');
     const titleDisplay = document.getElementById('title-display');
@@ -757,6 +1178,11 @@
     const linkInput = document.getElementById('setting-link-input');
     const linkDisplay = document.getElementById('credit-link-display');
     
+    let currentMaxHz = 120;
+    let lastFrameTime = 0;
+    let pendingAvatarUrl = '';
+    let pendingBadgeContent = '';
+
     function handleImageError(img) {
       if (!img.dataset.fallback) {
         img.dataset.fallback = "true";
@@ -769,9 +1195,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           const resultUrl = e.target.result;
-          if (type === 'avatar') {
-            document.getElementById('avatar-url-input').value = resultUrl;
-          } else if (type === 'bg') {
+          if (type === 'bg') {
             document.getElementById('setting-bg-url').value = resultUrl;
             previewSettingBg(resultUrl);
           } else if (type === 'car') {
@@ -782,7 +1206,208 @@
         reader.readAsDataURL(input.files[0]);
       }
     }
-        // PARALLAX PC
+
+    /* QUẢN LÝ POPUP ĐỔI TAG VÀ ICON TAG */
+    function openTagModal() {
+      document.getElementById('tag-name-input').value = document.getElementById('rblx-tag-text').textContent;
+      const iconSpan = document.getElementById('rblx-tag-icon');
+      const imgChild = iconSpan.querySelector('img');
+      document.getElementById('tag-icon-input').value = imgChild ? imgChild.src : iconSpan.textContent;
+      document.getElementById('tag-modal-overlay').classList.add('open');
+    }
+
+    function closeTagModalDirect() {
+      document.getElementById('tag-modal-overlay').classList.remove('open');
+    }
+
+    function closeTagModalEvent(e) {
+      if (e.target === document.getElementById('tag-modal-overlay')) {
+        closeTagModalDirect();
+      }
+    }
+
+    function applyNewTag() {
+      const newText = document.getElementById('tag-name-input').value.trim();
+      const newIcon = document.getElementById('tag-icon-input').value.trim();
+      
+      if (newText) {
+        document.getElementById('rblx-tag-text').textContent = newText;
+      }
+      
+      const iconSpan = document.getElementById('rblx-tag-icon');
+      if (newIcon) {
+        if (newIcon.startsWith('http') || newIcon.startsWith('data:image')) {
+          iconSpan.innerHTML = `<img src="${newIcon}" alt="Icon" onerror="handleImageError(this)">`;
+        } else {
+          iconSpan.textContent = newIcon;
+        }
+      }
+      closeTagModalDirect();
+    }
+
+    /* QUẢN LÝ POPUP ĐỔI AVATAR */
+    function openAvatarModal() {
+      const currentSrc = document.getElementById('creator-avatar-img').src;
+      document.getElementById('avatar-modal-preview').src = currentSrc;
+      document.getElementById('avatar-url-input').value = '';
+      pendingAvatarUrl = currentSrc;
+      document.getElementById('avatar-modal-overlay').classList.add('open');
+    }
+
+    function closeAvatarModalDirect() {
+      document.getElementById('avatar-modal-overlay').classList.remove('open');
+    }
+
+    function closeAvatarModal(e) {
+      if (e.target === document.getElementById('avatar-modal-overlay')) {
+        closeAvatarModalDirect();
+      }
+    }
+
+    function previewAvatarUrl(url) {
+      const trimmed = url.trim();
+      const prev = document.getElementById('avatar-modal-preview');
+      if (trimmed) {
+        prev.src = trimmed;
+        pendingAvatarUrl = trimmed;
+      }
+    }
+
+    function handleAvatarFileSelect(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const resultUrl = e.target.result;
+          document.getElementById('avatar-modal-preview').src = resultUrl;
+          document.getElementById('avatar-url-input').value = '';
+          pendingAvatarUrl = resultUrl;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function applyNewAvatar() {
+      if (pendingAvatarUrl) {
+        document.getElementById('creator-avatar-img').src = pendingAvatarUrl;
+        closeAvatarModalDirect();
+      } else {
+        alert('Vui lòng chọn tệp hoặc nhập link ảnh hợp lệ!');
+      }
+    }
+
+    /* QUẢN LÝ POPUP ĐỔI ICON MÀU ĐỎ */
+    function openBadgeModal() {
+      const badgeEl = document.getElementById('avatar-badge-display');
+      const imgChild = badgeEl.querySelector('img');
+      const currentVal = imgChild ? imgChild.src : badgeEl.textContent;
+      
+      const prevImg = document.getElementById('badge-modal-preview');
+      const prevText = document.getElementById('badge-modal-preview-text');
+      
+      if (imgChild) {
+        prevImg.src = imgChild.src;
+        prevImg.style.display = 'block';
+        prevText.style.display = 'none';
+      } else {
+        prevText.textContent = currentVal;
+        prevText.style.display = 'block';
+        prevImg.style.display = 'none';
+      }
+      
+      document.getElementById('badge-url-input').value = '';
+      pendingBadgeContent = currentVal;
+      document.getElementById('badge-modal-overlay').classList.add('open');
+    }
+
+    function closeBadgeModalDirect() {
+      document.getElementById('badge-modal-overlay').classList.remove('open');
+    }
+
+    function closeBadgeModalEvent(e) {
+      if (e.target === document.getElementById('badge-modal-overlay')) {
+        closeBadgeModalDirect();
+      }
+    }
+
+    function previewBadgeUrl(url) {
+      const trimmed = url.trim();
+      const prevImg = document.getElementById('badge-modal-preview');
+      const prevText = document.getElementById('badge-modal-preview-text');
+      if (trimmed) {
+        prevImg.src = trimmed;
+        prevImg.style.display = 'block';
+        prevText.style.display = 'none';
+        pendingBadgeContent = trimmed;
+      }
+    }
+
+    function handleBadgeFileSelect(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const resultUrl = e.target.result;
+          const prevImg = document.getElementById('badge-modal-preview');
+          const prevText = document.getElementById('badge-modal-preview-text');
+          prevImg.src = resultUrl;
+          prevImg.style.display = 'block';
+          prevText.style.display = 'none';
+          document.getElementById('badge-url-input').value = '';
+          pendingBadgeContent = resultUrl;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function applyNewBadge() {
+      const badgeEl = document.getElementById('avatar-badge-display');
+      if (pendingBadgeContent.startsWith('http') || pendingBadgeContent.startsWith('data:image')) {
+        badgeEl.innerHTML = `<img src="${pendingBadgeContent}" alt="Badge Icon" onerror="handleImageError(this)">`;
+      } else {
+        badgeEl.textContent = pendingBadgeContent;
+      }
+      closeBadgeModalDirect();
+    }
+
+    function promptChangeName() {
+      const nameEl = document.getElementById('creator-name-display');
+      const currentName = nameEl.textContent;
+      const newName = prompt('Nhập tên hiển thị mới:', currentName);
+      if (newName !== null && newName.trim() !== '') {
+        nameEl.textContent = newName.trim();
+      }
+    }
+
+    function promptChangeSubIcon() {
+      const iconEl = document.getElementById('creator-sub-icon-display');
+      const current = iconEl.textContent;
+      const newVal = prompt('Nhập icon mới (Emoji hoặc ký tự):', current);
+      if (newVal !== null && newVal.trim() !== '') {
+        iconEl.textContent = newVal.trim();
+      }
+    }
+
+    function changeMenuOpacity(val) {
+      document.documentElement.style.setProperty('--menu-opacity', val);
+      document.getElementById('opacity-val-label').textContent = val;
+    }
+
+    function changeRefreshRate(val) {
+      currentMaxHz = parseInt(val);
+      document.getElementById('hz-val-label').textContent = currentMaxHz;
+    }
+
+    function throttleLoop(timestamp) {
+      if (!lastFrameTime) lastFrameTime = timestamp;
+      const elapsed = timestamp - lastFrameTime;
+      const interval = 1000 / currentMaxHz;
+
+      if (elapsed >= interval) {
+        lastFrameTime = timestamp - (elapsed % interval);
+      }
+      requestAnimationFrame(throttleLoop);
+    }
+    requestAnimationFrame(throttleLoop);
+
     document.addEventListener('mousemove', (e) => {
       if (window.innerWidth > 768) {
         const x = (e.clientX / window.innerWidth - 0.5) * 20;
@@ -791,7 +1416,6 @@
       }
     });
 
-    // PARALLAX MOBILE
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', (e) => {
         if (e.gamma === null || window.innerWidth > 768) return;
@@ -799,22 +1423,6 @@
         const y = Math.max(-15, Math.min(15, ((e.beta - 45) / 45) * 15));
         bg.style.transform = `translate(${x}px, ${y}px)`;
       }, true);
-    }
-
-    function previewAvatarUrl(val) {}
-
-    function applyAvatarChange() {
-      const url = document.getElementById('avatar-url-input').value.trim();
-      const avatarImg = document.getElementById('creator-avatar-img');
-      if (url) {
-        avatarImg.src = url;
-      } else {
-        alert('Vui lòng chọn ảnh hoặc nhập link hợp lệ!');
-      }
-    }
-
-    function cancelAvatarChange() {
-      document.getElementById('avatar-url-input').value = '';
     }
 
     function previewTitle(val) {
@@ -837,7 +1445,6 @@
       closeSetting();
     }
 
-    /* XỬ LÝ LINK CHIA SẺ */
     function applyLinkChanges() {
       const val = linkInput.value.trim();
       if (val !== '') {
@@ -1200,8 +1807,470 @@
       document.getElementById('popup-overlay').classList.remove('open');
     }
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closePopupDirect(); closeForm(); closeSetting(); }
+      if (e.key === 'Escape') { closePopupDirect(); closeForm(); closeSetting(); closeAvatarModalDirect(); closeBadgeModalDirect(); closeTagModalDirect(); }
     });
+
+
+
+    // ===== BỔ SUNG TỪ XỊN NHẤT: HIỆU ỨNG TUYẾT =====
+    const snowCanvas = document.getElementById('snow-canvas');
+    const snowCtx = snowCanvas.getContext('2d');
+    let snowflakes = [];
+    const numSnowflakes = 100;
+
+    let mouse = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      isDown: false
+    };
+
+    window.addEventListener('resize', () => {
+      snowCanvas.width = window.innerWidth;
+      snowCanvas.height = window.innerHeight;
+    });
+    snowCanvas.width = window.innerWidth;
+    snowCanvas.height = window.innerHeight;
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mousedown', () => { mouse.isDown = true; });
+    window.addEventListener('mouseup', () => { mouse.isDown = false; });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchstart', (e) => {
+      mouse.isDown = true;
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+      }
+    });
+
+    window.addEventListener('touchend', () => { mouse.isDown = false; });
+
+class Snowflake {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * snowCanvas.width;
+        this.y = Math.random() * snowCanvas.height;
+        this.radius = Math.random() * 2.5 + 1;
+        this.baseSpeedY = Math.random() * 1 + 0.5;
+        this.speedY = this.baseSpeedY;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.alpha = Math.random() * 0.7 + 0.3;
+      }
+      update() {
+        // Hiệu ứng hút khi bấm chuột/chạm màn hình
+        if (mouse.isDown) {
+          let dx = mouse.x - this.x;
+          let dy = mouse.y - this.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 400 && dist > 5) {
+            let force = (400 - dist) / 400;
+            this.x += (dx / dist) * force * 6;
+            this.y += (dy / dist) * force * 6;
+          }
+        }
+
+        this.y += this.speedY;
+        this.x += this.speedX;
+
+        if (this.y > snowCanvas.height || this.x < 0 || this.x > snowCanvas.width) {
+          this.reset();
+          this.y = 0;
+        }
+      }
+      draw() {
+        snowCtx.beginPath();
+        snowCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        
+        // Lấy trực tiếp chuỗi màu RGB từ biến CSS (--main-color-rgb) để tuyết đổi màu theo menu
+        const mainRgb = getComputedStyle(document.documentElement).getPropertyValue('--main-color-rgb').trim();
+        snowCtx.fillStyle = `rgba(${mainRgb}, ${this.alpha})`;
+        
+        snowCtx.fill();
+      }
+    }
+
+    for (let i = 0; i < numSnowflakes; i++) {
+      snowflakes.push(new Snowflake());
+    }
+
+    function animateSnow() {
+      snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+      snowflakes.forEach(flake => {
+        flake.update();
+        flake.draw();
+      });
+      requestAnimationFrame(animateSnow);
+    }
+    animateSnow();
+
+
+    // ===== BỔ SUNG TỪ XỊN NHẤT: MUSIC PLAYER MP3 + YOUTUBE =====
+    // ===== MUSIC PLAYER (MP3 + YOUTUBE) =====
+    const mpAudio = document.getElementById('mp-audio');
+    const mpPlayer = document.getElementById('musicPlayer');
+    const mpToggle = document.getElementById('mp-toggle');
+    const mpPlayBtn = document.getElementById('mp-play');
+    const mpPrevBtn = document.getElementById('mp-prev');
+    const mpNextBtn = document.getElementById('mp-next');
+    const mpShuffleBtn = document.getElementById('mp-shuffle');
+    const mpLoopBtn = document.getElementById('mp-loop');
+    const mpMinBtn = document.getElementById('mp-min');
+    const mpTitleEl = document.getElementById('mp-title');
+    const mpArtistEl = document.getElementById('mp-artist');
+    const mpThumb = document.getElementById('mp-thumb');
+    const mpBar = document.getElementById('mp-bar');
+    const mpBarFill = document.getElementById('mp-bar-fill');
+    const mpCurrentTime = document.getElementById('mp-current');
+    const mpDuration = document.getElementById('mp-duration');
+    const mpVolBar = document.getElementById('mp-volume-bar');
+    const mpVolFill = document.getElementById('mp-volume-fill');
+    const mpPlaylist = document.getElementById('mp-playlist');
+    const mpPlaylistBtn = document.getElementById('mp-playlist-btn');
+    const mpPlaylistList = document.getElementById('mp-playlist-list');
+    const mpPlaylistCount = document.getElementById('mp-playlist-count');
+    const mpAddBtn = document.getElementById('mp-add-btn');
+    const mpAddOverlay = document.getElementById('mp-add-overlay');
+    const mpAddFile = document.getElementById('mp-add-file');
+
+    let songs = [];
+    let currentSongIdx = -1;
+    let isPlaying = false;
+    let isShuffle = false;
+    let isLoop = false;
+    let lastVolume = 0.7;
+    let ytPlayer = null;
+    let ytReady = false;
+    let currentType = 'audio';
+    let ytTimeInterval = null;
+
+    // Load YouTube API
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    window.onYouTubeIframeAPIReady = function() {
+      ytPlayer = new YT.Player('mp-yt-player', {
+        height: '1', width: '1',
+        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'playsinline': 1 },
+        events: {
+          'onReady': function() { ytReady = true; if(ytPlayer.setVolume) ytPlayer.setVolume(lastVolume * 100); },
+          'onStateChange': function(e) {
+            if (e.data == YT.PlayerState.PLAYING) {
+              isPlaying = true; mpPlayBtn.textContent = '⏸';
+              if (currentType === 'youtube') {
+                mpDuration.textContent = fmtTime(ytPlayer.getDuration());
+                mpArtistEl.textContent = 'Bài ' + (currentSongIdx + 1) + '/' + songs.length;
+                startYTTimeUpdate();
+              }
+            } else if (e.data == YT.PlayerState.PAUSED) {
+              isPlaying = false; mpPlayBtn.textContent = '▶';
+              stopYTTimeUpdate();
+            } else if (e.data == YT.PlayerState.ENDED) {
+              stopYTTimeUpdate();
+              if (isLoop && currentType === 'youtube') { ytPlayer.seekTo(0); ytPlayer.playVideo(); }
+              else { nextSong(); }
+            }
+          },
+          'onError': function() {
+            isPlaying = false; mpPlayBtn.textContent = '▶';
+            if (currentSongIdx !== -1) mpArtistEl.textContent = 'Lỗi phát YouTube (link sai hoặc bị chặn)';
+          }
+        }
+      });
+    };
+
+    function startYTTimeUpdate() {
+      stopYTTimeUpdate();
+      ytTimeInterval = setInterval(function() {
+        if (ytPlayer && ytPlayer.getCurrentTime) {
+          var cur = ytPlayer.getCurrentTime();
+          var dur = ytPlayer.getDuration();
+          if (dur) {
+            mpBarFill.style.width = ((cur / dur) * 100) + '%';
+            mpCurrentTime.textContent = fmtTime(cur);
+          }
+        }
+      }, 250);
+    }
+    function stopYTTimeUpdate() {
+      if (ytTimeInterval) { clearInterval(ytTimeInterval); ytTimeInterval = null; }
+    }
+
+    function extractYTId(url) {
+      if (!url) return null;
+      try {
+        var u = new URL(url.trim());
+        var host = u.hostname.replace(/^www\./, '').toLowerCase();
+        if (host === 'youtu.be') return u.pathname.split('/').filter(Boolean)[0] || null;
+        if (host === 'youtube.com' || host === 'm.youtube.com') {
+          if (u.searchParams.get('v')) return u.searchParams.get('v');
+          var parts = u.pathname.split('/').filter(Boolean);
+          if (parts[0] === 'shorts' || parts[0] === 'embed' || parts[0] === 'live' || parts[0] === 'v') return parts[1] || null;
+        }
+      } catch (e) {}
+      var match = url.match(/(?:youtube\.com\/(?:watch\?.*?v=|shorts\/|embed\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i);
+      return match ? match[1] : null;
+    }
+
+    function loadSongs() {
+      try {
+        const stored = localStorage.getItem('myspace_songs');
+        if (stored) { try { songs = JSON.parse(stored); } catch(e) { songs = []; } }
+        if (songs.length === 0) {
+          songs = [{ name: 'Test — SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', icon: '🎵' }];
+          saveSongs();
+        }
+      } catch(e) {
+        // Dự phòng nếu trình duyệt chặn localStorage (vd: mở file trực tiếp bằng file://)
+        console.warn('Không đọc được localStorage:', e);
+        songs = [{ name: 'Test — SoundHelix', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', icon: '🎵' }];
+      }
+      renderPlaylist();
+    }
+    function saveSongs() {
+      try { 
+        const toSave = songs.filter(s => !s.url || s.url.length < 2000000); 
+        localStorage.setItem('myspace_songs', JSON.stringify(toSave)); 
+      } catch(e) { console.warn('Lỗi lưu localStorage:', e); }
+    }
+    function fmtTime(sec) {
+      if (!sec || isNaN(sec)) return '0:00';
+      const m = Math.floor(sec / 60); const s = Math.floor(sec % 60);
+      return m + ':' + (s < 10 ? '0' + s : s);
+    }
+    function renderPlaylist() {
+      if (songs.length === 0) {
+        mpPlaylistList.innerHTML = '<div class="mp-playlist-empty">Chưa có bài nào. Nhấn + để thêm.</div>';
+        mpPlaylistCount.textContent = '0 bài'; return;
+      }
+      mpPlaylistCount.textContent = songs.length + ' bài';
+      mpPlaylistList.innerHTML = songs.map(function(s, i) {
+        return '<div class="mp-track ' + (i === currentSongIdx ? 'active' : '') + '" onclick="playSong(' + i + ')">' +
+          '<span class="mp-track-icon">' + (s.icon || '🎵') + '</span>' +
+          '<div class="mp-track-info"><div class="mp-track-name">' + s.name + '</div></div>' +
+          '<div class="mp-track-del" onclick="event.stopPropagation(); deleteSong(' + i + ')">✕</div></div>';
+      }).join('');
+    }
+    
+    function playSong(idx) {
+      if (idx < 0 || idx >= songs.length) return;
+      currentSongIdx = idx;
+      var song = songs[idx];
+      var url = song.url || '';
+      var ytId = extractYTId(url);
+
+      mpAudio.pause();
+      if (ytPlayer && ytPlayer.stopVideo) { try { ytPlayer.stopVideo(); } catch(e) {} }
+      stopYTTimeUpdate();
+
+      mpTitleEl.textContent = song.name;
+      mpArtistEl.textContent = 'Đang tải...';
+      mpThumb.textContent = song.icon || '🎵';
+
+      if (ytId) {
+        currentType = 'youtube';
+        if (ytReady && ytPlayer) {
+          ytPlayer.loadVideoById(ytId); // Lệnh này sẽ tự động Phát (Play) luôn
+          mpArtistEl.textContent = 'Đang phát YouTube...';
+        } else {
+          mpArtistEl.textContent = 'Đang chờ YouTube API...';
+          // Nếu API chưa sẵn sàng, thử lại sau 800ms
+          let attempts = 0;
+          let checkYT = setInterval(function() {
+            if (ytReady && ytPlayer) {
+              clearInterval(checkYT);
+              if (currentSongIdx === idx) {
+                 ytPlayer.loadVideoById(ytId);
+                 mpArtistEl.textContent = 'Đang phát YouTube...';
+              }
+            } else {
+              attempts++;
+              if (attempts > 10) { // Đợi khoảng 8 giây
+                clearInterval(checkYT);
+                if (currentSongIdx === idx) {
+                  mpArtistEl.textContent = 'Lỗi tải YouTube';
+                  alert('Không tải được YouTube. Có thể do mạng, Adblock, hoặc bạn mở file HTML trực tiếp (file://). Hãy up lên hosting hoặc dùng link MP3.');
+                }
+              }
+            }
+          }, 800);
+        }
+      } else {
+        currentType = 'audio';
+        mpAudio.src = url; mpAudio.load();
+        mpAudio.play().then(function() {
+          isPlaying = true; mpPlayBtn.textContent = '⏸';
+          mpArtistEl.textContent = 'Bài ' + (idx + 1) + '/' + songs.length;
+        }).catch(function(err) {
+          isPlaying = false; mpPlayBtn.textContent = '▶'; mpArtistEl.textContent = 'Lỗi phát nhạc';
+          alert('Không thể phát file MP3 này.\n\nLý do:\n- Link sai/hết hạn\n- CORS chặn\n\nThử lại link khác.');
+        });
+      }
+      renderPlaylist();
+    }
+
+    function togglePlay() {
+      if (currentSongIdx === -1 && songs.length > 0) { playSong(0); return; }
+      if (currentSongIdx === -1) return;
+      
+      if (currentType === 'youtube') {
+        if (!ytReady || !ytPlayer) {
+          alert('Trình phát YouTube chưa sẵn sàng hoặc đang bị Adblock chặn. Hãy thử lại hoặc dùng link MP3!');
+          return;
+        }
+        if (isPlaying) { ytPlayer.pauseVideo(); }
+        else { ytPlayer.playVideo(); }
+      } else {
+        if (isPlaying) { 
+          mpAudio.pause(); isPlaying = false; mpPlayBtn.textContent = '▶'; 
+        } else { 
+          mpAudio.play().then(function() { 
+            isPlaying = true; mpPlayBtn.textContent = '⏸'; 
+          }).catch(function() { 
+            mpPlayBtn.textContent = '▶';
+            alert('Lỗi không thể phát nhạc. Trình duyệt có thể đã chặn tự động phát.');
+          }); 
+        }
+      }
+    }
+    
+    function nextSong() {
+      if (songs.length === 0) return;
+      if (isShuffle) { var r; do { r = Math.floor(Math.random() * songs.length); } while (r === currentSongIdx && songs.length > 1); playSong(r); }
+      else { playSong((currentSongIdx + 1) % songs.length); }
+    }
+    function prevSong() {
+      if (songs.length === 0) return;
+      if (currentType === 'audio' && mpAudio.currentTime > 3) { mpAudio.currentTime = 0; return; }
+      if (currentType === 'youtube' && ytPlayer && ytPlayer.getCurrentTime && ytPlayer.getCurrentTime() > 3) { ytPlayer.seekTo(0, true); return; }
+      playSong((currentSongIdx - 1 + songs.length) % songs.length);
+    }
+    function deleteSong(idx) {
+      if (idx === currentSongIdx) {
+        if (currentType === 'youtube') {
+          if (ytPlayer && ytPlayer.stopVideo) { try { ytPlayer.stopVideo(); } catch(e) {} }
+          stopYTTimeUpdate();
+        } else {
+          mpAudio.pause(); mpAudio.removeAttribute('src'); mpAudio.load();
+        }
+        currentSongIdx = -1; isPlaying = false; mpPlayBtn.textContent = '▶';
+        mpTitleEl.textContent = 'Chưa chọn bài'; mpArtistEl.textContent = 'MySpace Music'; mpThumb.textContent = '🎵';
+        mpBarFill.style.width = '0%'; mpCurrentTime.textContent = '0:00'; mpDuration.textContent = '0:00';
+      }
+      songs.splice(idx, 1);
+      if (currentSongIdx > idx) currentSongIdx--;
+      if (currentSongIdx >= songs.length) currentSongIdx = -1;
+      saveSongs(); renderPlaylist();
+    }
+    function addSong() {
+      var name = document.getElementById('mp-add-name').value.trim();
+      var url = document.getElementById('mp-add-url').value.trim();
+      if (!name || !url) { alert('Cần nhập tên bài và link nhạc!'); return; }
+      songs.push({ name: name, url: url, icon: '🎵' });
+      saveSongs(); renderPlaylist(); closeMpAddModal();
+      if (currentSongIdx === -1) playSong(songs.length - 1);
+    }
+    function closeMpAddModal() {
+      mpAddOverlay.classList.remove('open');
+      document.getElementById('mp-add-name').value = ''; document.getElementById('mp-add-url').value = ''; mpAddFile.value = '';
+    }
+
+    mpPlayBtn.addEventListener('click', togglePlay);
+    mpNextBtn.addEventListener('click', nextSong);
+    mpPrevBtn.addEventListener('click', prevSong);
+    mpShuffleBtn.addEventListener('click', function() { isShuffle = !isShuffle; mpShuffleBtn.classList.toggle('active', isShuffle); });
+    mpLoopBtn.addEventListener('click', function() { isLoop = !isLoop; mpLoopBtn.classList.toggle('active', isLoop); });
+    mpPlaylistBtn.addEventListener('click', function(e) { e.stopPropagation(); mpPlaylist.classList.toggle('open'); });
+    mpAddBtn.addEventListener('click', function() { mpAddOverlay.classList.add('open'); });
+    mpMinBtn.addEventListener('click', function() { mpPlayer.classList.add('hidden'); mpToggle.classList.add('show'); mpPlaylist.classList.remove('open'); });
+    mpToggle.addEventListener('click', function() { mpPlayer.classList.remove('hidden'); mpToggle.classList.remove('show'); });
+    mpAddFile.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        var file = e.target.files[0];
+        if (!file.type.startsWith('audio/')) { alert('File không phải audio.'); e.target.value = ''; return; }
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('mp-add-url').value = ev.target.result;
+          var nameInput = document.getElementById('mp-add-name');
+          if (!nameInput.value.trim()) { nameInput.value = file.name.replace(/\.[^/.]+$/, ''); }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Audio tag events (chỉ cho MP3)
+    mpAudio.addEventListener('loadedmetadata', function() { mpDuration.textContent = fmtTime(mpAudio.duration); if (currentSongIdx !== -1 && currentType === 'audio') mpArtistEl.textContent = 'Bài ' + (currentSongIdx + 1) + '/' + songs.length; });
+    mpAudio.addEventListener('timeupdate', function() { if (mpAudio.duration && currentType === 'audio') { var pct = (mpAudio.currentTime / mpAudio.duration) * 100; mpBarFill.style.width = pct + '%'; mpCurrentTime.textContent = fmtTime(mpAudio.currentTime); } });
+    mpAudio.addEventListener('ended', function() { if (isLoop && currentType === 'audio') { mpAudio.currentTime = 0; mpAudio.play(); } else { nextSong(); } });
+    mpAudio.addEventListener('error', function() { if (currentType === 'audio') { isPlaying = false; mpPlayBtn.textContent = '▶'; if (currentSongIdx !== -1) mpArtistEl.textContent = 'Lỗi tải âm thanh'; } });
+
+    // SEEK BAR
+    let isDraggingBar = false;
+    function seekToX(e) {
+      var rect = mpBar.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      if (currentType === 'youtube') {
+        if (ytPlayer && ytPlayer.getDuration) { var dur = ytPlayer.getDuration(); if (dur) { ytPlayer.seekTo(pct * dur, true); mpBarFill.style.width = (pct * 100) + '%'; mpCurrentTime.textContent = fmtTime(pct * dur); } }
+      } else {
+        if (!mpAudio.duration) return;
+        mpAudio.currentTime = pct * mpAudio.duration; mpBarFill.style.width = (pct * 100) + '%'; mpCurrentTime.textContent = fmtTime(mpAudio.currentTime);
+      }
+    }
+    mpBar.addEventListener('mousedown', function(e) { isDraggingBar = true; seekToX(e); });
+    document.addEventListener('mousemove', function(e) { if (isDraggingBar) seekToX(e); });
+    document.addEventListener('mouseup', function() { isDraggingBar = false; });
+
+    // VOLUME
+    let isDraggingVol = false;
+    function volToX(e) {
+      var rect = mpVolBar.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      lastVolume = pct; mpVolFill.style.width = (pct * 100) + '%';
+      if (currentType === 'youtube') { if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(pct * 100); }
+      else { mpAudio.volume = pct; }
+    }
+    mpVolBar.addEventListener('mousedown', function(e) { isDraggingVol = true; volToX(e); });
+    document.addEventListener('mousemove', function(e) { if (isDraggingVol) volToX(e); });
+    document.addEventListener('mouseup', function() { isDraggingVol = false; });
+
+    // Touch
+    mpBar.addEventListener('touchstart', function(e) { isDraggingBar = true; seekToX(e.touches[0]); });
+    document.addEventListener('touchmove', function(e) { if (isDraggingBar) { e.preventDefault(); seekToX(e.touches[0]); } }, { passive: false });
+    document.addEventListener('touchend', function() { isDraggingBar = false; });
+    mpVolBar.addEventListener('touchstart', function(e) { isDraggingVol = true; volToX(e.touches[0]); });
+    document.addEventListener('touchmove', function(e) { if (isDraggingVol) volToX(e.touches[0]); });
+    document.addEventListener('touchend', function() { isDraggingVol = false; });
+
+    mpAudio.volume = lastVolume;
+    mpVolFill.style.width = (lastVolume * 100) + '%';
+
+    document.addEventListener('click', function(e) {
+      if (!mpPlaylist.contains(e.target) && e.target !== mpPlaylistBtn && !mpPlaylistBtn.contains(e.target)) mpPlaylist.classList.remove('open');
+      if (e.target === mpAddOverlay) closeMpAddModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (mpAddOverlay.classList.contains('open')) { if (e.key === 'Escape') closeMpAddModal(); return; }
+      if (e.code === 'Space' && currentSongIdx !== -1) { e.preventDefault(); togglePlay(); }
+      if (e.code === 'ArrowRight' && e.shiftKey) { e.preventDefault(); nextSong(); }
+      if (e.code === 'ArrowLeft' && e.shiftKey) { e.preventDefault(); prevSong(); }
+    });
+
+    loadSongs();
 
     initDefaultCars();
   </script>
